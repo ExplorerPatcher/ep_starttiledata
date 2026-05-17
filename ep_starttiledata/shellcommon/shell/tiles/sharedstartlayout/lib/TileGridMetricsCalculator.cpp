@@ -2,8 +2,6 @@
 
 #include "TileGridMetricsCalculator.h"
 
-#include <wil/result_macros.h>
-
 using namespace Microsoft::WRL;
 
 TileGridMetricsCalculator::TileGridMetricsCalculator()
@@ -117,7 +115,8 @@ HRESULT TileGridMetricsCalculator::GetTileSize(
     }
     else
     {
-        *tileSize = 100.0f * (float)(int)((float)scaleFactor / 100.0f * (m_displayWidth - (float)(groupWidth + 1) * (float)c_tileSpacing) / (float)groupWidth) / (float)scaleFactor;
+        *tileSize = 100.0f * (float)(int)((float)scaleFactor / 100.0f * (m_displayWidth - (float)(groupWidth + 1)
+            * (float)c_tileSpacing) / (float)groupWidth) / (float)scaleFactor;
     }
 
     return S_OK;

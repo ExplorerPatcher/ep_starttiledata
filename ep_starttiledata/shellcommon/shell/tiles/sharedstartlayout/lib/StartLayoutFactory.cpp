@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include <WRL/Module.h>
-#include <wil/result_macros.h>
 
 #include "GenericTraversalOrder.h"
 #include "ItemLayoutResolver.h"

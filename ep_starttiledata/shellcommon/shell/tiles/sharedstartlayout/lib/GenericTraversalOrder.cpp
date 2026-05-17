@@ -3,11 +3,8 @@
 #include "GenericTraversalOrder.h"
 
 #include <wrl.h>
-#include <wil/result_macros.h>
 
 using namespace Microsoft::WRL;
-
-// shellcommon\shell\tiles\sharedstartlayout\lib\generictraversalorder.cpp
 
 CGenericTraversalOrder::CGenericTraversalOrder()
 {

@@ -2,8 +2,6 @@
 
 #include "TileGridMetricsCalculator.h"
 
-#include <wil/result_macros.h>
-
 using namespace Microsoft::WRL;
 
 EXTERN_C STDAPI SharedStartLayout_CreateTileGridMetricsCalculator(
