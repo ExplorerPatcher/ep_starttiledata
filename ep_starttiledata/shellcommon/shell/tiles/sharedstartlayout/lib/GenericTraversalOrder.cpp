@@ -1,6 +1,9 @@
 #include "pch.h"
 
+#include "GenericTraversalOrder.h"
+
 #include <wrl.h>
+#include <wil/result_macros.h>
 
 using namespace Microsoft::WRL;
 
