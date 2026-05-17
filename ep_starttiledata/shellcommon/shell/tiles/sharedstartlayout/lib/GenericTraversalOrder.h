@@ -2,7 +2,7 @@
 
 #include "ItemLayoutResolver.h"
 
-enum class LayoutNavigationDirection
+enum LayoutNavigationDirection
 {
     LayoutNavigationDirection_Up = 0x0,
     LayoutNavigationDirection_Down = 0x1,

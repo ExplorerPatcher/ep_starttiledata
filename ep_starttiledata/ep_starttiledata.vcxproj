@@ -156,6 +156,7 @@
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\GenericTraversalOrder.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ItemLayoutResolver.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\TileGridMetricsCalculator.h" />
+    <ClInclude Include="shell\inc\Geometry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
