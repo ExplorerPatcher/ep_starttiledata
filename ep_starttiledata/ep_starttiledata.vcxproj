@@ -177,6 +177,7 @@
     </ClCompile>
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\ColumnChangeMigrationHandler.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\GenericTraversalOrder.cpp" />
+    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\ItemLayoutResolver.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\SharedStartLayout.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\StartLayoutFactory.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\TileGridMetricsCalculator.cpp" />

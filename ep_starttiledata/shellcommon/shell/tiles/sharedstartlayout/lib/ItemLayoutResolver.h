@@ -2,6 +2,9 @@
 
 #include <wrl.h>
 
+#include "ColumnChangeMigrationHandler.h"
+#include "ICellArrayManager.h"
+
 // @TODO: We will probably need these later.
 interface IItemLayoutResolverCallback;
 interface IItemLayoutResolverInternalCallback;
@@ -32,6 +35,7 @@ IItemLayoutResolver : IUnknown
     virtual HRESULT STDMETHODCALLTYPE AddItem(const GUID&, const RECT) = 0;
     virtual HRESULT STDMETHODCALLTYPE InsertItemUncommitted(const GUID&, const RECT) = 0;
     virtual HRESULT STDMETHODCALLTYPE ResizeItemUncommitted(const GUID&, const SIZE) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SwapItemsUncommitted(const GUID&, const GUID&) = 0; // @Note: Added after 14361
     virtual HRESULT STDMETHODCALLTYPE AddNewContainer(const GUID&, IItemLayoutResolver*) = 0;
     virtual HRESULT STDMETHODCALLTYPE AddContainer(const GUID&, IItemLayoutResolver*, const POINT) = 0;
     virtual HRESULT STDMETHODCALLTYPE AddSizedContainer(const GUID&, IItemLayoutResolver*, const RECT) = 0;

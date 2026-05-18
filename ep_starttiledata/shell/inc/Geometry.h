@@ -309,7 +309,7 @@ namespace Geometry
 
         POINT GetCenter() const
         {
-            return { left + (right - left) / 2, top + (bottom - top) / 2 };
+            return { left + GetWidth() / 2, top + GetHeight() / 2 };
         }
 
         POINT GetTopLeft() const { return { left, top }; }
