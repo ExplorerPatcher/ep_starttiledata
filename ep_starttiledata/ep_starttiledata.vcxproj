@@ -154,10 +154,18 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedmodel\lib\SharedModelCommon.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ColumnChangeMigrationHandler.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\GenericTraversalOrder.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ICellArrayManager.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ItemLayoutResolver.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\TileGridMetricsCalculator.h" />
+    <ClInclude Include="shell\inc\ContainerPolicies.h" />
     <ClInclude Include="shell\inc\Geometry.h" />
+    <ClInclude Include="shell\inc\HrNew.h" />
+    <ClInclude Include="shell\inc\Set.h" />
+    <ClInclude Include="shell\inc\SimpleArray.h" />
+    <ClInclude Include="shell\inc\SimpleHashTable.h" />
+    <ClInclude Include="shell\inc\SimpleHashTableHelpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -167,6 +175,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\ColumnChangeMigrationHandler.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\GenericTraversalOrder.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\SharedStartLayout.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\StartLayoutFactory.cpp" />
