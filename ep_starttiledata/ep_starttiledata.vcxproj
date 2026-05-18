@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedmodel\lib\SharedModelCommon.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\GenericTraversalOrder.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ItemLayoutResolver.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\TileGridMetricsCalculator.h" />

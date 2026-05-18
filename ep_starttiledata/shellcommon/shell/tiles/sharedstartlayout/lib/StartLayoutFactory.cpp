@@ -5,14 +5,9 @@
 #include "GenericTraversalOrder.h"
 #include "ItemLayoutResolver.h"
 #include "TileGridMetricsCalculator.h"
+#include "../../sharedmodel/lib/SharedModelCommon.h"
 
 using namespace Microsoft::WRL;
-
-enum class LayoutOrder
-{
-    LayoutOrder_Grid = 0,
-    LayoutOrder_Linear = 1
-};
 
 MIDL_INTERFACE("e329db7a-e2f4-4d74-f1b5-9d75b80a5e46")
 IStartLayoutFactory : IUnknown
@@ -61,6 +56,12 @@ HRESULT StartLayoutFactory::CreateGroupsLayoutResolver(IItemLayoutResolver** ppL
 {
     RETURN_HR(SharedStartLayout_CreateGroupsLayoutResolver(ppLayoutResolver)); // 28
 }
+
+EXTERN_C STDAPI SharedStartLayout_CreateLayoutTraversalOrder(
+    IItemLayoutResolver* layoutResolver,
+    int maxGroupWidth,
+    LayoutOrder order,
+    ILayoutTraversalOrder** ppLayoutTraversalOrder);
 
 HRESULT StartLayoutFactory::CreateLayoutTraversalOrder(
     IItemLayoutResolver* layoutResolver, int maxGroupWidth, LayoutOrder order,
