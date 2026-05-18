@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wrl.h>
+#include <wil/resource.h>
 
 #include "ColumnChangeMigrationHandler.h"
 #include "ICellArrayManager.h"
@@ -61,4 +62,112 @@ IItemLayoutResolver : IUnknown
     virtual HRESULT STDMETHODCALLTYPE CommitChanges() = 0;
     virtual HRESULT STDMETHODCALLTYPE AbandonChanges() = 0;
     virtual HRESULT STDMETHODCALLTYPE RepairLayoutUncommitted() = 0;
+};
+
+enum LAYOUT_RESOLVER_OPTIONS
+{
+    LRO_NONE = 0x0,
+    LRO_DISPLACE_INTO_NEGATIVE_SPACE = 0x1,
+};
+
+class CItemLayoutResolver
+    : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::ClassicCom>
+        , IItemLayoutResolver
+        , ICellArrayManagerCallback
+        , IGroupBoundsChangeNotification
+        , ILayoutHitTest
+        , IItemLayoutResolverInternal
+    >
+{
+public:
+    CItemLayoutResolver();
+    ~CItemLayoutResolver();
+
+    HRESULT RuntimeClassInitialize();
+
+    HRESULT RegisterCallback(IItemLayoutResolverCallback*);
+    HRESULT UnregisterCallback(IItemLayoutResolverCallback*);
+    HRESULT RegisterInternalCallback(IItemLayoutResolverInternalCallback*);
+    HRESULT UnregisterInternalCallback(IItemLayoutResolverInternalCallback*);
+    HRESULT AddNewItem(const GUID&, const SIZE);
+    HRESULT AddItem(const GUID&, const RECT);
+    HRESULT InsertItemUncommitted(const GUID&, const RECT);
+    HRESULT ResizeItemUncommitted(const GUID& itemID, const SIZE sizeItemCells);
+    HRESULT AddNewContainer(_GUID&, IItemLayoutResolver*);
+    HRESULT AddContainer(_GUID&, IItemLayoutResolver*, const tagPOINT);
+    HRESULT AddSizedContainer(_GUID&, IItemLayoutResolver*, const tagRECT);
+    HRESULT InsertContainerUncommitted(_GUID&, IItemLayoutResolver*, const tagPOINT);
+    HRESULT GetLayoutResolverForContainer(_GUID&, IItemLayoutResolver**);
+    BOOL IsCollapsed();
+    HRESULT Collapse();
+    HRESULT Expand();
+    HRESULT RemoveItemUncommitted(_GUID&);
+    HRESULT MoveItemUncommitted(_GUID&, const tagPOINT);
+    BOOL IsEmpty();
+    HRESULT GetItemByCell(const tagPOINT, _GUID*);
+    HRESULT GetLayoutBounds(tagRECT*);
+    HRESULT GetLayoutBoundsWithoutItem(_GUID&, tagRECT*);
+    HRESULT GetItemBounds(_GUID&, tagRECT*);
+    HRESULT GetContainerSizeWithMargins(_GUID&, tagSIZE*);
+    HRESULT GetLastOccupiedCellInColumn(const long, _GUID&, tagPOINT*, int*);
+    HRESULT SetContainerMargins(const tagRECT);
+    HRESULT GetContainerMargins(tagRECT*);
+    HRESULT SetMaxCellBounds(const int, const int);
+    SIZE GetMaxCellBounds();
+    HRESULT MigrateItems(IItemLayoutResolver*, const _LayoutMigrationOptions);
+    HRESULT CommitChanges();
+    HRESULT AbandonChanges();
+    HRESULT RepairLayoutUncommitted();
+
+    void ItemBoundsUpdated(_GUID&, Geometry::CRect&);
+    void CellArrayBoundsUpdated(Geometry::CRect&);
+    void ItemRemovedPending(_GUID&);
+    void ItemRemoved(_GUID&);
+    void NewItemAddedBegin();
+    void NewItemAddedEnd();
+    void OnItemsMigrated(IItemLayoutResolver*);
+    void OnItemsMigrated(IItemLayoutResolver*, _GUID&);
+    HRESULT GroupBoundsChanged(_GUID&);
+    void GroupEmptiedPending(_GUID&);
+    void GroupEmptied();
+    HRESULT GetGutterHitTarget(_GUID&, const tagRECT, tagPOINT*);
+
+protected:
+    HRESULT _FindTargetDestinationForNewSize(_GUID&, tagSIZE&, Geometry::CRect*);
+    IItemCellAssignor* _GetCellAssignor();
+    HRESULT _PrepareLayoutBeforeOperation(Geometry::CRect&, Geometry::CRect&);
+    HRESULT _CleanupLayoutAfterOperation(Geometry::CRect&, Geometry::CRect&);
+    HRESULT _RepairLayout();
+    HRESULT _ModifyItemUncommittedInternal(_GUID&, tagRECT&, const ModificationOperation);
+    HRESULT _CommitChangesInternal();
+    HRESULT _Collapse(Geometry::CRect&, Geometry::CRect&);
+    void _NotifyNewItemAddedBegin();
+    void _NotifyNewItemAddedEnd();
+    void _NotifyItemBoundsChange(_GUID&, tagRECT&);
+    void _NotifyLayoutBoundsChange(Geometry::CRect&);
+    void _NotifyItemRemovedPending(_GUID&);
+    void _NotifyItemRemoved(_GUID&);
+    void _NotifyLastItemRemovedPending();
+    void _NotifyLastItemRemoved();
+
+    Microsoft::WRL::ComPtr<ICellArrayManager> _spCellArrayManager;
+    CItemLayoutDisplacement _displacementManager;
+    CItemLayoutCollapseManager _collapseManager;
+    LAYOUT_RESOLVER_OPTIONS _options;
+    Microsoft::WRL::ComPtr<ItemLayoutResolverProxy> m_itemLayoutResolverProxy;
+    CSimpleHashTable<GUID, Microsoft::WRL::ComPtr<IItemLayoutResolver>> m_folderResolvers;
+
+private:
+    CSimpleHashTable<IItemLayoutResolverCallback*, Microsoft::WRL::ComPtr<IItemLayoutResolverCallback>> _htCallbacks;
+    CSimpleHashTable<IItemLayoutResolverInternalCallback*, Microsoft::WRL::ComPtr<IItemLayoutResolverInternalCallback>> _htInternalCallbacks;
+    bool _isBatchingItemBoundsChangeUpdates;
+    CSimpleHashTable<GUID, Geometry::CRect> _batchedUpdates;
+    bool m_isCollapsed;
+
+    HRESULT _DisplaceItemsFromRect(const Geometry::CRect&, const Geometry::CRect&);
+    HRESULT _StartBatchingItemBoundsChangeUpdates();
+    HRESULT _StopBatchingItemBoundsChangeUpdatesAndNotify();
+
+    HRESULT s_CreateMigrationHandler(
+        const LayoutMigrationOptions& migrationOptions, IItemMigrationHandler** ppMigrationHandler);
 };
