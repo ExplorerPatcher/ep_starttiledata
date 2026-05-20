@@ -6,9 +6,26 @@
 #include "ColumnChangeMigrationHandler.h"
 #include "ICellArrayManager.h"
 
-// @TODO: We will probably need these later.
-interface IItemLayoutResolverCallback;
-interface IItemLayoutResolverInternalCallback;
+MIDL_INTERFACE("751657ce-45b3-4150-8f86-fda773983ebc")
+IItemLayoutResolverCallback : IUnknown
+{
+    virtual void STDMETHODCALLTYPE ItemBoundsUpdated(const GUID*, const RECT*, const UINT) = 0;
+    virtual void STDMETHODCALLTYPE LayoutBoundsUpdated(const RECT) = 0;
+    virtual void STDMETHODCALLTYPE ItemRemovedPending(REFGUID) = 0;
+    virtual void STDMETHODCALLTYPE ItemRemoved(REFGUID) = 0;
+    virtual void STDMETHODCALLTYPE LastItemRemovedPending() = 0;
+    virtual void STDMETHODCALLTYPE LastItemRemoved() = 0;
+};
+
+interface IItemLayoutResolver;
+
+MIDL_INTERFACE("c20f0b4b-91e4-47a6-a785-c0d735c7b6c6")
+IItemLayoutResolverInternalCallback : IUnknown
+{
+    virtual void STDMETHODCALLTYPE NewItemAddedBegin() = 0;
+    virtual void STDMETHODCALLTYPE NewItemAddedEnd() = 0;
+    virtual void STDMETHODCALLTYPE OnItemsMigrated(IItemLayoutResolver*) = 0;
+};
 
 enum class LayoutMigrationType
 {
@@ -62,6 +79,30 @@ IItemLayoutResolver : IUnknown
     virtual HRESULT STDMETHODCALLTYPE CommitChanges() = 0;
     virtual HRESULT STDMETHODCALLTYPE AbandonChanges() = 0;
     virtual HRESULT STDMETHODCALLTYPE RepairLayoutUncommitted() = 0;
+};
+
+MIDL_INTERFACE("7749f118-6f2a-4fb7-b84d-eef688cbd0e6")
+IGroupBoundsChangeNotification : IUnknown
+{
+    virtual void STDMETHODCALLTYPE NewItemAddedBegin() = 0;
+    virtual void STDMETHODCALLTYPE NewItemAddedEnd() = 0;
+    virtual void STDMETHODCALLTYPE OnItemsMigrated(IItemLayoutResolver*, REFGUID) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GroupBoundsChanged(REFGUID) = 0;
+    virtual void STDMETHODCALLTYPE GroupEmptiedPending(REFGUID) = 0;
+    virtual void STDMETHODCALLTYPE GroupEmptied() = 0;
+};
+
+MIDL_INTERFACE("aa22a8ff-a704-4ea8-82b5-3c51d9dd3b3c")
+ILayoutHitTest : IUnknown
+{
+    virtual HRESULT STDMETHODCALLTYPE GetGutterHitTarget(REFGUID, const RECT, POINT*) = 0;
+};
+
+MIDL_INTERFACE("6f13ad3b-7bf5-4ba5-b676-87f3ad61ae04")
+IItemLayoutResolverInternal : IUnknown
+{
+    virtual void STDMETHODCALLTYPE OnItemsMigrated(IItemLayoutResolver*) = 0;
+    virtual void STDMETHODCALLTYPE EnableCollapse(BOOL) = 0; ///< @Note: Added after 14361
 };
 
 enum LAYOUT_RESOLVER_OPTIONS

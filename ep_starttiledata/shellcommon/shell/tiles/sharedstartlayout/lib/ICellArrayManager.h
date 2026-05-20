@@ -5,7 +5,8 @@
 #include "../../../shell/inc/Set.h"
 #include "../../../shell/inc/Geometry.h"
 
-struct ICellArrayManagerCallback : public IUnknown
+MIDL_INTERFACE("da5ab758-b158-4490-963c-87916bd8049a")
+ICellArrayManagerCallback : IUnknown
 {
     virtual void STDMETHODCALLTYPE ItemBoundsUpdated(const GUID&, const Geometry::CRect&) = 0;
     virtual void STDMETHODCALLTYPE CellArrayBoundsUpdated(const Geometry::CRect&) = 0;
@@ -19,7 +20,8 @@ enum SET_ITEM_OPTIONS
     SIO_SEND_BOUNDS_UPDATE = 0x1,
 };
 
-struct ICellArrayManager : IUnknown
+MIDL_INTERFACE("dd5c8f3a-3ca5-4964-a162-192c9b8fd2bc") // @Note: Same GUID as IItemLayoutResolver
+ICellArrayManager : IUnknown
 {
     virtual HRESULT STDMETHODCALLTYPE RegisterCallback(ICellArrayManagerCallback*) = 0;
     virtual HRESULT STDMETHODCALLTYPE UnregisterCallback(ICellArrayManagerCallback*) = 0;

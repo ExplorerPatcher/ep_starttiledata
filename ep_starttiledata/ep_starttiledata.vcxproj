@@ -166,6 +166,7 @@
     <ClInclude Include="shell\inc\SimpleArray.h" />
     <ClInclude Include="shell\inc\SimpleHashTable.h" />
     <ClInclude Include="shell\inc\SimpleHashTableHelpers.h" />
+    <ClInclude Include="IDATypes_SharedStartModel_22621.1992.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
