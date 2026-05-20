@@ -8,10 +8,10 @@
 MIDL_INTERFACE("da5ab758-b158-4490-963c-87916bd8049a")
 ICellArrayManagerCallback : IUnknown
 {
-    virtual void STDMETHODCALLTYPE ItemBoundsUpdated(const GUID&, const Geometry::CRect&) = 0;
+    virtual void STDMETHODCALLTYPE ItemBoundsUpdated(REFGUID, const Geometry::CRect&) = 0;
     virtual void STDMETHODCALLTYPE CellArrayBoundsUpdated(const Geometry::CRect&) = 0;
-    virtual void STDMETHODCALLTYPE ItemRemovedPending(const GUID&) = 0;
-    virtual void STDMETHODCALLTYPE ItemRemoved(const GUID&) = 0;
+    virtual void STDMETHODCALLTYPE ItemRemovedPending(REFGUID) = 0;
+    virtual void STDMETHODCALLTYPE ItemRemoved(REFGUID) = 0;
 };
 
 enum SET_ITEM_OPTIONS
@@ -34,18 +34,18 @@ ICellArrayManager : IUnknown
     virtual bool STDMETHODCALLTYPE IsRectEmpty(const Geometry::CRect) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetItemsInRect(const Geometry::CRect, CSet<GUID>*) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetItemsOutsideOfRect(const Geometry::CRect, CSet<GUID>*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetItemBounds(const GUID&, Geometry::CRect&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetItemBounds(REFGUID, Geometry::CRect&) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetBoundingRectForItems(const CSet<GUID>&, Geometry::CRect&) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetLayoutBoundsWithoutItem(const GUID&, RECT*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetLayoutBoundsWithoutItem(REFGUID, RECT*) = 0;
     virtual HRESULT STDMETHODCALLTYPE ContainRectInsideFixedArrayBounds(Geometry::CRect&) = 0;
     virtual HRESULT STDMETHODCALLTYPE SetMaximumCellArrayDimensions(const int, const int) = 0;
-    virtual HRESULT STDMETHODCALLTYPE SetItem(const GUID&, Geometry::CRect, SET_ITEM_OPTIONS) = 0;
-    virtual HRESULT STDMETHODCALLTYPE RemoveItemUncommitted(const GUID&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SetItem(REFGUID, Geometry::CRect, SET_ITEM_OPTIONS) = 0;
+    virtual HRESULT STDMETHODCALLTYPE RemoveItemUncommitted(REFGUID) = 0;
     virtual HRESULT STDMETHODCALLTYPE InsertEmptyColumn(Geometry::CRect, bool) = 0;
-    virtual HRESULT STDMETHODCALLTYPE MoveItemUncommitted(const GUID&, Geometry::CRect) = 0;
-    virtual HRESULT STDMETHODCALLTYPE InsertItemUncommitted(const GUID&, const Geometry::CRect) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddIgnoredItem(const GUID&) = 0;
-    virtual HRESULT STDMETHODCALLTYPE RemoveIgnoredItem(const GUID&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE MoveItemUncommitted(REFGUID, Geometry::CRect) = 0;
+    virtual HRESULT STDMETHODCALLTYPE InsertItemUncommitted(REFGUID, const Geometry::CRect) = 0;
+    virtual HRESULT STDMETHODCALLTYPE AddIgnoredItem(REFGUID) = 0;
+    virtual HRESULT STDMETHODCALLTYPE RemoveIgnoredItem(REFGUID) = 0;
     virtual HRESULT STDMETHODCALLTYPE CommitChanges() = 0;
     virtual HRESULT STDMETHODCALLTYPE AbandonChanges() = 0;
     virtual HRESULT STDMETHODCALLTYPE FixCoordinatesToBeNonNegative() = 0;

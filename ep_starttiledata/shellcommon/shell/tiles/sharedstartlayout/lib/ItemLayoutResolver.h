@@ -49,28 +49,28 @@ IItemLayoutResolver : IUnknown
     virtual HRESULT STDMETHODCALLTYPE UnregisterCallback(IItemLayoutResolverCallback*) = 0;
     virtual HRESULT STDMETHODCALLTYPE RegisterInternalCallback(IItemLayoutResolverInternalCallback*) = 0;
     virtual HRESULT STDMETHODCALLTYPE UnregisterInternalCallback(IItemLayoutResolverInternalCallback*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddNewItem(const GUID&, const SIZE) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddItem(const GUID&, const RECT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE InsertItemUncommitted(const GUID&, const RECT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE ResizeItemUncommitted(const GUID&, const SIZE) = 0;
-    virtual HRESULT STDMETHODCALLTYPE SwapItemsUncommitted(const GUID&, const GUID&) = 0; // @Note: Added after 14361
-    virtual HRESULT STDMETHODCALLTYPE AddNewContainer(const GUID&, IItemLayoutResolver*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddContainer(const GUID&, IItemLayoutResolver*, const POINT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddSizedContainer(const GUID&, IItemLayoutResolver*, const RECT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE InsertContainerUncommitted(const GUID&, IItemLayoutResolver*, const POINT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetLayoutResolverForContainer(const GUID&, IItemLayoutResolver**) = 0;
+    virtual HRESULT STDMETHODCALLTYPE AddNewItem(REFGUID, const SIZE) = 0;
+    virtual HRESULT STDMETHODCALLTYPE AddItem(REFGUID, const RECT) = 0;
+    virtual HRESULT STDMETHODCALLTYPE InsertItemUncommitted(REFGUID, const RECT) = 0;
+    virtual HRESULT STDMETHODCALLTYPE ResizeItemUncommitted(REFGUID, const SIZE) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SwapItemsUncommitted(REFGUID, REFGUID) = 0; // @Note: Added after 14361
+    virtual HRESULT STDMETHODCALLTYPE AddNewContainer(REFGUID, IItemLayoutResolver*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE AddContainer(REFGUID, IItemLayoutResolver*, const POINT) = 0;
+    virtual HRESULT STDMETHODCALLTYPE AddSizedContainer(REFGUID, IItemLayoutResolver*, const RECT) = 0;
+    virtual HRESULT STDMETHODCALLTYPE InsertContainerUncommitted(REFGUID, IItemLayoutResolver*, const POINT) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetLayoutResolverForContainer(REFGUID, IItemLayoutResolver**) = 0;
     virtual BOOL STDMETHODCALLTYPE IsCollapsed() = 0;
     virtual HRESULT STDMETHODCALLTYPE Collapse() = 0;
     virtual HRESULT STDMETHODCALLTYPE Expand() = 0;
-    virtual HRESULT STDMETHODCALLTYPE RemoveItemUncommitted(const GUID&) = 0;
-    virtual HRESULT STDMETHODCALLTYPE MoveItemUncommitted(const GUID&, const POINT) = 0;
+    virtual HRESULT STDMETHODCALLTYPE RemoveItemUncommitted(REFGUID) = 0;
+    virtual HRESULT STDMETHODCALLTYPE MoveItemUncommitted(REFGUID, const POINT) = 0;
     virtual BOOL STDMETHODCALLTYPE IsEmpty() = 0;
     virtual HRESULT STDMETHODCALLTYPE GetItemByCell(const POINT, GUID*) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetLayoutBounds(RECT*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetLayoutBoundsWithoutItem(const GUID&, RECT*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetItemBounds(const GUID&, RECT*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetContainerSizeWithMargins(const GUID&, SIZE*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetLastOccupiedCellInColumn(const long, const GUID&, POINT*, int*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetLayoutBoundsWithoutItem(REFGUID, RECT*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetItemBounds(REFGUID, RECT*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetContainerSizeWithMargins(REFGUID, SIZE*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetLastOccupiedCellInColumn(const long, REFGUID, POINT*, int*) = 0;
     virtual HRESULT STDMETHODCALLTYPE SetContainerMargins(const RECT) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetContainerMargins(RECT*) = 0;
     virtual HRESULT STDMETHODCALLTYPE SetMaxCellBounds(const int, const int) = 0;
@@ -105,6 +105,54 @@ IItemLayoutResolverInternal : IUnknown
     virtual void STDMETHODCALLTYPE EnableCollapse(BOOL) = 0; ///< @Note: Added after 14361
 };
 
+enum class ModificationOperation
+{
+    Insert = 0,
+    Move = 1,
+    Remove = 2,
+    Resize = 3,
+};
+
+MIDL_INTERFACE("d364071e-0afe-427c-a397-e9e1f734d4dd")
+IItemLayoutDisplacementHandler : IUnknown
+{
+    virtual HRESULT STDMETHODCALLTYPE SetCellArray(ICellArrayManager*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE DisplaceItemsFromRect(const Geometry::CRect&, const Geometry::CRect&) = 0;
+};
+
+MIDL_INTERFACE("16d714e3-2917-489e-81f1-fbd6b8e72742")
+IItemLayoutCollapseHandler : IUnknown
+{
+    virtual HRESULT STDMETHODCALLTYPE SetCellArray(ICellArrayManager*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE Collapse(const Geometry::CRect&, const Geometry::CRect&) = 0;
+};
+
+class CItemLayoutDisplacement
+{
+public:
+    CItemLayoutDisplacement();
+
+    HRESULT DisplaceItemsFromRect(
+        const Geometry::CRect& targetRect, const Geometry::CRect& previousRect, ICellArrayManager* cellArrayManager);
+    HRESULT AddDisplacementHandler(IItemLayoutDisplacementHandler* displacementHandler);
+
+private:
+    CCoSimpleArray<Microsoft::WRL::ComPtr<IItemLayoutDisplacementHandler>> m_displacementHandlers;
+};
+
+class CItemLayoutCollapseManager
+{
+public :
+    CItemLayoutCollapseManager();
+
+    HRESULT Collapse(
+        const Geometry::CRect& sourceCells, const Geometry::CRect& targetCells, ICellArrayManager* cellArrayManager);
+    HRESULT AddCollapseHandler(IItemLayoutCollapseHandler* collapseHandler);
+
+private:
+    CCoSimpleArray<Microsoft::WRL::ComPtr<IItemLayoutCollapseHandler>> m_collapseHandlers;
+};
+
 enum LAYOUT_RESOLVER_OPTIONS
 {
     LRO_NONE = 0x0,
@@ -124,75 +172,83 @@ public:
     CItemLayoutResolver();
     ~CItemLayoutResolver() override;
 
-    HRESULT RuntimeClassInitialize();
+    virtual HRESULT RuntimeClassInitialize();
 
     //~ Begin IItemLayoutResolver Interface
-    STDMETHODIMP RegisterCallback(IItemLayoutResolverCallback* callback);
-    STDMETHODIMP UnregisterCallback(IItemLayoutResolverCallback* callback);
-    STDMETHODIMP RegisterInternalCallback(IItemLayoutResolverInternalCallback* callback);
-    STDMETHODIMP UnregisterInternalCallback(IItemLayoutResolverInternalCallback* callback);
-    STDMETHODIMP AddNewItem(const GUID& itemID, const SIZE sizeItemCells);
-    STDMETHODIMP AddItem(const GUID& itemID, const RECT rcItemBoundsCells);
-    STDMETHODIMP InsertItemUncommitted(const GUID& itemID, const RECT rcDestination);
-    STDMETHODIMP ResizeItemUncommitted(const GUID& itemID, const SIZE sizeItemCells);
-    STDMETHODIMP SwapItemsUncommitted(const GUID& itemID1, const GUID& itemID2); // @Note: Added after 14361
-    STDMETHODIMP AddNewContainer(const GUID&, IItemLayoutResolver*);
-    STDMETHODIMP AddContainer(const GUID&, IItemLayoutResolver*, const POINT);
-    STDMETHODIMP AddSizedContainer(const GUID& containerID, IItemLayoutResolver* pResolver, const RECT destination);
-    STDMETHODIMP InsertContainerUncommitted(const GUID&, IItemLayoutResolver*, const POINT);
-    STDMETHODIMP GetLayoutResolverForContainer(const GUID&, IItemLayoutResolver**);
-    STDMETHODIMP_(BOOL) IsCollapsed();
-    STDMETHODIMP Collapse();
-    STDMETHODIMP Expand();
-    STDMETHODIMP RemoveItemUncommitted(const GUID&);
-    STDMETHODIMP MoveItemUncommitted(const GUID&, const POINT);
-    STDMETHODIMP_(BOOL) IsEmpty();
-    STDMETHODIMP GetItemByCell(const POINT, GUID*);
-    STDMETHODIMP GetLayoutBounds(RECT*);
-    STDMETHODIMP GetLayoutBoundsWithoutItem(const GUID&, RECT*);
-    STDMETHODIMP GetItemBounds(_GUID&, tagRECT*);
-    STDMETHODIMP GetContainerSizeWithMargins(const GUID&, SIZE*);
-    STDMETHODIMP GetLastOccupiedCellInColumn(const long, GUID&, tagPOINT*, int*);
-    STDMETHODIMP SetContainerMargins(const tagRECT);
-    STDMETHODIMP GetContainerMargins(tagRECT*);
-    STDMETHODIMP SetMaxCellBounds(const int, const int);
-    STDMETHODIMP_(SIZE) GetMaxCellBounds();
-    STDMETHODIMP MigrateItems(IItemLayoutResolver*, const LayoutMigrationOptions);
-    STDMETHODIMP CommitChanges();
-    STDMETHODIMP AbandonChanges();
-    STDMETHODIMP RepairLayoutUncommitted();
+    STDMETHODIMP RegisterCallback(IItemLayoutResolverCallback* callback) override;
+    STDMETHODIMP UnregisterCallback(IItemLayoutResolverCallback* callback) override;
+    STDMETHODIMP RegisterInternalCallback(IItemLayoutResolverInternalCallback* callback) override;
+    STDMETHODIMP UnregisterInternalCallback(IItemLayoutResolverInternalCallback* callback) override;
+    STDMETHODIMP AddNewItem(REFGUID itemID, const SIZE sizeItemCells) override;
+    STDMETHODIMP AddItem(REFGUID itemID, const RECT rcItemBoundsCells) override;
+    STDMETHODIMP InsertItemUncommitted(REFGUID itemID, const RECT rcDestination) override;
+    STDMETHODIMP ResizeItemUncommitted(REFGUID itemID, const SIZE sizeItemCells) override;
+    STDMETHODIMP SwapItemsUncommitted(REFGUID itemID1, REFGUID itemID2) override; // @Note: Added after 14361
+    STDMETHODIMP AddNewContainer(REFGUID, IItemLayoutResolver*) override;
+    STDMETHODIMP AddContainer(REFGUID, IItemLayoutResolver*, const POINT) override;
+    STDMETHODIMP AddSizedContainer(REFGUID containerID, IItemLayoutResolver* pResolver, const RECT destination) override;
+    STDMETHODIMP InsertContainerUncommitted(REFGUID, IItemLayoutResolver*, const POINT) override;
+    STDMETHODIMP GetLayoutResolverForContainer(REFGUID, IItemLayoutResolver**) override;
+    STDMETHODIMP_(BOOL) IsCollapsed() override;
+    STDMETHODIMP Collapse() override;
+    STDMETHODIMP Expand() override;
+    STDMETHODIMP RemoveItemUncommitted(REFGUID) override;
+    STDMETHODIMP MoveItemUncommitted(REFGUID, const POINT) override;
+    STDMETHODIMP_(BOOL) IsEmpty() override;
+    STDMETHODIMP GetItemByCell(const POINT, GUID*) override;
+    STDMETHODIMP GetLayoutBounds(RECT*) override;
+    STDMETHODIMP GetLayoutBoundsWithoutItem(REFGUID, RECT*) override;
+    STDMETHODIMP GetItemBounds(REFGUID, RECT*) override;
+    STDMETHODIMP GetContainerSizeWithMargins(REFGUID, SIZE*) override;
+    STDMETHODIMP GetLastOccupiedCellInColumn(const long, REFGUID, POINT*, int*) override;
+    STDMETHODIMP SetContainerMargins(const RECT) override;
+    STDMETHODIMP GetContainerMargins(RECT*) override;
+    STDMETHODIMP SetMaxCellBounds(const int, const int) override;
+    STDMETHODIMP_(SIZE) GetMaxCellBounds() override;
+    STDMETHODIMP MigrateItems(IItemLayoutResolver*, const LayoutMigrationOptions) override;
+    STDMETHODIMP CommitChanges() override;
+    STDMETHODIMP AbandonChanges() override;
+    STDMETHODIMP RepairLayoutUncommitted() override;
     //~ End IItemLayoutResolver Interface
 
-    void ItemBoundsUpdated(_GUID&, Geometry::CRect&);
-    void CellArrayBoundsUpdated(Geometry::CRect&);
-    void ItemRemovedPending(_GUID&);
-    void ItemRemoved(_GUID&);
-    void NewItemAddedBegin();
-    void NewItemAddedEnd();
-    void OnItemsMigrated(IItemLayoutResolver*);
-    void OnItemsMigrated(IItemLayoutResolver*, _GUID&);
-    HRESULT GroupBoundsChanged(_GUID&);
-    void GroupEmptiedPending(_GUID&);
-    void GroupEmptied();
-    HRESULT GetGutterHitTarget(_GUID&, const tagRECT, tagPOINT*);
+    //~ Begin ICellArrayManagerCallback Interface
+    STDMETHODIMP_(void) ItemBoundsUpdated(REFGUID itemID, const Geometry::CRect& rcItemBoundsCells) override;
+    STDMETHODIMP_(void) CellArrayBoundsUpdated(const Geometry::CRect& rcLayoutBounds) override;
+    STDMETHODIMP_(void) ItemRemovedPending(REFGUID itemID) override;
+    STDMETHODIMP_(void) ItemRemoved(REFGUID itemID) override;
+    //~ End ICellArrayManagerCallback Interface
+
+    //~ Begin IGroupBoundsChangeNotification Interface
+    STDMETHODIMP_(void) NewItemAddedBegin() override;
+    STDMETHODIMP_(void) NewItemAddedEnd() override;
+    STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver) override; // IItemLayoutResolverInternal
+    STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver, REFGUID groupID) override;
+    STDMETHODIMP GroupBoundsChanged(REFGUID groupID) override;
+    STDMETHODIMP_(void) GroupEmptiedPending(REFGUID groupID) override;
+    STDMETHODIMP_(void) GroupEmptied() override;
+    //~ End IGroupBoundsChangeNotification Interface
+
+    //~ Begin ILayoutHitTest Interface
+    STDMETHODIMP GetGutterHitTarget(REFGUID, const RECT, POINT*) override;
+    //~ End ILayoutHitTest Interface
 
 protected:
-    virtual HRESULT _FindTargetDestinationForNewSize(const GUID&, const SIZE&, Geometry::CRect*) = 0;
+    virtual HRESULT _FindTargetDestinationForNewSize(REFGUID, const SIZE&, Geometry::CRect*) = 0;
     virtual IItemCellAssignor* _GetCellAssignor() = 0;
-    virtual HRESULT _PrepareLayoutBeforeOperation(Geometry::CRect&, Geometry::CRect&) = 0;
-    virtual HRESULT _CleanupLayoutAfterOperation(Geometry::CRect&, Geometry::CRect&) = 0;
+    virtual HRESULT _PrepareLayoutBeforeOperation(const Geometry::CRect&, const Geometry::CRect&) = 0;
+    virtual HRESULT _CleanupLayoutAfterOperation(const Geometry::CRect&, const Geometry::CRect&) = 0;
     virtual HRESULT _RepairLayout() = 0;
     virtual HRESULT _ModifyItemUncommittedInternal(
-        const GUID& itemID, const RECT& rcDestination, const ModificationOperation operation);
+        REFGUID itemID, const RECT& rcDestination, const ModificationOperation operation);
     virtual HRESULT _CommitChangesInternal();
 
     HRESULT _Collapse(const Geometry::CRect&, const Geometry::CRect&);
     void _NotifyNewItemAddedBegin();
     void _NotifyNewItemAddedEnd();
-    void _NotifyItemBoundsChange(_GUID&, tagRECT&);
-    void _NotifyLayoutBoundsChange(Geometry::CRect&);
-    void _NotifyItemRemovedPending(_GUID&);
-    void _NotifyItemRemoved(_GUID&);
+    void _NotifyItemBoundsChange(REFGUID, const RECT&);
+    void _NotifyLayoutBoundsChange(const Geometry::CRect&);
+    void _NotifyItemRemovedPending(REFGUID);
+    void _NotifyItemRemoved(REFGUID);
     void _NotifyLastItemRemovedPending();
     void _NotifyLastItemRemoved();
 
@@ -200,7 +256,7 @@ protected:
     CItemLayoutDisplacement _displacementManager;
     CItemLayoutCollapseManager _collapseManager;
     LAYOUT_RESOLVER_OPTIONS _options;
-    Microsoft::WRL::ComPtr<ItemLayoutResolverProxy> m_itemLayoutResolverProxy;
+    Microsoft::WRL::ComPtr<class ItemLayoutResolverProxy> m_itemLayoutResolverProxy;
     CSimpleHashTable<GUID, Microsoft::WRL::ComPtr<IItemLayoutResolver>> m_folderResolvers;
 
 private:
@@ -209,6 +265,7 @@ private:
     bool _isBatchingItemBoundsChangeUpdates;
     CSimpleHashTable<GUID, Geometry::CRect> _batchedUpdates;
     bool m_isCollapsed;
+    bool m_isUnk1;
 
     HRESULT _DisplaceItemsFromRect(const Geometry::CRect&, const Geometry::CRect&);
     HRESULT _StartBatchingItemBoundsChangeUpdates();

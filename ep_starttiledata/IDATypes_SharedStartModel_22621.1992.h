@@ -17,32 +17,6 @@ struct /*VFT*/ IUnknown_vtbl
 };
 #pragma pack(pop)
 
-template <typename TKey>
-class CDefaultHashPolicy
-{
-};
-
-template <typename TKey>
-class CDefaultKeyCompare
-{
-};
-
-class CDefaultResizePolicy
-{
-};
-
-class CDefaultRehashPolicy
-{
-};
-
-class CStringHashPolicy
-{
-};
-
-class CCaseInsensitiveStringHashPolicy
-{
-};
-
 namespace Windows { namespace Internal
 {
     template <typename ElementType>
@@ -81,6 +55,125 @@ namespace Microsoft { namespace WRL
     }
 } }
 
+template<typename T>
+class CTContainer_PolicyUnOwned
+{
+};
+
+template<typename T>
+class CTContainer_PolicyRelease
+{
+};
+
+class CTContainer_PolicyNewMem
+{
+};
+
+class CTContainer_PolicyCoTaskMem
+{
+};
+
+class CTContainer_PolicyLocalMem
+{
+};
+
+template <typename T>
+class CTPolicyCoTaskMem : CTContainer_PolicyCoTaskMem
+{
+};
+
+template <typename T>
+class CTPolicyLocalMem : CTContainer_PolicyLocalMem
+{
+};
+
+template <typename T>
+class CSimpleArrayStandardCompareHelper
+{
+};
+
+class CSimpleArrayCaseInsensitiveOrdinalStringCompareHelper
+{
+};
+
+class CSimpleArrayUserDefaultLocaleCaseInsensitiveCompareHelper
+{
+};
+
+template <typename T>
+class CSimpleArrayStandardMergeHelper
+{
+};
+
+template <
+    typename T,
+    typename CompareHelper = CSimpleArrayStandardCompareHelper<T>
+>
+class CTSimpleFixedArray
+{
+public:
+    T* _parray;
+    size_t _celem;
+};
+
+template <
+    typename T,
+    size_t MaxSize,
+    typename Allocator,
+    typename CompareHelper = CSimpleArrayStandardCompareHelper<T>,
+    typename MergeHelper = CSimpleArrayStandardMergeHelper<T>
+>
+class CTSimpleArray : public CTSimpleFixedArray<T, CompareHelper>
+{
+public:
+    T* _parrayT;
+    size_t _celemCapacity;
+};
+
+template <
+    typename T,
+    size_t MaxSize = 0xffffffff - 1,
+    typename CompareHelper = CSimpleArrayStandardCompareHelper<T>
+>
+class CCoSimpleArray : public CTSimpleArray<T, MaxSize, CTPolicyCoTaskMem<T>, CompareHelper>
+{
+};
+
+template <
+    typename T,
+    size_t MaxSize = 0xffffffff - 1,
+    typename CompareHelper = CSimpleArrayStandardCompareHelper<T>
+>
+class CLocalSimpleArray : public CTSimpleArray<T, MaxSize, CTPolicyLocalMem<T>, CompareHelper>
+{
+};
+
+template <typename TKey>
+class CDefaultHashPolicy
+{
+};
+
+template <typename TKey>
+class CDefaultKeyCompare
+{
+};
+
+class CDefaultResizePolicy
+{
+};
+
+class CDefaultRehashPolicy
+{
+};
+
+class CStringHashPolicy
+{
+};
+
+class CCaseInsensitiveStringHashPolicy
+{
+};
+
 template <
     typename TKey,
     typename TValue,
@@ -111,12 +204,98 @@ class CSimpleHashTable
     HashBucket* _rgBuckets;
 };
 
+template <typename TItem>
+class CSet
+{
+    CSimpleHashTable<TItem, bool>* _pTable;
+};
+
 namespace Geometry
 {
+    struct CPoint : POINT
+    {
+    };
+
     struct CRect : RECT
     {
     };
+
+    struct CSize : SIZE
+    {
+    };
 }
+
+struct ICellArrayManagerCallback : IUnknown
+{
+};
+
+struct ICellArrayManagerCallback_vtbl : IUnknown_vtbl
+{
+    void (__stdcall *ItemBoundsUpdated)(ICellArrayManagerCallback* This, const GUID&, const Geometry::CRect&);
+    void (__stdcall *CellArrayBoundsUpdated)(ICellArrayManagerCallback* This, const Geometry::CRect&);
+    void (__stdcall *ItemRemovedPending)(ICellArrayManagerCallback* This, const GUID&);
+    void (__stdcall *ItemRemoved)(ICellArrayManagerCallback* This, const GUID&);
+};
+
+enum SET_ITEM_OPTIONS
+{
+    SIO_NONE = 0x0,
+    SIO_SEND_BOUNDS_UPDATE = 0x1,
+};
+
+struct ICellArrayManager : IUnknown
+{
+};
+
+struct ICellArrayManager_vtbl : IUnknown_vtbl
+{
+    HRESULT (__stdcall *RegisterCallback)(ICellArrayManager* This, ICellArrayManagerCallback*);
+    HRESULT (__stdcall *UnregisterCallback)(ICellArrayManager* This, ICellArrayManagerCallback*);
+    const Geometry::CRect& (__stdcall *GetCurrentCellArrayBounds)(ICellArrayManager* This);
+    const Geometry::CSize& (__stdcall *GetMaximumCellArrayDimensions)(ICellArrayManager* This);
+    bool (__stdcall *IsEmpty)(ICellArrayManager* This);
+    bool (__stdcall *IsValidRect)(ICellArrayManager* This, const Geometry::CRect&);
+    bool (__stdcall *IsValidCellCoordinate)(ICellArrayManager* This, const Geometry::CPoint&);
+    const GUID (__stdcall *GetItemAtCell)(ICellArrayManager* This, const int, const int);
+    bool (__stdcall *IsRectEmpty)(ICellArrayManager* This, const Geometry::CRect);
+    HRESULT (__stdcall *GetItemsInRect)(ICellArrayManager* This, const Geometry::CRect, CSet<GUID>*);
+    HRESULT (__stdcall *GetItemsOutsideOfRect)(ICellArrayManager* This, const Geometry::CRect, CSet<GUID>*);
+    HRESULT (__stdcall *GetItemBounds)(ICellArrayManager* This, const GUID&, Geometry::CRect&);
+    HRESULT (__stdcall *GetBoundingRectForItems)(ICellArrayManager* This, const CSet<GUID>&, Geometry::CRect&);
+    HRESULT (__stdcall *GetLayoutBoundsWithoutItem)(ICellArrayManager* This, const GUID&, RECT*);
+    HRESULT (__stdcall *ContainRectInsideFixedArrayBounds)(ICellArrayManager* This, Geometry::CRect&);
+    HRESULT (__stdcall *SetMaximumCellArrayDimensions)(ICellArrayManager* This, const int, const int);
+    HRESULT (__stdcall *SetItem)(ICellArrayManager* This, const GUID&, Geometry::CRect, SET_ITEM_OPTIONS);
+    HRESULT (__stdcall *RemoveItemUncommitted)(ICellArrayManager* This, const GUID&);
+    HRESULT (__stdcall *InsertEmptyColumn)(ICellArrayManager* This, Geometry::CRect, bool);
+    HRESULT (__stdcall *MoveItemUncommitted)(ICellArrayManager* This, const GUID&, Geometry::CRect);
+    HRESULT (__stdcall *InsertItemUncommitted)(ICellArrayManager* This, const GUID&, const Geometry::CRect);
+    HRESULT (__stdcall *AddIgnoredItem)(ICellArrayManager* This, const GUID&);
+    HRESULT (__stdcall *RemoveIgnoredItem)(ICellArrayManager* This, const GUID&);
+    HRESULT (__stdcall *CommitChanges)(ICellArrayManager* This);
+    HRESULT (__stdcall *AbandonChanges)(ICellArrayManager* This);
+    HRESULT (__stdcall *FixCoordinatesToBeNonNegative)(ICellArrayManager* This);
+};
+
+struct IItemCellAssignor : IUnknown
+{
+};
+
+struct IItemCellAssignor_vtbl : IUnknown_vtbl
+{
+    HRESULT (__stdcall *SetCellArray)(IItemCellAssignor* This, ICellArrayManager*);
+    HRESULT (__stdcall *CalculateLocationForNewItem)(IItemCellAssignor* This, const Geometry::CSize&, Geometry::CRect*);
+};
+
+struct IItemMigrationHandler : IUnknown
+{
+};
+
+struct IItemMigrationHandler_vtbl : IUnknown_vtbl
+{
+    HRESULT (__stdcall *MigrateItems)(IItemMigrationHandler* This, ICellArrayManager*, ICellArrayManager*, IItemCellAssignor*);
+    HRESULT (__stdcall *SetUnassignedItemId)(IItemMigrationHandler* This, const GUID&);
+};
 
 struct IItemLayoutResolverCallback : IUnknown
 {
@@ -200,18 +379,6 @@ struct IItemLayoutResolver_vtbl : IUnknown_vtbl
     HRESULT (__stdcall *RepairLayoutUncommitted)(IItemLayoutResolver* This);
 };
 
-struct ICellArrayManagerCallback : IUnknown
-{
-};
-
-struct ICellArrayManagerCallback_vtbl : IUnknown_vtbl
-{
-    void (__stdcall *ItemBoundsUpdated)(ICellArrayManagerCallback* This, const GUID&, const Geometry::CRect&);
-    void (__stdcall *CellArrayBoundsUpdated)(ICellArrayManagerCallback* This, const Geometry::CRect&);
-    void (__stdcall *ItemRemovedPending)(ICellArrayManagerCallback* This, const GUID&);
-    void (__stdcall *ItemRemoved)(ICellArrayManagerCallback* This, const GUID&);
-};
-
 struct IGroupBoundsChangeNotification : IUnknown
 {
 };
@@ -245,6 +412,76 @@ struct IItemLayoutResolverInternal_vtbl : IUnknown_vtbl
     void (__stdcall *EnableCollapse)(IItemLayoutResolverInternal* This, BOOL); ///< @Note: Added after 14361
 };
 
+struct IItemLayoutDisplacementHandler : IUnknown
+{
+};
+
+struct IItemLayoutDisplacementHandler_vtbl : IUnknown_vtbl
+{
+    HRESULT (__stdcall *SetCellArray)(IItemLayoutDisplacementHandler* This, ICellArrayManager*);
+    HRESULT (__stdcall *DisplaceItemsFromRect)(IItemLayoutDisplacementHandler* This, const Geometry::CRect&, const Geometry::CRect&);
+};
+
+struct IItemLayoutCollapseHandler : IUnknown
+{
+};
+
+struct IItemLayoutCollapseHandler_vtbl : IUnknown_vtbl
+{
+    HRESULT (__stdcall *SetCellArray)(IItemLayoutCollapseHandler* This, ICellArrayManager*);
+    HRESULT (__stdcall *Collapse)(IItemLayoutCollapseHandler* This, const Geometry::CRect&, const Geometry::CRect&);
+};
+
+class CItemLayoutDisplacement
+{
+public:
+    CItemLayoutDisplacement();
+
+    HRESULT DisplaceItemsFromRect(
+        const Geometry::CRect& targetRect, const Geometry::CRect& previousRect, ICellArrayManager* cellArrayManager);
+    HRESULT AddDisplacementHandler(IItemLayoutDisplacementHandler* displacementHandler);
+
+private:
+    CCoSimpleArray<Microsoft::WRL::ComPtr<IItemLayoutDisplacementHandler>> m_displacementHandlers;
+};
+
+class CItemLayoutCollapseManager
+{
+public :
+    CItemLayoutCollapseManager();
+
+    HRESULT Collapse(
+        const Geometry::CRect& sourceCells, const Geometry::CRect& targetCells, ICellArrayManager* cellArrayManager);
+    HRESULT AddCollapseHandler(IItemLayoutCollapseHandler* collapseHandler);
+
+private:
+    CCoSimpleArray<Microsoft::WRL::ComPtr<IItemLayoutCollapseHandler>> m_collapseHandlers;
+};
+
+enum LAYOUT_RESOLVER_OPTIONS
+{
+    LRO_NONE = 0x0,
+    LRO_DISPLACE_INTO_NEGATIVE_SPACE = 0x1,
+};
+
+class ItemLayoutResolverProxy
+    : ICellArrayManagerCallback
+    , IGroupBoundsChangeNotification
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    class CItemLayoutResolver* m_callbackNoRef;
+};
+
+enum /*class*/ ModificationOperation
+{
+    ModificationOperation_Insert = 0,
+    ModificationOperation_Move = 1,
+    ModificationOperation_Remove = 2,
+    ModificationOperation_Resize = 3,
+};
+
 class CItemLayoutResolver
     : IItemLayoutResolver
     , ICellArrayManagerCallback
@@ -254,41 +491,32 @@ class CItemLayoutResolver
 {
     Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
     ULONG refcount_;
-    UINT64 field_30;
-    UINT64 field_38;
-    UINT64 field_40;
-    UINT64 field_48;
-    UINT64 field_50;
-    UINT64 field_58;
-    UINT64 field_60;
-    UINT64 field_68;
-    UINT64 field_70;
-    UINT32 field_78;
-    UINT8 gap7C[4];
-    UINT64 field_80;
-    UINT32 field_88;
-    int field_8C;
-    int field_90;
-    UINT8 gap94[4];
-    UINT64 field_98;
-    UINT32 field_A0;
-    int field_A4;
-    int field_A8;
-    UINT8 gapAC[4];
-    UINT64 field_B0;
-    UINT32 field_B8;
-    int field_BC;
-    int field_C0;
-    UINT8 gapC4[4];
-    UINT64 field_C8;
+
+    Microsoft::WRL::ComPtr<ICellArrayManager> _spCellArrayManager;
+    CItemLayoutDisplacement _displacementManager;
+    CItemLayoutCollapseManager _collapseManager;
+    LAYOUT_RESOLVER_OPTIONS _options;
+    Microsoft::WRL::ComPtr<ItemLayoutResolverProxy> m_itemLayoutResolverProxy;
+    CSimpleHashTable<GUID, Microsoft::WRL::ComPtr<IItemLayoutResolver>> m_folderResolvers;
+    CSimpleHashTable<IItemLayoutResolverCallback*, Microsoft::WRL::ComPtr<IItemLayoutResolverCallback>> _htCallbacks;
+    CSimpleHashTable<IItemLayoutResolverInternalCallback*, Microsoft::WRL::ComPtr<IItemLayoutResolverInternalCallback>> _htInternalCallbacks;
     char _isBatchingItemBoundsChangeUpdates;
-    UINT8 gapD1[3];
-    int field_D4;
-    UINT32 _batchedUpdates;
-    int field_DC;
-    int field_E0;
-    UINT8 gapE4[4];
-    UINT64 field_E8;
+    CSimpleHashTable<GUID, Geometry::CRect> _batchedUpdates;
     char m_isCollapsed;
-    char field_F1;
+    char m_isUnk1; ///< @Note: Added after 14361
+};
+
+struct CItemLayoutResolver_vtbl : IItemLayoutResolver_vtbl // Make sure after the type
+{
+    void* (__thiscall *__vecDelDtor)(UINT);
+
+    HRESULT (__thiscall *RuntimeClassInitialize)(CItemLayoutResolver* This);
+
+    HRESULT (__thiscall *_FindTargetDestinationForNewSize)(CItemLayoutResolver* This, const GUID&, const SIZE&, Geometry::CRect*);
+    IItemCellAssignor* (__thiscall *_GetCellAssignor)(CItemLayoutResolver* This);
+    HRESULT (__thiscall *_PrepareLayoutBeforeOperation)(CItemLayoutResolver* This, const Geometry::CRect&, const Geometry::CRect&);
+    HRESULT (__thiscall *_CleanupLayoutAfterOperation)(CItemLayoutResolver* This, const Geometry::CRect&, const Geometry::CRect&);
+    HRESULT (__thiscall *_RepairLayout)(CItemLayoutResolver* This);
+    HRESULT (__thiscall *_ModifyItemUncommittedInternal)(CItemLayoutResolver* This, const GUID& itemID, const RECT& rcDestination, const ModificationOperation operation);
+    HRESULT (__thiscall *_CommitChangesInternal)(CItemLayoutResolver* This);
 };
