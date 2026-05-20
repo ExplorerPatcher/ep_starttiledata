@@ -520,3 +520,32 @@ struct CItemLayoutResolver_vtbl : IItemLayoutResolver_vtbl // Make sure after th
     HRESULT (__thiscall *_ModifyItemUncommittedInternal)(CItemLayoutResolver* This, const GUID& itemID, const RECT& rcDestination, const ModificationOperation operation);
     HRESULT (__thiscall *_CommitChangesInternal)(CItemLayoutResolver* This);
 };
+
+struct ICommittedCellArrayManager : IUnknown
+{
+};
+
+struct ICommittedCellArrayManager_vtbl : IUnknown_vtbl
+{
+	const GUID (__stdcall* GetCommittedItemAtCell)(ICommittedCellArrayManager*, const int, const int );
+    HRESULT (__stdcall* GetCommittedItemBounds)(ICommittedCellArrayManager*, const GUID&, const Geometry::CRect&);
+    HRESULT (__stdcall* GetCommittedItemsInRect)(ICommittedCellArrayManager*, const Geometry::CRect&, CSet<GUID>*);
+    HRESULT (__stdcall* AddIgnoredCommittedItem)(ICommittedCellArrayManager*, const GUID&);
+    HRESULT (__stdcall* RemoveIgnoredCommittedItem)(ICommittedCellArrayManager*, const GUID&);
+};
+
+class CCellArrayManager
+	: ICellArrayManager
+	, ICommittedCellArrayManager
+{
+	Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+	
+	CSimpleHashTable<ICellArrayManagerCallback*, Microsoft::WRL::ComPtr<ICellArrayManagerCallback>, CDefaultHashPolicy<ICellArrayManagerCallback*>, CDefaultKeyCompare<ICellArrayManagerCallback*>, CDefaultResizePolicy, CDefaultRehashPolicy> _htCallbacks;
+	Microsoft::WRL::ComPtr<IUnknown> _pCellArray; ///< Microsoft::WRL::ComPtr<ICellArray
+	Geometry::CSize _sizeMaxBounds;
+	CSimpleHashTable<GUID, Geometry::CRect, CDefaultHashPolicy<GUID>, CDefaultKeyCompare<GUID>, CDefaultResizePolicy, CDefaultRehashPolicy> _htTileBounds;
+	Microsoft::WRL::ComPtr<IUnknown> _pCommittedCellArray; ///< Microsoft::WRL::ComPtr<ICellArray
+	CSimpleHashTable<GUID, Geometry::CRect, CDefaultHashPolicy<_GUID>, CDefaultKeyCompare<GUID>, CDefaultResizePolicy, CDefaultRehashPolicy> _htCommittedTileBounds;
+	GUID m_removedItem;
+};
