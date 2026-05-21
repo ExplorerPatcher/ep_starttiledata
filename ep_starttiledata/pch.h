@@ -11,5 +11,6 @@
 #include "framework.h"
 
 #include <wil/result_macros.h>
+#include <wrl/implements.h>
 
 #endif //PCH_H

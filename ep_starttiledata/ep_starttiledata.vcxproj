@@ -154,8 +154,11 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedmodel\lib\SharedModelCommon.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\CellArray.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\CellArrayManager.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ColumnChangeMigrationHandler.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\GenericTraversalOrder.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ICellArray.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ICellArrayManager.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ItemLayoutResolver.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\TileGridMetricsCalculator.h" />
@@ -176,6 +179,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\CellArray.cpp" />
+    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\CellArrayManager.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\ColumnChangeMigrationHandler.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\GenericTraversalOrder.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\ItemLayoutResolver.cpp" />

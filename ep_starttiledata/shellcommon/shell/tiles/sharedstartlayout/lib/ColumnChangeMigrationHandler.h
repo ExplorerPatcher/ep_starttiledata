@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <wrl/implements.h>
-
 #include "ICellArrayManager.h"
 
 struct IItemCellAssignor : IUnknown

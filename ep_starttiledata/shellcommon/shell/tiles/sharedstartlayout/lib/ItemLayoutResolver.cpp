@@ -5,6 +5,8 @@
 #include <wil/common.h>
 #include <wil/resource.h>
 
+#include "CellArrayManager.h"
+
 using namespace Microsoft::WRL;
 
 // @Note
@@ -622,7 +624,7 @@ HRESULT CItemLayoutResolver::GetGutterHitTarget(REFGUID tileID, const RECT targe
 
     POINT targetCell = { targetBounds.left, targetBounds.top };
 
-    ComPtr<interface ICommittedCellArrayManager> spCommittedCellArrayManager;
+    ComPtr<ICommittedCellArrayManager> spCommittedCellArrayManager;
     RETURN_IF_FAILED(_spCellArrayManager.As(&spCommittedCellArrayManager)); // 425
 
     CSet<GUID> overlappingTiles;
@@ -649,7 +651,7 @@ HRESULT CItemLayoutResolver::GetGutterHitTarget(REFGUID tileID, const RECT targe
     tilesInRow.Enumerate([&spCommittedCellArrayManager, &topRow, &bottomRow](REFGUID value) -> bool
     {
         Geometry::CRect rc;
-        if (SUCCEEDED(spCommittedCellArrayManager->GetCommittedItemBounds(value, &rc)))
+        if (SUCCEEDED(spCommittedCellArrayManager->GetCommittedItemBounds(value, rc)))
         {
             topRow = min(rc.top, topRow);
             bottomRow = max(rc.bottom - 1, bottomRow);

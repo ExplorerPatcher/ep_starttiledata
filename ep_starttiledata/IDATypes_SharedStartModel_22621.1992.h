@@ -41,6 +41,20 @@ typedef Windows::Internal::NativeString<Windows::Internal::CoTaskMemPolicy<WCHAR
 
 namespace Microsoft { namespace WRL
 {
+	namespace Details
+	{
+		template <typename T>
+		class ComPtrRefBase
+		{
+			T* ptr_;
+		};
+		
+		template <typename T>
+		class ComPtrRef : Details::ComPtrRefBase<T>
+		{
+		};
+	}
+	
     template <typename T>
     class ComPtr
     {
