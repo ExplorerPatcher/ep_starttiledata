@@ -521,6 +521,37 @@ struct CItemLayoutResolver_vtbl : IItemLayoutResolver_vtbl // Make sure after th
     HRESULT (__thiscall *_CommitChangesInternal)(CItemLayoutResolver* This);
 };
 
+
+struct ICellArray : IUnknown
+{
+};
+
+struct ICellArray_vtbl : IUnknown_vtbl
+{
+  HRESULT (__stdcall *CloneArray)(ICellArray , ICellArray **);
+  const GUID (__stdcall *GetCellValue)(ICellArray *, const int, const int);
+  const Geometry::CRect *(__stdcall *GetArrayBounds)(ICellArray *);
+  void (__stdcall *GetItemsInRect)(ICellArray *, const Geometry::CRect&, CSet<GUID> *);
+  void (__stdcall *FixCoordinatesToBeNonNegative)(ICellArray *);
+  HRESULT (__stdcall *SetItem)(ICellArray *, const GUID&, const Geometry::CRect&);
+  HRESULT (__stdcall *RemoveItem)(ICellArray *, const GUID&);
+  HRESULT (__stdcall *SetArrayBounds)(ICellArray *, const Geometry::CRect&);
+  HRESULT (__stdcall *AddIgnoredItem)(ICellArray *, const GUID&);
+  HRESULT (__stdcall *RemoveIgnoredItem)(ICellArray *, const GUID&);
+};
+
+class CCellArray
+	: ICellArray
+{
+	Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+	
+	Geometry::CRect _rcArrayBounds;
+	GUID* _rgCellData;
+	CSet<GUID> _setIgnoredTiles;
+	Geometry::CPoint _ptOrigin;
+};
+
 struct ICommittedCellArrayManager : IUnknown
 {
 };
@@ -542,10 +573,10 @@ class CCellArrayManager
     ULONG refcount_;
 	
 	CSimpleHashTable<ICellArrayManagerCallback*, Microsoft::WRL::ComPtr<ICellArrayManagerCallback>, CDefaultHashPolicy<ICellArrayManagerCallback*>, CDefaultKeyCompare<ICellArrayManagerCallback*>, CDefaultResizePolicy, CDefaultRehashPolicy> _htCallbacks;
-	Microsoft::WRL::ComPtr<IUnknown> _pCellArray; ///< Microsoft::WRL::ComPtr<ICellArray
+	Microsoft::WRL::ComPtr<ICellArray> _pCellArray; ///< Microsoft::WRL::ComPtr<ICellArray
 	Geometry::CSize _sizeMaxBounds;
 	CSimpleHashTable<GUID, Geometry::CRect, CDefaultHashPolicy<GUID>, CDefaultKeyCompare<GUID>, CDefaultResizePolicy, CDefaultRehashPolicy> _htTileBounds;
-	Microsoft::WRL::ComPtr<IUnknown> _pCommittedCellArray; ///< Microsoft::WRL::ComPtr<ICellArray
+	Microsoft::WRL::ComPtr<ICellArray> _pCommittedCellArray; ///< Microsoft::WRL::ComPtr<ICellArray
 	CSimpleHashTable<GUID, Geometry::CRect, CDefaultHashPolicy<_GUID>, CDefaultKeyCompare<GUID>, CDefaultResizePolicy, CDefaultRehashPolicy> _htCommittedTileBounds;
 	GUID m_removedItem;
 };
