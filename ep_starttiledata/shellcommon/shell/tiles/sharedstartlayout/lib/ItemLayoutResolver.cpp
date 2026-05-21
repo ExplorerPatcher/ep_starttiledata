@@ -728,7 +728,7 @@ HRESULT CItemLayoutResolver::GetGutterHitTarget(REFGUID tileID, const RECT targe
 }
 
 HRESULT CItemLayoutResolver::_ModifyItemUncommittedInternal(
-    const GUID& itemID, const RECT& rcDestination, const ModificationOperation operation)
+    REFGUID itemID, const RECT& rcDestination, const ModificationOperation operation)
 {
     Geometry::CRect rcActualDestination = rcDestination;
 
@@ -802,7 +802,7 @@ void CItemLayoutResolver::_NotifyNewItemAddedEnd()
     });
 }
 
-void CItemLayoutResolver::_NotifyItemBoundsChange(const GUID& itemID, const RECT& rcItemBoundsCells)
+void CItemLayoutResolver::_NotifyItemBoundsChange(REFGUID itemID, const RECT& rcItemBoundsCells)
 {
     if (_isBatchingItemBoundsChangeUpdates)
     {
@@ -884,13 +884,13 @@ HRESULT CItemLayoutResolver::_StopBatchingItemBoundsChangeUpdatesAndNotify()
     _isBatchingItemBoundsChangeUpdates = false;
 
     CSimpleHashTable<GUID, Geometry::CRect> htUpdatesUnique;
-    (void)_batchedUpdates.Enum([&htUpdatesUnique](const GUID& key, const Geometry::CRect& value) -> bool // @Note: htUpdatesUnique added after 14361
+    (void)_batchedUpdates.Enum([&htUpdatesUnique](REFGUID key, const Geometry::CRect& value) -> bool // @Note: htUpdatesUnique added after 14361
     {
         htUpdatesUnique.SetItem(key, value);
         return true;
     });
 
-    (void)htUpdatesUnique.Enum([this](const GUID& key, const Geometry::CRect& value) -> bool
+    (void)htUpdatesUnique.Enum([this](REFGUID key, const Geometry::CRect& value) -> bool
     {
         _NotifyItemBoundsChange(key, value);
         return true;

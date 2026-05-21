@@ -7,10 +7,10 @@ MIDL_INTERFACE("48aa14a7-b0e2-4a6e-8a9e-55e8c7a00533")
 ICommittedCellArrayManager : IUnknown
 {
     virtual const GUID STDMETHODCALLTYPE GetCommittedItemAtCell(const int, const int) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetCommittedItemBounds(const GUID&, const Geometry::CRect&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetCommittedItemBounds(REFGUID, const Geometry::CRect&) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetCommittedItemsInRect(const Geometry::CRect&, CSet<GUID>*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddIgnoredCommittedItem(const GUID&) = 0;
-    virtual HRESULT STDMETHODCALLTYPE RemoveIgnoredCommittedItem(const GUID&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE AddIgnoredCommittedItem(REFGUID) = 0;
+    virtual HRESULT STDMETHODCALLTYPE RemoveIgnoredCommittedItem(REFGUID) = 0;
 };
 
 class CCellArrayManager

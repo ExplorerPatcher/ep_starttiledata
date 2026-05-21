@@ -11,7 +11,7 @@ struct IItemCellAssignor : IUnknown
 struct IItemMigrationHandler : IUnknown
 {
     virtual HRESULT STDMETHODCALLTYPE MigrateItems(ICellArrayManager*, ICellArrayManager*, IItemCellAssignor*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE SetUnassignedItemId(const GUID&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SetUnassignedItemId(REFGUID) = 0;
 };
 
 class CColumnChangeMigrationHandler
@@ -26,7 +26,7 @@ public:
     STDMETHODIMP MigrateItems(
         ICellArrayManager* pSourceCellArrayManager, ICellArrayManager* pDestinationCellArrayManager,
         IItemCellAssignor* pTileCellAssignor) override;
-    STDMETHODIMP SetUnassignedItemId(const GUID& unassignedItemId) override;
+    STDMETHODIMP SetUnassignedItemId(REFGUID unassignedItemId) override;
     //~ End IItemMigrationHandler Interface
 
 private:

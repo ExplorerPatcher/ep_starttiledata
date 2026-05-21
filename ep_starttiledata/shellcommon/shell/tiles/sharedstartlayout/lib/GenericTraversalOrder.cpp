@@ -54,7 +54,7 @@ HRESULT CGenericTraversalOrder::GetCurrentItemGroup(
     return S_OK;
 }
 
-HRESULT CGenericTraversalOrder::GetActualGroupStartCell(const GUID& groupID, POINT* cell)
+HRESULT CGenericTraversalOrder::GetActualGroupStartCell(REFGUID groupID, POINT* cell)
 {
     RECT targetBounds;
     RETURN_IF_FAILED(m_layoutResolver->GetItemBounds(groupID, &targetBounds)); // 44

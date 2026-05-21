@@ -18,7 +18,7 @@ HRESULT CColumnChangeMigrationHandler::MigrateItems(
     return _ToWiderLayout(pSourceCellArrayManager, pDestinationCellArrayManager);
 }
 
-HRESULT CColumnChangeMigrationHandler::SetUnassignedItemId(const GUID& unassignedItemId)
+HRESULT CColumnChangeMigrationHandler::SetUnassignedItemId(REFGUID unassignedItemId)
 {
     if (unassignedItemId == GUID_NULL)
     {
@@ -34,7 +34,7 @@ HRESULT CColumnChangeMigrationHandler::_ToWiderLayout(
     HRESULT hr = pSourceCellArrayManager->GetItemsInRect(pSourceCellArrayManager->GetCurrentCellArrayBounds(), &setAllItems);
     if (SUCCEEDED(hr))
     {
-        (void)setAllItems.Enumerate([&hr, &pSourceCellArrayManager, &pDestinationCellArrayManager](const GUID& key) -> bool
+        (void)setAllItems.Enumerate([&hr, &pSourceCellArrayManager, &pDestinationCellArrayManager](REFGUID key) -> bool
         {
             Geometry::CRect rcTileBounds;
             hr = pSourceCellArrayManager->GetItemBounds(key, rcTileBounds);
@@ -59,7 +59,7 @@ HRESULT CColumnChangeMigrationHandler::_ToNarrowerLayout(
     HRESULT hr = pSourceCellArrayManager->GetItemsInRect(pSourceCellArrayManager->GetCurrentCellArrayBounds(), &setAllItems);
     if (SUCCEEDED(hr))
     {
-        (void)setAllItems.Enumerate([&hr, &pSourceCellArrayManager, &pDestinationCellArrayManager, &setOverflowedItems](const GUID& tileID) -> bool
+        (void)setAllItems.Enumerate([&hr, &pSourceCellArrayManager, &pDestinationCellArrayManager, &setOverflowedItems](REFGUID tileID) -> bool
         {
             Geometry::CRect rcTileBounds;
             hr = pSourceCellArrayManager->GetItemBounds(tileID, rcTileBounds);
@@ -78,7 +78,7 @@ HRESULT CColumnChangeMigrationHandler::_ToNarrowerLayout(
         });
         if (SUCCEEDED(hr))
         {
-            (void)setOverflowedItems.Enumerate([&hr, &pSourceCellArrayManager, &pTileCellAssignor, &pDestinationCellArrayManager](const GUID& tileID) -> bool
+            (void)setOverflowedItems.Enumerate([&hr, &pSourceCellArrayManager, &pTileCellAssignor, &pDestinationCellArrayManager](REFGUID tileID) -> bool
             {
                 if (SUCCEEDED(hr))
                 {
