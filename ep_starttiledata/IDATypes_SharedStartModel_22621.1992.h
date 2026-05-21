@@ -269,6 +269,7 @@ struct ICellArrayManager_vtbl : IUnknown_vtbl
     HRESULT (__stdcall *RemoveItemUncommitted)(ICellArrayManager* This, const GUID&);
     HRESULT (__stdcall *InsertEmptyColumn)(ICellArrayManager* This, Geometry::CRect, bool);
     HRESULT (__stdcall *MoveItemUncommitted)(ICellArrayManager* This, const GUID&, Geometry::CRect);
+    HRESULT (__stdcall *SwapItemsUncommitted)(ICellArrayManager* This, const GUID&, const GUID&); ///< @Note: Added after 14361
     HRESULT (__stdcall *InsertItemUncommitted)(ICellArrayManager* This, const GUID&, const Geometry::CRect);
     HRESULT (__stdcall *AddIgnoredItem)(ICellArrayManager* This, const GUID&);
     HRESULT (__stdcall *RemoveIgnoredItem)(ICellArrayManager* This, const GUID&);
@@ -506,6 +507,19 @@ class CItemLayoutResolver
     char m_isUnk1; ///< @Note: Added after 14361
 };
 
+enum /*class*/ AutoIgnoredItemArray
+{
+    AutoIgnoredItemArray_Pending = 0,
+    AutoIgnoredItemArray_Committed = 1,
+};
+
+class AutoIgnoredItem
+{
+    AutoIgnoredItemArray _arrayToModify;
+    Microsoft::WRL::ComPtr<ICellArrayManager> _spCellArrayManager;
+    GUID _tileID;
+};
+
 struct CItemLayoutResolver_vtbl : IItemLayoutResolver_vtbl // Make sure after the type
 {
     void* (__thiscall *__vecDelDtor)(UINT);
@@ -545,7 +559,7 @@ class CCellArray
 {
 	Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
     ULONG refcount_;
-	
+
 	Geometry::CRect _rcArrayBounds;
 	GUID* _rgCellData;
 	CSet<GUID> _setIgnoredTiles;
@@ -571,7 +585,7 @@ class CCellArrayManager
 {
 	Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
     ULONG refcount_;
-	
+
 	CSimpleHashTable<ICellArrayManagerCallback*, Microsoft::WRL::ComPtr<ICellArrayManagerCallback>, CDefaultHashPolicy<ICellArrayManagerCallback*>, CDefaultKeyCompare<ICellArrayManagerCallback*>, CDefaultResizePolicy, CDefaultRehashPolicy> _htCallbacks;
 	Microsoft::WRL::ComPtr<ICellArray> _pCellArray; ///< Microsoft::WRL::ComPtr<ICellArray
 	Geometry::CSize _sizeMaxBounds;

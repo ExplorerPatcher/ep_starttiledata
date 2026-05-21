@@ -27,7 +27,7 @@ IItemLayoutResolverInternalCallback : IUnknown
     virtual void STDMETHODCALLTYPE OnItemsMigrated(IItemLayoutResolver*) = 0;
 };
 
-enum class LayoutMigrationType
+enum LayoutMigrationType
 {
     LayoutMigrationType_LandscapeToPortrait = 0x0,
     LayoutMigrationType_PortraitToLandscape = 0x1,
@@ -184,28 +184,28 @@ public:
     STDMETHODIMP InsertItemUncommitted(REFGUID itemID, const RECT rcDestination) override;
     STDMETHODIMP ResizeItemUncommitted(REFGUID itemID, const SIZE sizeItemCells) override;
     STDMETHODIMP SwapItemsUncommitted(REFGUID itemID1, REFGUID itemID2) override; // @Note: Added after 14361
-    STDMETHODIMP AddNewContainer(REFGUID, IItemLayoutResolver*) override;
-    STDMETHODIMP AddContainer(REFGUID, IItemLayoutResolver*, const POINT) override;
+    STDMETHODIMP AddNewContainer(REFGUID containerID, IItemLayoutResolver* resolver) override;
+    STDMETHODIMP AddContainer(REFGUID containerID, IItemLayoutResolver* resolver, const POINT destination) override;
     STDMETHODIMP AddSizedContainer(REFGUID containerID, IItemLayoutResolver* pResolver, const RECT destination) override;
-    STDMETHODIMP InsertContainerUncommitted(REFGUID, IItemLayoutResolver*, const POINT) override;
-    STDMETHODIMP GetLayoutResolverForContainer(REFGUID, IItemLayoutResolver**) override;
+    STDMETHODIMP InsertContainerUncommitted(REFGUID containerID, IItemLayoutResolver* resolver, const POINT destination) override;
+    STDMETHODIMP GetLayoutResolverForContainer(REFGUID containerID, IItemLayoutResolver** ppResolver) override;
     STDMETHODIMP_(BOOL) IsCollapsed() override;
     STDMETHODIMP Collapse() override;
     STDMETHODIMP Expand() override;
-    STDMETHODIMP RemoveItemUncommitted(REFGUID) override;
-    STDMETHODIMP MoveItemUncommitted(REFGUID, const POINT) override;
+    STDMETHODIMP RemoveItemUncommitted(REFGUID itemID) override;
+    STDMETHODIMP MoveItemUncommitted(REFGUID itemID, const POINT destination) override;
     STDMETHODIMP_(BOOL) IsEmpty() override;
-    STDMETHODIMP GetItemByCell(const POINT, GUID*) override;
-    STDMETHODIMP GetLayoutBounds(RECT*) override;
-    STDMETHODIMP GetLayoutBoundsWithoutItem(REFGUID, RECT*) override;
-    STDMETHODIMP GetItemBounds(REFGUID, RECT*) override;
-    STDMETHODIMP GetContainerSizeWithMargins(REFGUID, SIZE*) override;
-    STDMETHODIMP GetLastOccupiedCellInColumn(const long, REFGUID, POINT*, int*) override;
-    STDMETHODIMP SetContainerMargins(const RECT) override;
-    STDMETHODIMP GetContainerMargins(RECT*) override;
-    STDMETHODIMP SetMaxCellBounds(const int, const int) override;
+    STDMETHODIMP GetItemByCell(const POINT ptCell, GUID* pItemID) override;
+    STDMETHODIMP GetLayoutBounds(RECT* prcBounds) override;
+    STDMETHODIMP GetLayoutBoundsWithoutItem(REFGUID itemID, RECT* bounds) override;
+    STDMETHODIMP GetItemBounds(REFGUID itemID, RECT* itemBounds) override;
+    STDMETHODIMP GetContainerSizeWithMargins(REFGUID containerID, SIZE* size) override;
+    STDMETHODIMP GetLastOccupiedCellInColumn(const long column, REFGUID excludedItemID, POINT* occupiedCell, int* columnUnoccupied) override;
+    STDMETHODIMP SetContainerMargins(const RECT containerMargins) override;
+    STDMETHODIMP GetContainerMargins(RECT* containerMargins) override;
+    STDMETHODIMP SetMaxCellBounds(const int nMaxXBounds, const int nMaxYBounds) override;
     STDMETHODIMP_(SIZE) GetMaxCellBounds() override;
-    STDMETHODIMP MigrateItems(IItemLayoutResolver*, const LayoutMigrationOptions) override;
+    STDMETHODIMP MigrateItems(IItemLayoutResolver* pSourceLayout, const LayoutMigrationOptions migrationOptions) override;
     STDMETHODIMP CommitChanges() override;
     STDMETHODIMP AbandonChanges() override;
     STDMETHODIMP RepairLayoutUncommitted() override;
@@ -221,7 +221,7 @@ public:
     //~ Begin IGroupBoundsChangeNotification Interface
     STDMETHODIMP_(void) NewItemAddedBegin() override;
     STDMETHODIMP_(void) NewItemAddedEnd() override;
-    STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver) override; // IItemLayoutResolverInternal
+    STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayout) override; // IItemLayoutResolverInternal
     STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver, REFGUID groupID) override;
     STDMETHODIMP GroupBoundsChanged(REFGUID groupID) override;
     STDMETHODIMP_(void) GroupEmptiedPending(REFGUID groupID) override;
@@ -229,7 +229,7 @@ public:
     //~ End IGroupBoundsChangeNotification Interface
 
     //~ Begin ILayoutHitTest Interface
-    STDMETHODIMP GetGutterHitTarget(REFGUID, const RECT, POINT*) override;
+    STDMETHODIMP GetGutterHitTarget(REFGUID tileID, const RECT targetBounds, POINT* pAdjustedTargetCell) override;
     //~ End ILayoutHitTest Interface
 
 protected:
@@ -245,10 +245,10 @@ protected:
     HRESULT _Collapse(const Geometry::CRect&, const Geometry::CRect&);
     void _NotifyNewItemAddedBegin();
     void _NotifyNewItemAddedEnd();
-    void _NotifyItemBoundsChange(REFGUID, const RECT&);
-    void _NotifyLayoutBoundsChange(const Geometry::CRect&);
-    void _NotifyItemRemovedPending(REFGUID);
-    void _NotifyItemRemoved(REFGUID);
+    void _NotifyItemBoundsChange(REFGUID itemID, const RECT& rcItemBoundsCells);
+    void _NotifyLayoutBoundsChange(const Geometry::CRect& rcLayoutBoundsCells);
+    void _NotifyItemRemovedPending(REFGUID itemID);
+    void _NotifyItemRemoved(REFGUID itemID);
     void _NotifyLastItemRemovedPending();
     void _NotifyLastItemRemoved();
 
@@ -267,10 +267,10 @@ private:
     bool m_isCollapsed;
     bool m_isUnk1;
 
-    HRESULT _DisplaceItemsFromRect(const Geometry::CRect&, const Geometry::CRect&);
+    HRESULT _DisplaceItemsFromRect(const Geometry::CRect& targetRect, const Geometry::CRect& previousRect);
     HRESULT _StartBatchingItemBoundsChangeUpdates();
     HRESULT _StopBatchingItemBoundsChangeUpdatesAndNotify();
 
-    HRESULT s_CreateMigrationHandler(
+    static HRESULT s_CreateMigrationHandler(
         const LayoutMigrationOptions& migrationOptions, IItemMigrationHandler** ppMigrationHandler);
 };

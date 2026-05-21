@@ -43,6 +43,7 @@ ICellArrayManager : IUnknown
     virtual HRESULT STDMETHODCALLTYPE RemoveItemUncommitted(REFGUID) = 0;
     virtual HRESULT STDMETHODCALLTYPE InsertEmptyColumn(Geometry::CRect, bool) = 0;
     virtual HRESULT STDMETHODCALLTYPE MoveItemUncommitted(REFGUID, Geometry::CRect) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SwapItemsUncommitted(REFGUID, REFGUID) = 0;
     virtual HRESULT STDMETHODCALLTYPE InsertItemUncommitted(REFGUID, const Geometry::CRect) = 0;
     virtual HRESULT STDMETHODCALLTYPE AddIgnoredItem(REFGUID) = 0;
     virtual HRESULT STDMETHODCALLTYPE RemoveIgnoredItem(REFGUID) = 0;
