@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "GenericTraversalOrder.h"
+#include "GroupsLayoutResolver.h"
 #include "ItemLayoutResolver.h"
 #include "PortraitTileLayoutResolver.h"
 #include "TileGridMetricsCalculator.h"
@@ -34,7 +35,7 @@ EXTERN_C STDAPI SharedStartLayout_CreateGroupsLayoutResolver(IItemLayoutResolver
     *ppLayoutResolver = nullptr;
 
     ComPtr<IItemLayoutResolver> layoutResolver;
-    RETURN_IF_FAILED(MakeAndInitialize<CGroupsTileLayoutResolver>(&layoutResolver)); // 37
+    RETURN_IF_FAILED(MakeAndInitialize<CGroupsLayoutResolver>(&layoutResolver)); // 37
 
     static constexpr RECT c_GroupsLayoutResolverContainerMargins = { 0, 1, 0, 0 };
 

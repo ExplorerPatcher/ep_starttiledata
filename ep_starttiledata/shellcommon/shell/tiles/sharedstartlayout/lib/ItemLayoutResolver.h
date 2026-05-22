@@ -11,8 +11,8 @@ IItemLayoutResolverCallback : IUnknown
 {
     virtual void STDMETHODCALLTYPE ItemBoundsUpdated(const GUID*, const RECT*, const UINT) = 0;
     virtual void STDMETHODCALLTYPE LayoutBoundsUpdated(const RECT) = 0;
-    virtual void STDMETHODCALLTYPE ItemRemovedPending(REFGUID) = 0;
-    virtual void STDMETHODCALLTYPE ItemRemoved(REFGUID) = 0;
+    virtual void STDMETHODCALLTYPE ItemRemovedPending(REFGUID itemID) = 0;
+    virtual void STDMETHODCALLTYPE ItemRemoved(REFGUID itemID) = 0;
     virtual void STDMETHODCALLTYPE LastItemRemovedPending() = 0;
     virtual void STDMETHODCALLTYPE LastItemRemoved() = 0;
 };
@@ -24,7 +24,7 @@ IItemLayoutResolverInternalCallback : IUnknown
 {
     virtual void STDMETHODCALLTYPE NewItemAddedBegin() = 0;
     virtual void STDMETHODCALLTYPE NewItemAddedEnd() = 0;
-    virtual void STDMETHODCALLTYPE OnItemsMigrated(IItemLayoutResolver*) = 0;
+    virtual void STDMETHODCALLTYPE OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver) = 0;
 };
 
 enum LayoutMigrationType
