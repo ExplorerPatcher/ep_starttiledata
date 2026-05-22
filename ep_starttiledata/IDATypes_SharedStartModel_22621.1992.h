@@ -479,6 +479,8 @@ enum LAYOUT_RESOLVER_OPTIONS
     LRO_DISPLACE_INTO_NEGATIVE_SPACE = 0x1,
 };
 
+class CItemLayoutResolver;
+
 class ItemLayoutResolverProxy
     : ICellArrayManagerCallback
     , IGroupBoundsChangeNotification
@@ -486,7 +488,7 @@ class ItemLayoutResolverProxy
     Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
     ULONG refcount_;
 
-    class CItemLayoutResolver* m_callbackNoRef;
+    CItemLayoutResolver* m_callbackNoRef;
 };
 
 enum /*class*/ ModificationOperation
@@ -719,3 +721,30 @@ class CGroupsLayoutResolver : public CItemLayoutResolver
     CSimpleHashTable<GUID, GroupResolverInternal> m_groupResolvers;
 };
 
+class CPortraitTileCellAssignor
+    : IItemCellAssignor
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    Microsoft::WRL::ComPtr<ICellArrayManager> _spCellArrayManager;
+};
+
+class CPushDownDisplacementHandler
+    : IItemLayoutDisplacementHandler
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    ICellArrayManager* m_cellArrayManager;
+};
+
+class CExpandDisplacementHandler
+    : IItemLayoutDisplacementHandler
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    ICellArrayManager* m_cellArrayManager;
+    EXPAND_COLLAPSE_DIRECTION m_rowOrColumn;
+};
