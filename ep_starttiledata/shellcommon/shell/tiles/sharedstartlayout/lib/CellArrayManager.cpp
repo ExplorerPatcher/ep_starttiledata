@@ -90,6 +90,7 @@ HRESULT CCellArrayManager::GetItemsOutsideOfRect(const Geometry::CRect rcRect, C
 {
     _EnumerateAllCells([&rcRect, &psetItemsOutsideRect](const int indexY, const int indexX, REFGUID itemID) -> int
     {
+        static_assert(false, "Please implement me first!");
         return 0;
     });
     return S_OK;
@@ -120,54 +121,18 @@ AutoIgnoredItem::~AutoIgnoredItem()
 
 HRESULT AutoIgnoredItem::SetIgnoredItem(ICellArrayManager* pCellArrayManager, REFGUID tileID, AutoIgnoredItemArray arrayToModify)
 {
-    // rbx
-    // zf
-    HRESULT v9; // eax
-    unsigned int v10; // ebx
-    int v11; // eax
-    GUID nullGuid; // [rsp+20h] [rbp-38h] OVERLAPPED
-    ComPtr<ICommittedCellArrayManager> spCommittedCellArrayManager; // [rsp+20h] [rbp-38h] SPLIT BYREF
-    void* retaddr; // [rsp+58h] [rbp+0h]
+    GUID nullGuid = {};
+    RETURN_HR_IF(E_INVALIDARG, _spCellArrayManager != nullptr || _tileID != nullGuid); // 685
 
-    ComPtr<ICellArrayManager>* p_spCellArrayManager = &_spCellArrayManager;
-    bool v5 = _spCellArrayManager.ptr_ == 0;
-    nullGuid = 0;
-    if (!v5)
-    {
-        goto LABEL_12;
-    }
-    if (_tileID != nullGuid)
-    {
-    LABEL_12:
-        v10 = 0x80070057;
-        wil::details::in1diag3::Return_Hr(retaddr, 685u, "shellcommon\\shell\\tiles\\sharedstartlayout\\lib\\cellarraymanager.cpp", 0x80070057);
-    }
-    else
-    {
-        _arrayToModify = AutoIgnoredItemArray::Committed;
+    _arrayToModify = arrayToModify;
+    _spCellArrayManager = pCellArrayManager;
 
-        ComPtr<ICellArrayManager>::operator=((ComPtr<struct ICellArrayManager>*)&_spCellArrayManager, pCellArrayManager);
-        spCommittedCellArrayManager.ptr_ = 0;
-        v9 = ComPtr<ICellArrayManager>::As<ICommittedCellArrayManager>(p_spCellArrayManager, (__int64)&spCommittedCellArrayManager);
-        v10 = v9;
-        if (v9 >= 0)
-        {
-            v11 = spCommittedCellArrayManager.ptr_->AddIgnoredCommittedItem(spCommittedCellArrayManager.ptr_, tileID);
-            if (v11 >= 0)
-            {
-                _tileID = *tileID;
-            }
-            else
-            {
-                wil::details::in1diag3::_Log_Hr(retaddr, 697u, "shellcommon\\shell\\tiles\\sharedstartlayout\\lib\\cellarraymanager.cpp", v11);
-            }
-            v10 = 0;
-        }
-        else
-        {
-            wil::details::in1diag3::Return_Hr(retaddr, 696u, "shellcommon\\shell\\tiles\\sharedstartlayout\\lib\\cellarraymanager.cpp", v9);
-        }
-        ComPtr<IAssociationElement>::InternalRelease(&spCommittedCellArrayManager);
+    ComPtr<ICommittedCellArrayManager> spCommittedCellArrayManager;
+    RETURN_IF_FAILED(_spCellArrayManager.As(&spCommittedCellArrayManager)); // 696
+    if (SUCCEEDED_LOG(spCommittedCellArrayManager->AddIgnoredCommittedItem(tileID))) // 697
+    {
+        _tileID = tileID;
     }
-    return v10;
+
+    return S_OK;
 }

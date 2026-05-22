@@ -41,6 +41,7 @@ HRESULT CCellArray::RemoveItem(REFGUID itemID)
 {
     _EnumerateAllCells([&itemID, this](int indexY, int indexX, REFGUID) -> void
     {
+        static_assert(false, "Please implement me first!");
     });
     return S_OK;
 }
