@@ -134,7 +134,7 @@ void ItemLayoutResolverProxy::GroupEmptied()
 CItemLayoutResolver::CItemLayoutResolver()
     : _options(LRO_DISPLACE_INTO_NEGATIVE_SPACE)
     , m_isCollapsed(false)
-    , m_isUnk1(true)
+    , m_canCollapse(true)
 {
 }
 
@@ -782,6 +782,11 @@ HRESULT CItemLayoutResolver::_CommitChangesInternal()
     }
 
     return hr;
+}
+
+HRESULT CItemLayoutResolver::_Collapse(const Geometry::CRect& rcSourceCells, const Geometry::CRect& rcTargetCells)
+{
+    return m_canCollapse ? _collapseManager.Collapse(rcSourceCells, rcTargetCells, _spCellArrayManager.Get()) : S_OK;
 }
 
 void CItemLayoutResolver::_NotifyNewItemAddedBegin()

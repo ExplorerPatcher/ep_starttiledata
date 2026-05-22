@@ -154,13 +154,18 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedmodel\lib\SharedModelCommon.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\AdjacentDisplacementHandler.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\BaseDisplacementHandler.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\CellArray.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\CellArrayManager.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ColumnChangeMigrationHandler.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\EmptyCellDisplacementHandler.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\GenericTraversalOrder.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ICellArray.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ICellArrayManager.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\ItemLayoutResolver.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\PathCollapseHandler.h" />
+    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\PortraitTileLayoutResolver.h" />
     <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\TileGridMetricsCalculator.h" />
     <ClInclude Include="shell\inc\ContainerPolicies.h" />
     <ClInclude Include="shell\inc\Geometry.h" />
@@ -179,11 +184,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\AdjacentDisplacementHandler.cpp" />
+    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\BaseDisplacementHandler.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\CellArray.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\CellArrayManager.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\ColumnChangeMigrationHandler.cpp" />
+    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\EmptyCellDisplacementHandler.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\GenericTraversalOrder.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\ItemLayoutResolver.cpp" />
+    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\PathCollapseHandler.cpp" />
+    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\PortraitTileLayoutResolver.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\SharedStartLayout.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\StartLayoutFactory.cpp" />
     <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\TileGridMetricsCalculator.cpp" />

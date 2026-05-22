@@ -2,22 +2,44 @@
 
 #include "GenericTraversalOrder.h"
 #include "ItemLayoutResolver.h"
+#include "PortraitTileLayoutResolver.h"
 #include "TileGridMetricsCalculator.h"
 
 #include "../../sharedmodel/lib/SharedModelCommon.h"
 
 using namespace Microsoft::WRL;
 
-EXTERN_C STDAPI SharedStartLayout_CreateTileGridMetricsCalculator(
-    TileSizingMode tileSizingMode, const float displayWidth, const float displayHeight, const float screenDiagonal,
-    ITileGridMetricsCalculator** tileSizeCalculator)
+EXTERN_C STDAPI SharedStartLayout_CreatePortraitLayoutResolver(IItemLayoutResolver** ppLayoutResolver)
 {
-    *tileSizeCalculator = nullptr;
+    *ppLayoutResolver = nullptr;
 
-    ComPtr<ITileGridMetricsCalculator> spTileGridMetricsCalculator;
-    RETURN_IF_FAILED(MakeAndInitialize<TileGridMetricsCalculator>(
-        &spTileGridMetricsCalculator, tileSizingMode, displayWidth, displayHeight, screenDiagonal)); // 77
-    *tileSizeCalculator = spTileGridMetricsCalculator.Detach();
+    ComPtr<IItemLayoutResolver> spLayoutResolver;
+    RETURN_IF_FAILED(MakeAndInitialize<CPortraitTileLayoutResolver>(&spLayoutResolver, LRO_DISPLACE_INTO_NEGATIVE_SPACE)); // 17
+    *ppLayoutResolver = spLayoutResolver.Detach();
+    return S_OK;
+}
+
+EXTERN_C STDAPI SharedStartLayout_CreateDesktopPortraitLayoutResolver(IItemLayoutResolver** ppLayoutResolver)
+{
+    *ppLayoutResolver = nullptr;
+
+    ComPtr<IItemLayoutResolver> spLayoutResolver;
+    RETURN_IF_FAILED(MakeAndInitialize<CPortraitTileLayoutResolver>(&spLayoutResolver, LRO_NONE)); // 27
+    *ppLayoutResolver = spLayoutResolver.Detach();
+    return S_OK;
+}
+
+EXTERN_C STDAPI SharedStartLayout_CreateGroupsLayoutResolver(IItemLayoutResolver** ppLayoutResolver)
+{
+    *ppLayoutResolver = nullptr;
+
+    ComPtr<IItemLayoutResolver> layoutResolver;
+    RETURN_IF_FAILED(MakeAndInitialize<CGroupsTileLayoutResolver>(&layoutResolver)); // 37
+
+    static constexpr RECT c_GroupsLayoutResolverContainerMargins = { 0, 1, 0, 0 };
+
+    RETURN_IF_FAILED(layoutResolver->SetContainerMargins(c_GroupsLayoutResolverContainerMargins)); // 41
+    *ppLayoutResolver = layoutResolver.Detach();
     return S_OK;
 }
 
@@ -42,5 +64,18 @@ EXTERN_C STDAPI SharedStartLayout_CreateLayoutTraversalOrder(
     }
 
     *ppLayoutTraversalOrder = spLayoutTraversalOrder.Detach();
+    return S_OK;
+}
+
+EXTERN_C STDAPI SharedStartLayout_CreateTileGridMetricsCalculator(
+    TileSizingMode tileSizingMode, const float displayWidth, const float displayHeight, const float screenDiagonal,
+    ITileGridMetricsCalculator** tileSizeCalculator)
+{
+    *tileSizeCalculator = nullptr;
+
+    ComPtr<ITileGridMetricsCalculator> spTileGridMetricsCalculator;
+    RETURN_IF_FAILED(MakeAndInitialize<TileGridMetricsCalculator>(
+        &spTileGridMetricsCalculator, tileSizingMode, displayWidth, displayHeight, screenDiagonal)); // 77
+    *tileSizeCalculator = spTileGridMetricsCalculator.Detach();
     return S_OK;
 }

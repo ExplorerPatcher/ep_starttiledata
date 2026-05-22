@@ -42,6 +42,20 @@ public:
     //~ End IStartLayoutFactory Interface
 };
 
+EXTERN_C STDAPI SharedStartLayout_CreatePortraitLayoutResolver(IItemLayoutResolver** ppLayoutResolver);
+
+EXTERN_C STDAPI SharedStartLayout_CreateDesktopPortraitLayoutResolver(IItemLayoutResolver** ppLayoutResolver);
+
+EXTERN_C STDAPI SharedStartLayout_CreateGroupsLayoutResolver(IItemLayoutResolver** ppLayoutResolver);
+
+EXTERN_C STDAPI SharedStartLayout_CreateTileGridMetricsCalculator(
+    TileSizingMode tileSizingMode, const float displayWidth, const float displayHeight, const float screenDiagonal,
+    ITileGridMetricsCalculator** tileSizeCalculator);
+
+EXTERN_C STDAPI SharedStartLayout_CreateLayoutTraversalOrder(
+    IItemLayoutResolver* layoutResolver, int maxGroupWidth, LayoutOrder order,
+    ILayoutTraversalOrder** ppLayoutTraversalOrder);
+
 HRESULT StartLayoutFactory::CreatePortraitLayoutResolver(IItemLayoutResolver** ppLayoutResolver)
 {
     RETURN_HR(SharedStartLayout_CreatePortraitLayoutResolver(ppLayoutResolver)); // 18
@@ -57,12 +71,6 @@ HRESULT StartLayoutFactory::CreateGroupsLayoutResolver(IItemLayoutResolver** ppL
     RETURN_HR(SharedStartLayout_CreateGroupsLayoutResolver(ppLayoutResolver)); // 28
 }
 
-EXTERN_C STDAPI SharedStartLayout_CreateLayoutTraversalOrder(
-    IItemLayoutResolver* layoutResolver,
-    int maxGroupWidth,
-    LayoutOrder order,
-    ILayoutTraversalOrder** ppLayoutTraversalOrder);
-
 HRESULT StartLayoutFactory::CreateLayoutTraversalOrder(
     IItemLayoutResolver* layoutResolver, int maxGroupWidth, LayoutOrder order,
     ILayoutTraversalOrder** ppLayoutTraversalOrder)
@@ -70,10 +78,6 @@ HRESULT StartLayoutFactory::CreateLayoutTraversalOrder(
     RETURN_HR(SharedStartLayout_CreateLayoutTraversalOrder(
         layoutResolver, maxGroupWidth, order, ppLayoutTraversalOrder)); // 36
 }
-
-EXTERN_C STDAPI SharedStartLayout_CreateTileGridMetricsCalculator(
-    TileSizingMode tileSizingMode, const float displayWidth, const float displayHeight, const float screenDiagonal,
-    ITileGridMetricsCalculator** tileSizeCalculator);
 
 HRESULT StartLayoutFactory::CreateTileGridMetricsCalculator(
     const TileSizingMode tileSizingMode, const float displayWidth, const float displayHeight,

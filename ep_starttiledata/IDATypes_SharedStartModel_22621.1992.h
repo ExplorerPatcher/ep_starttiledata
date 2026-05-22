@@ -549,6 +549,86 @@ struct CItemLayoutResolver_vtbl : IItemLayoutResolver_vtbl // Make sure after th
     HRESULT (__thiscall *_CommitChangesInternal)(CItemLayoutResolver* This);
 };
 
+class CEmptyCellDisplacementHandler
+    : IItemLayoutDisplacementHandler
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    ICellArrayManager* m_cellArrayManager;
+};
+
+enum DISPLACEMENT_DIRECTION
+{
+    DD_UP = 0,
+    DD_DOWN = 1,
+    DD_LEFT = 2,
+    DD_RIGHT = 3,
+    DD_MAX = 4,
+};
+
+class CBaseDisplacementHandler
+    : IItemLayoutDisplacementHandler
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    ICellArrayManager* m_cellArrayManager;
+};
+
+enum SINGLE_TILE_ADJACENT_OPTION_FLAGS
+{
+    STAOF_NONE = 0,
+    STAOF_PREFER_SHORTEST_DISPLACEMENT = 0x1,
+    STAOF_DISPLACE_BLOCK_IS_CONTAINED_IN_TARGET = 0x2,
+    STAOF_DISPLACE_INTO_NEGATIVE_SPACE = 0x4,
+    STAOF_PREFER_SWAP_OVER_DIRECTION_PRIORITY = 0x8,
+};
+
+class CAdjacentDisplacementHandler
+    : CBaseDisplacementHandler
+{
+    void* gap[3];
+
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    struct DisplaceResult
+    {
+        bool valid;
+        Geometry::CPoint offset;
+        int distanceMoved;
+        Geometry::CRect displacementDestination;
+    };
+
+    CCoSimpleArray<DISPLACEMENT_DIRECTION> m_directionPriorities;
+    SINGLE_TILE_ADJACENT_OPTION_FLAGS m_options;
+};
+
+enum EXPAND_COLLAPSE_DIRECTION
+{
+    EXPAND_COLLAPSE_DIRECTION_ROW = 0,
+    EXPAND_COLLAPSE_DIRECTION_COLUMN = 1,
+};
+
+class CPathCollapseHandler
+    : IItemLayoutCollapseHandler
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    ICellArrayManager* m_cellArrayManager;
+    EXPAND_COLLAPSE_DIRECTION m_expandCollapseDirection;
+    bool m_smartCollapseEnabled;
+};
+
+class __cppobj CPortraitTileLayoutResolver : CItemLayoutResolver
+{
+    Microsoft::WRL::ComPtr<IItemCellAssignor> _spCellAssignor;
+    Microsoft::WRL::ComPtr<CPathCollapseHandler> m_pathCollapseHandler;
+    Geometry::CRect m_lastCleanupSource;
+    Geometry::CRect m_lastCleanupTarget;
+};
 
 struct ICellArray : IUnknown
 {

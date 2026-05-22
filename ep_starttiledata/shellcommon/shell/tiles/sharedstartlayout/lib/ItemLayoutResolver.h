@@ -116,15 +116,15 @@ enum class ModificationOperation
 MIDL_INTERFACE("d364071e-0afe-427c-a397-e9e1f734d4dd")
 IItemLayoutDisplacementHandler : IUnknown
 {
-    virtual HRESULT STDMETHODCALLTYPE SetCellArray(ICellArrayManager*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE DisplaceItemsFromRect(const Geometry::CRect&, const Geometry::CRect&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SetCellArray(ICellArrayManager* cellArrayManager) = 0;
+    virtual HRESULT STDMETHODCALLTYPE DisplaceItemsFromRect(const Geometry::CRect& targetRect, const Geometry::CRect& previousRect) = 0;
 };
 
 MIDL_INTERFACE("16d714e3-2917-489e-81f1-fbd6b8e72742")
 IItemLayoutCollapseHandler : IUnknown
 {
-    virtual HRESULT STDMETHODCALLTYPE SetCellArray(ICellArrayManager*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE Collapse(const Geometry::CRect&, const Geometry::CRect&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SetCellArray(ICellArrayManager* cellArrayManager) = 0;
+    virtual HRESULT STDMETHODCALLTYPE Collapse(const Geometry::CRect& sourceCells, const Geometry::CRect& targetCells) = 0;
 };
 
 class CItemLayoutDisplacement
@@ -155,9 +155,11 @@ private:
 
 enum LAYOUT_RESOLVER_OPTIONS
 {
-    LRO_NONE = 0x0,
+    LRO_NONE = 0,
     LRO_DISPLACE_INTO_NEGATIVE_SPACE = 0x1,
 };
+
+DEFINE_ENUM_FLAG_OPERATORS(LAYOUT_RESOLVER_OPTIONS);
 
 class CItemLayoutResolver
     : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::ClassicCom>
@@ -233,16 +235,16 @@ public:
     //~ End ILayoutHitTest Interface
 
 protected:
-    virtual HRESULT _FindTargetDestinationForNewSize(REFGUID, const SIZE&, Geometry::CRect*) = 0;
+    virtual HRESULT _FindTargetDestinationForNewSize(REFGUID itemId, const SIZE& sizeItemCells, Geometry::CRect* rcItemBounds) = 0;
     virtual IItemCellAssignor* _GetCellAssignor() = 0;
-    virtual HRESULT _PrepareLayoutBeforeOperation(const Geometry::CRect&, const Geometry::CRect&) = 0;
-    virtual HRESULT _CleanupLayoutAfterOperation(const Geometry::CRect&, const Geometry::CRect&) = 0;
+    virtual HRESULT _PrepareLayoutBeforeOperation(const Geometry::CRect& rcSourceCells, const Geometry::CRect& rcTargetCells) = 0;
+    virtual HRESULT _CleanupLayoutAfterOperation(const Geometry::CRect& rcSourceCells, const Geometry::CRect& rcTargetCells) = 0;
     virtual HRESULT _RepairLayout() = 0;
     virtual HRESULT _ModifyItemUncommittedInternal(
         REFGUID itemID, const RECT& rcDestination, const ModificationOperation operation);
     virtual HRESULT _CommitChangesInternal();
 
-    HRESULT _Collapse(const Geometry::CRect&, const Geometry::CRect&);
+    HRESULT _Collapse(const Geometry::CRect& rcSourceCells, const Geometry::CRect& rcTargetCells);
     void _NotifyNewItemAddedBegin();
     void _NotifyNewItemAddedEnd();
     void _NotifyItemBoundsChange(REFGUID itemID, const RECT& rcItemBoundsCells);
@@ -265,7 +267,7 @@ private:
     bool _isBatchingItemBoundsChangeUpdates;
     CSimpleHashTable<GUID, Geometry::CRect> _batchedUpdates;
     bool m_isCollapsed;
-    bool m_isUnk1;
+    bool m_canCollapse; // @Note: Added after 14361
 
     HRESULT _DisplaceItemsFromRect(const Geometry::CRect& targetRect, const Geometry::CRect& previousRect);
     HRESULT _StartBatchingItemBoundsChangeUpdates();
