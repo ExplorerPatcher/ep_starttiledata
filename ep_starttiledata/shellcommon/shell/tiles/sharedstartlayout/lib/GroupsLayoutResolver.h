@@ -28,7 +28,7 @@ public:
     //~ Begin IGroupBoundsChangeNotification Interface
     STDMETHODIMP_(void) NewItemAddedBegin() override;
     STDMETHODIMP_(void) NewItemAddedEnd() override;
-    STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayout) override;
+    STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver, REFGUID groupID) override;
     STDMETHODIMP GroupBoundsChanged(REFGUID groupID) override;
     STDMETHODIMP_(void) GroupEmptiedPending(REFGUID groupID) override;
     STDMETHODIMP_(void) GroupEmptied() override;
@@ -63,7 +63,10 @@ private:
     HRESULT _GetResolverBoundsWithMargins(REFGUID itemID, Geometry::CRect* bounds);
     HRESULT _EnsureConsistencyWithResolverBounds(REFGUID groupID);
 
-    static constexpr int c_groupWidth = 69696969; // todo real value
+    template <typename T>
+    static HRESULT EnumerateGroupsInLayoutOrder(ICellArrayManager* pCellArrayManager, T lambda);
+
+    const int c_groupWidth;
 
     bool m_newItemBeingAdded;
     GUID m_pendingRemovedGroup;

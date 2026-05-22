@@ -200,12 +200,12 @@ class CSimpleHashTable
 {
     class HashBucket
     {
-        enum ENTRYSTATE
+        typedef enum ENTRYSTATE
         {
             EMPTY = 0,
             OCCUPIED = 1,
             FREED = 2
-        };
+        } ENTRYSTATE;
 
         ENTRYSTATE _state;
         TKey _key;
@@ -270,7 +270,7 @@ struct ICellArrayManager_vtbl : IUnknown_vtbl
     bool (__stdcall *IsEmpty)(ICellArrayManager* This);
     bool (__stdcall *IsValidRect)(ICellArrayManager* This, const Geometry::CRect&);
     bool (__stdcall *IsValidCellCoordinate)(ICellArrayManager* This, const Geometry::CPoint&);
-    const GUID (__stdcall *GetItemAtCell)(ICellArrayManager* This, const int, const int);
+    GUID* (__stdcall *GetItemAtCell)(ICellArrayManager* This, GUID* retstr, const int, const int);
     bool (__stdcall *IsRectEmpty)(ICellArrayManager* This, const Geometry::CRect);
     HRESULT (__stdcall *GetItemsInRect)(ICellArrayManager* This, const Geometry::CRect, CSet<GUID>*);
     HRESULT (__stdcall *GetItemsOutsideOfRect)(ICellArrayManager* This, const Geometry::CRect, CSet<GUID>*);
@@ -387,7 +387,7 @@ struct IItemLayoutResolver_vtbl : IUnknown_vtbl
     HRESULT (__stdcall *SetContainerMargins)(IItemLayoutResolver* This, const RECT);
     HRESULT (__stdcall *GetContainerMargins)(IItemLayoutResolver* This, RECT*);
     HRESULT (__stdcall *SetMaxCellBounds)(IItemLayoutResolver* This, const int, const int);
-    SIZE (__stdcall *GetMaxCellBounds)(IItemLayoutResolver* This);
+    SIZE* (__stdcall *GetMaxCellBounds)(IItemLayoutResolver* This, SIZE* retstr);
     HRESULT (__stdcall *MigrateItems)(IItemLayoutResolver* This, IItemLayoutResolver*, const LayoutMigrationOptions);
     HRESULT (__stdcall *CommitChanges)(IItemLayoutResolver* This);
     HRESULT (__stdcall *AbandonChanges)(IItemLayoutResolver* This);
@@ -639,7 +639,7 @@ struct ICellArray : IUnknown
 struct ICellArray_vtbl : IUnknown_vtbl
 {
     HRESULT (__stdcall *CloneArray)(ICellArray*, ICellArray**);
-    const GUID (__stdcall *GetCellValue)(ICellArray*, const int, const int);
+    GUID* (__stdcall *GetCellValue)(ICellArray*, GUID* retstr, const int, const int);
     const Geometry::CRect* (__stdcall *GetArrayBounds)(ICellArray*);
     void (__stdcall *GetItemsInRect)(ICellArray*, const Geometry::CRect&, CSet<GUID>*);
     void (__stdcall *FixCoordinatesToBeNonNegative)(ICellArray*);
@@ -668,7 +668,7 @@ struct ICommittedCellArrayManager : IUnknown
 
 struct ICommittedCellArrayManager_vtbl : IUnknown_vtbl
 {
-	const GUID (__stdcall *GetCommittedItemAtCell)(ICommittedCellArrayManager*, const int, const int);
+	GUID* (__stdcall *GetCommittedItemAtCell)(ICommittedCellArrayManager*, GUID* retstr, const int, const int);
     HRESULT (__stdcall *GetCommittedItemBounds)(ICommittedCellArrayManager*, const GUID&, const Geometry::CRect&);
     HRESULT (__stdcall *GetCommittedItemsInRect)(ICommittedCellArrayManager*, const Geometry::CRect&, CSet<GUID>*);
     HRESULT (__stdcall *AddIgnoredCommittedItem)(ICommittedCellArrayManager*, const GUID&);
@@ -690,7 +690,6 @@ class CCellArrayManager
 	CSimpleHashTable<GUID, Geometry::CRect, CDefaultHashPolicy<_GUID>, CDefaultKeyCompare<GUID>, CDefaultResizePolicy, CDefaultRehashPolicy> _htCommittedTileBounds;
 	GUID m_removedItem;
 };
-
 
 class CGroupsLayoutResolverCallbackListener
     : public IItemLayoutResolverInternalCallback
@@ -714,6 +713,7 @@ class CGroupsLayoutResolver : public CItemLayoutResolver
         Microsoft::WRL::ComPtr<CGroupsLayoutResolverCallbackListener> resolverCallback;
     };
 
+    /*const*/ int c_groupWidth;
     bool m_newItemBeingAdded;
     GUID m_pendingRemovedGroup;
     RECT m_containerMargins;
@@ -721,6 +721,12 @@ class CGroupsLayoutResolver : public CItemLayoutResolver
     CSimpleHashTable<GUID, GroupResolverInternal> m_groupResolvers;
 };
 
+class CEmptyColumnCollapseMigrationHandler
+    : public IItemMigrationHandler
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+};
 class CPortraitTileCellAssignor
     : IItemCellAssignor
 {

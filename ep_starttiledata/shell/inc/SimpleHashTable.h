@@ -321,12 +321,12 @@ private:
     private:
         HashBucket& operator=(const HashBucket& other) = delete;
 
-        enum class ENTRYSTATE
+        typedef enum class ENTRYSTATE
         {
             EMPTY = 0,
             OCCUPIED = 1,
             FREED = 2
-        };
+        } ENTRYSTATE;
 
         ENTRYSTATE _state;
         TKey _key;

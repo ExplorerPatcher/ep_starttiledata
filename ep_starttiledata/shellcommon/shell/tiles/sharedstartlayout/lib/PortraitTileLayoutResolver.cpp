@@ -20,6 +20,7 @@ CPortraitTileLayoutResolver::CPortraitTileLayoutResolver()
 HRESULT CPortraitTileLayoutResolver::RuntimeClassInitialize(LAYOUT_RESOLVER_OPTIONS options)
 {
     _options = options;
+
     CItemLayoutResolver::RuntimeClassInitialize();
 
     RETURN_IF_FAILED(_displacementManager.AddDisplacementHandler(Make<CEmptyCellDisplacementHandler>().Get())); // 23

@@ -41,7 +41,7 @@ HRESULT CGenericTraversalOrder::GetCurrentItemGroup(
 
     POINT currentGroupsCell;
     currentGroupsCell.y = startingCell.y;
-    currentGroupsCell.x = startingCell.x / (groupMargins.left + groupMargins.right + m_maxGroupWidth);
+    currentGroupsCell.x = startingCell.x / (groupMargins.left + m_maxGroupWidth + groupMargins.right);
 
     RETURN_IF_FAILED(m_layoutResolver->GetItemByCell(currentGroupsCell, itemID)); // 30
     RETURN_IF_FAILED(m_layoutResolver->GetLayoutResolverForContainer(*itemID, groupResolver)); // 31
@@ -49,8 +49,8 @@ HRESULT CGenericTraversalOrder::GetCurrentItemGroup(
     POINT groupStartCell;
     RETURN_IF_FAILED(GetActualGroupStartCell(*itemID, &groupStartCell)); // 34
 
-    groupRelativeCell->y = startingCell.y - groupStartCell.y;
-    groupRelativeCell->x = startingCell.x - groupStartCell.x;
+    *groupRelativeCell = { startingCell.x - groupStartCell.x, startingCell.y - groupStartCell.y };
+
     return S_OK;
 }
 
@@ -63,7 +63,7 @@ HRESULT CGenericTraversalOrder::GetActualGroupStartCell(REFGUID groupID, POINT* 
     RETURN_IF_FAILED(m_layoutResolver->GetContainerMargins(&groupMargins)); // 47
 
     m_layoutResolver->GetMaxCellBounds();
-    cell->y = targetBounds.top;
-    cell->x = targetBounds.left * (groupMargins.left + groupMargins.right + m_maxGroupWidth);
+    *cell = { targetBounds.left * (groupMargins.left + m_maxGroupWidth + groupMargins.right), targetBounds.top };
+
     return S_OK;
 }
