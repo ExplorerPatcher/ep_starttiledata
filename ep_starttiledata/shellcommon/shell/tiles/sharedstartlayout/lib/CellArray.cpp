@@ -14,7 +14,7 @@ CCellArray::~CCellArray()
 
 HRESULT CCellArray::RuntimeClassInitialize()
 {
-    _rgCellData = new(std::nothrow) GUID[];
+    _rgCellData = new(std::nothrow) GUID[1];
     RETURN_IF_NULL_ALLOC(_rgCellData); // 22
 
     *_rgCellData = c_emptyCellValue_7;

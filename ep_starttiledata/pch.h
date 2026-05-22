@@ -10,6 +10,8 @@
 // add headers that you want to pre-compile here
 #include "framework.h"
 
+#include <algorithm>
+
 #include <wil/result_macros.h>
 #include <wrl/implements.h>
 

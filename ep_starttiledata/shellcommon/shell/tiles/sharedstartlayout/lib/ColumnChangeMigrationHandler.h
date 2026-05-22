@@ -2,16 +2,18 @@
 
 #include "ICellArrayManager.h"
 
-struct IItemCellAssignor : IUnknown
+MIDL_INTERFACE("7ae8c636-b6f2-48db-a6ef-88bb015c01cb")
+IItemCellAssignor : IUnknown
 {
-    virtual HRESULT STDMETHODCALLTYPE SetCellArray(ICellArrayManager*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE CalculateLocationForNewItem(const Geometry::CSize&, Geometry::CRect*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SetCellArray(ICellArrayManager* cellArrayManager) = 0;
+    virtual HRESULT STDMETHODCALLTYPE CalculateLocationForNewItem(const Geometry::CSize& sizeItemCells, Geometry::CRect* rcNewBounds) = 0;
 };
 
-struct IItemMigrationHandler : IUnknown
+MIDL_INTERFACE("c44d7f05-9680-4583-a2de-090cd1645d1a")
+IItemMigrationHandler : IUnknown
 {
-    virtual HRESULT STDMETHODCALLTYPE MigrateItems(ICellArrayManager*, ICellArrayManager*, IItemCellAssignor*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE SetUnassignedItemId(REFGUID) = 0;
+    virtual HRESULT STDMETHODCALLTYPE MigrateItems(ICellArrayManager* pSourceCellArrayManager, ICellArrayManager* pDestinationCellArrayManager, IItemCellAssignor* pTileCellAssignor) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SetUnassignedItemId(REFGUID unassignedItemId) = 0;
 };
 
 class CColumnChangeMigrationHandler
