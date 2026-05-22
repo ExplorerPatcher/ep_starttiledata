@@ -498,11 +498,11 @@ enum /*class*/ ModificationOperation
 };
 
 class CItemLayoutResolver
-    : IItemLayoutResolver
-    , ICellArrayManagerCallback
-    , IGroupBoundsChangeNotification
-    , ILayoutHitTest
-    , IItemLayoutResolverInternal
+    : public IItemLayoutResolver
+    , public ICellArrayManagerCallback
+    , public IGroupBoundsChangeNotification
+    , public ILayoutHitTest
+    , public IItemLayoutResolverInternal
 {
     Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
     ULONG refcount_;
@@ -688,3 +688,34 @@ class CCellArrayManager
 	CSimpleHashTable<GUID, Geometry::CRect, CDefaultHashPolicy<_GUID>, CDefaultKeyCompare<GUID>, CDefaultResizePolicy, CDefaultRehashPolicy> _htCommittedTileBounds;
 	GUID m_removedItem;
 };
+
+
+class CGroupsLayoutResolverCallbackListener
+    : public IItemLayoutResolverInternalCallback
+    , public IItemLayoutResolverCallback
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    bool m_iteratingOverCallbacks;
+    GUID m_groupID;
+    Microsoft::WRL::ComPtr<IItemLayoutResolver> m_resolver;
+    CCoSimpleArray<IGroupBoundsChangeNotification*> m_resolversToUnregister;
+    CSimpleHashTable<IGroupBoundsChangeNotification*, Microsoft::WRL::ComPtr<IGroupBoundsChangeNotification>> m_callbacks;
+};
+
+class CGroupsLayoutResolver : public CItemLayoutResolver
+{
+    struct GroupResolverInternal
+    {
+        Microsoft::WRL::ComPtr<IItemLayoutResolver> resolver;
+        Microsoft::WRL::ComPtr<CGroupsLayoutResolverCallbackListener> resolverCallback;
+    };
+
+    bool m_newItemBeingAdded;
+    GUID m_pendingRemovedGroup;
+    RECT m_containerMargins;
+    Microsoft::WRL::ComPtr<IItemCellAssignor> m_cellAssignor;
+    CSimpleHashTable<GUID, GroupResolverInternal> m_groupResolvers;
+};
+

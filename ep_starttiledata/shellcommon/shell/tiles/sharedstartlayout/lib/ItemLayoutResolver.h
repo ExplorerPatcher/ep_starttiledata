@@ -202,7 +202,8 @@ public:
     STDMETHODIMP GetLayoutBoundsWithoutItem(REFGUID itemID, RECT* bounds) override;
     STDMETHODIMP GetItemBounds(REFGUID itemID, RECT* itemBounds) override;
     STDMETHODIMP GetContainerSizeWithMargins(REFGUID containerID, SIZE* size) override;
-    STDMETHODIMP GetLastOccupiedCellInColumn(const long column, REFGUID excludedItemID, POINT* occupiedCell, int* columnUnoccupied) override;
+    STDMETHODIMP GetLastOccupiedCellInColumn(
+        const long column, REFGUID excludedItemID, POINT* occupiedCell, int* columnUnoccupied) override;
     STDMETHODIMP SetContainerMargins(const RECT containerMargins) override;
     STDMETHODIMP GetContainerMargins(RECT* containerMargins) override;
     STDMETHODIMP SetMaxCellBounds(const int nMaxXBounds, const int nMaxYBounds) override;
@@ -235,10 +236,13 @@ public:
     //~ End ILayoutHitTest Interface
 
 protected:
-    virtual HRESULT _FindTargetDestinationForNewSize(REFGUID itemId, const SIZE& sizeItemCells, Geometry::CRect* rcItemBounds) = 0;
+    virtual HRESULT _FindTargetDestinationForNewSize(
+        REFGUID itemId, const SIZE& sizeItemCells, Geometry::CRect* rcItemBounds) = 0;
     virtual IItemCellAssignor* _GetCellAssignor() = 0;
-    virtual HRESULT _PrepareLayoutBeforeOperation(const Geometry::CRect& rcSourceCells, const Geometry::CRect& rcTargetCells) = 0;
-    virtual HRESULT _CleanupLayoutAfterOperation(const Geometry::CRect& rcSourceCells, const Geometry::CRect& rcTargetCells) = 0;
+    virtual HRESULT _PrepareLayoutBeforeOperation(
+        const Geometry::CRect& rcSourceCells, const Geometry::CRect& rcTargetCells) = 0;
+    virtual HRESULT _CleanupLayoutAfterOperation(
+        const Geometry::CRect& rcSourceCells, const Geometry::CRect& rcTargetCells) = 0;
     virtual HRESULT _RepairLayout() = 0;
     virtual HRESULT _ModifyItemUncommittedInternal(
         REFGUID itemID, const RECT& rcDestination, const ModificationOperation operation);
