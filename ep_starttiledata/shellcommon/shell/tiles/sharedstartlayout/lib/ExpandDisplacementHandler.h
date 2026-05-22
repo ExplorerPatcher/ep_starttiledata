@@ -1,12 +1,7 @@
 ﻿#pragma once
 
 #include "ItemLayoutResolver.h"
-
-enum EXPAND_COLLAPSE_DIRECTION
-{
-    EXPAND_COLLAPSE_DIRECTION_ROW = 0,
-    EXPAND_COLLAPSE_DIRECTION_COLUMN = 1
-};
+#include "PathCollapseHandler.h"
 
 class CExpandDisplacementHandler
     : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::ClassicCom>

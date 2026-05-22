@@ -4,8 +4,12 @@
 
 #include "AdjacentDisplacementHandler.h"
 #include "BaseDisplacementHandler.h"
+#include "CompoundDisplacementHandler.h"
 #include "EmptyCellDisplacementHandler.h"
+#include "ExpandDisplacementHandler.h"
 #include "PathCollapseHandler.h"
+#include "PortraitTileCellAssignor.h"
+#include "PushDownDisplacementHandler.h"
 
 using namespace Microsoft::WRL;
 
