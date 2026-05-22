@@ -636,16 +636,16 @@ struct ICellArray : IUnknown
 
 struct ICellArray_vtbl : IUnknown_vtbl
 {
-  HRESULT (__stdcall *CloneArray)(ICellArray , ICellArray **);
-  const GUID (__stdcall *GetCellValue)(ICellArray *, const int, const int);
-  const Geometry::CRect *(__stdcall *GetArrayBounds)(ICellArray *);
-  void (__stdcall *GetItemsInRect)(ICellArray *, const Geometry::CRect&, CSet<GUID> *);
-  void (__stdcall *FixCoordinatesToBeNonNegative)(ICellArray *);
-  HRESULT (__stdcall *SetItem)(ICellArray *, const GUID&, const Geometry::CRect&);
-  HRESULT (__stdcall *RemoveItem)(ICellArray *, const GUID&);
-  HRESULT (__stdcall *SetArrayBounds)(ICellArray *, const Geometry::CRect&);
-  HRESULT (__stdcall *AddIgnoredItem)(ICellArray *, const GUID&);
-  HRESULT (__stdcall *RemoveIgnoredItem)(ICellArray *, const GUID&);
+    HRESULT (__stdcall *CloneArray)(ICellArray*, ICellArray**);
+    const GUID (__stdcall *GetCellValue)(ICellArray*, const int, const int);
+    const Geometry::CRect* (__stdcall *GetArrayBounds)(ICellArray*);
+    void (__stdcall *GetItemsInRect)(ICellArray*, const Geometry::CRect&, CSet<GUID>*);
+    void (__stdcall *FixCoordinatesToBeNonNegative)(ICellArray*);
+    HRESULT (__stdcall *SetItem)(ICellArray*, const GUID&, const Geometry::CRect&);
+    HRESULT (__stdcall *RemoveItem)(ICellArray*, const GUID&);
+    HRESULT (__stdcall *SetArrayBounds)(ICellArray*, const Geometry::CRect&);
+    HRESULT (__stdcall *AddIgnoredItem)(ICellArray*, const GUID&);
+    HRESULT (__stdcall *RemoveIgnoredItem)(ICellArray*, const GUID&);
 };
 
 class CCellArray
@@ -666,11 +666,11 @@ struct ICommittedCellArrayManager : IUnknown
 
 struct ICommittedCellArrayManager_vtbl : IUnknown_vtbl
 {
-	const GUID (__stdcall* GetCommittedItemAtCell)(ICommittedCellArrayManager*, const int, const int );
-    HRESULT (__stdcall* GetCommittedItemBounds)(ICommittedCellArrayManager*, const GUID&, const Geometry::CRect&);
-    HRESULT (__stdcall* GetCommittedItemsInRect)(ICommittedCellArrayManager*, const Geometry::CRect&, CSet<GUID>*);
-    HRESULT (__stdcall* AddIgnoredCommittedItem)(ICommittedCellArrayManager*, const GUID&);
-    HRESULT (__stdcall* RemoveIgnoredCommittedItem)(ICommittedCellArrayManager*, const GUID&);
+	const GUID (__stdcall *GetCommittedItemAtCell)(ICommittedCellArrayManager*, const int, const int);
+    HRESULT (__stdcall *GetCommittedItemBounds)(ICommittedCellArrayManager*, const GUID&, const Geometry::CRect&);
+    HRESULT (__stdcall *GetCommittedItemsInRect)(ICommittedCellArrayManager*, const Geometry::CRect&, CSet<GUID>*);
+    HRESULT (__stdcall *AddIgnoredCommittedItem)(ICommittedCellArrayManager*, const GUID&);
+    HRESULT (__stdcall *RemoveIgnoredCommittedItem)(ICommittedCellArrayManager*, const GUID&);
 };
 
 class CCellArrayManager

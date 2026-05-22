@@ -8,7 +8,7 @@ CAdjacentDisplacementHandler::CAdjacentDisplacementHandler()
 }
 
 HRESULT CAdjacentDisplacementHandler::RuntimeClassInitialize(
-    const CCoSimpleArray<DISPLACEMENT_DIRECTION>& directionPriorities, SINGLE_TILE_ADJACENT_OPTION_FLAGS options)
+    CCoSimpleArray<DISPLACEMENT_DIRECTION>& directionPriorities, SINGLE_TILE_ADJACENT_OPTION_FLAGS options)
 {
     m_options = options;
     m_directionPriorities.Merge(directionPriorities, SAMF_SORTED | SAMF_UNION);

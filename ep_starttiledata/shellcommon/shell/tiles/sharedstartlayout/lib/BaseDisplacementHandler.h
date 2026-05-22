@@ -11,7 +11,8 @@ enum DISPLACEMENT_DIRECTION
     DD_MAX = 4,
 };
 
-class CBaseDisplacementHandler
+class DECLSPEC_UUID("f56d4a12-5ab3-438f-850d-e633763c12fc")
+CBaseDisplacementHandler
     : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::ClassicCom>
         , IItemLayoutDisplacementHandler
     >

@@ -22,7 +22,7 @@ public:
     CAdjacentDisplacementHandler();
 
     HRESULT RuntimeClassInitialize(
-        const CCoSimpleArray<DISPLACEMENT_DIRECTION>& directionPriorities, SINGLE_TILE_ADJACENT_OPTION_FLAGS options);
+        CCoSimpleArray<DISPLACEMENT_DIRECTION>& directionPriorities, SINGLE_TILE_ADJACENT_OPTION_FLAGS options);
 
     //~ Begin IItemLayoutDisplacementHandler Interface
     STDMETHODIMP DisplaceItemsFromRect(const Geometry::CRect& targetRect, const Geometry::CRect& previousRect) override;

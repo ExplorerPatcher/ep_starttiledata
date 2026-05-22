@@ -36,6 +36,11 @@ public:
 template <typename T>
 class CSimpleArrayStandardMergeHelper
 {
+public:
+    HRESULT Merge(T& elemDst, T& elemSrc) const
+    {
+        return S_OK;
+    }
 };
 
 template <
@@ -181,6 +186,16 @@ public:
     }
 };
 
+enum SAMERGE_FLAGS
+{
+    SAMF_SORTED = 0x1,
+    SAMF_NORMAL = 0x2,
+    SAMF_UNION = 0x4,
+    SAMF_INTERSECT = 0x8,
+};
+
+DEFINE_ENUM_FLAG_OPERATORS(SAMERGE_FLAGS);
+
 template <
     typename T,
     size_t MaxSize,
@@ -284,7 +299,7 @@ public:
         if constexpr (!std::is_trivially_destructible_v<T>)
             this->_parray[iElem].~T();
         if (iElem != this->_celem - 1)
-            memmove(std::addressof(this->_parray[iElem]), std::addressof(this->_parray[iElem + 1]), sizeof(T) * (this->_celem - iElem - 1));
+            memmove(this->_parray + iElem, this->_parray + (iElem + 1), sizeof(T) * (this->_celem - iElem - 1));
         --this->_celem;
         return S_OK;
     }
@@ -356,6 +371,105 @@ public:
         return hr;
     }
 
+    HRESULT Merge(CTSimpleArray& sarraySrc, SAMERGE_FLAGS samf)
+    {
+        return MergeEx(CompareHelper(), MergeHelper(), sarraySrc, samf);
+    }
+
+    template <typename Comparer, typename Merger>
+    HRESULT MergeEx(const Comparer& tcompare, const Merger& tmerge, CTSimpleArray& sarraySrc, SAMERGE_FLAGS samf)
+    {
+        HRESULT hr = S_OK;
+
+        if ((samf & SAMF_SORTED) == 0)
+        {
+            hr = sarraySrc.SortEx(tcompare);
+            if (SUCCEEDED(hr))
+            {
+                hr = this->SortEx(tcompare);
+            }
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            size_t iSrc;
+            hr = SizeTSub(sarraySrc.GetSize(), 1, &iSrc);
+            if (SUCCEEDED(hr))
+            {
+                size_t iDest;
+                hr = SizeTSub(this->GetSize(), 1, &iDest);
+
+                BOOL fBail = FALSE;
+                while (SUCCEEDED(hr))
+                {
+                    T& elemSrc = *(sarraySrc._parray + iSrc);
+                    T& elemDst = *(this->_parray + iDest);
+                    int nCompare = tcompare.Compare(elemDst, elemSrc);
+                    if (nCompare == 0)
+                    {
+                        hr = tmerge.Merge(elemDst, elemSrc);
+                        if (hr >= 0)
+                        {
+                            hr = SizeTSub(iSrc, 1, &iSrc);
+                        }
+                        if (hr >= 0)
+                        {
+                            hr = SizeTSub(iDest, 1, &iDest);
+                        }
+                    }
+                    else if (nCompare > 0)
+                    {
+                        if ((samf & SAMF_INTERSECT) != 0)
+                        {
+                            this->RemoveAt(iDest);
+                        }
+                        hr = SizeTSub(iDest, 1, &iDest);
+                    }
+                    else
+                    {
+                        if ((samf & SAMF_UNION) != 0)
+                        {
+                            hr = this->_InsertAt(elemSrc, iDest + 1);
+                            if (SUCCEEDED(hr))
+                            {
+                                if constexpr(std::is_pointer_v<T>)
+                                {
+                                    elemSrc = nullptr;
+                                }
+                            }
+                            else
+                            {
+                                fBail = TRUE;
+                                break;
+                            }
+                        }
+                        hr = SizeTSub(iSrc, 1, &iSrc);
+                    }
+                }
+
+                if ((samf & SAMF_UNION) != 0 && iSrc != -1 && !fBail)
+                {
+                    do
+                    {
+                        hr = this->InsertAt(sarraySrc.GetData()[iSrc], 0);
+                        if (hr >= 0)
+                        {
+                            hr = SizeTSub(iSrc, 1, &iSrc);
+                        }
+                    }
+                    while (SUCCEEDED(hr));
+                }
+            }
+
+            if (hr == INTSAFE_E_ARITHMETIC_OVERFLOW)
+            {
+                hr = S_OK;
+            }
+        }
+
+        return hr;
+    }
+
     HRESULT _EnsureCapacity(size_t celemCapacityDesired, size_t celemMaxCapacity = 4096)
     {
         HRESULT hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
@@ -405,7 +519,7 @@ public:
         if (SUCCEEDED(hr))
         {
             if (iElem < this->_celem)
-                memmove(std::addressof(this->_parray[iElem + 1]), std::addressof(this->_parray[iElem]), sizeof(T) * (this->_celem - iElem));
+                memmove(this->_parray + (iElem + 1), this->_parray + iElem, sizeof(T) * (this->_celem - iElem));
             this->_celem = cElemGrowTo;
         }
 
@@ -415,7 +529,7 @@ public:
     template <typename ArgType>
     void _InternalSetAtIndex(size_t iElem, ArgType&& t)
     {
-        T* newPos = std::addressof(this->_parray[iElem]);
+        T* newPos = this->_parray + iElem;
         if (newPos)
             new(newPos) T(std::forward<ArgType>(t));
     }
@@ -496,7 +610,7 @@ public:
     void _MergeThem(const Comparer& tcompare, size_t iFirst, size_t cElems)
     {
         size_t cHalf = cElems / 2;
-        T* parraySrc = &this->_parray[iFirst];
+        T* parraySrc = this->_parray + iFirst;
         memcpy(_parrayT, parraySrc, sizeof(T) * cHalf);
 
         size_t iIn1 = 0;
@@ -507,17 +621,17 @@ public:
         {
             if (tcompare.Compare(_parrayT[iIn1], parraySrc[iIn2]) > 0)
             {
-                memmove(&parraySrc[iOut], &parraySrc[iIn2], sizeof(T));
+                memmove(parraySrc + iOut, parraySrc + iIn2, sizeof(T));
                 ++iOut;
                 if (++iIn2 == cElems)
                 {
-                    memcpy(&parraySrc[iOut], &_parrayT[iIn1], sizeof(T) * (cElems - iOut));
+                    memcpy(parraySrc + iOut, _parrayT + iIn1, sizeof(T) * (cElems - iOut));
                     fDone = true;
                 }
             }
             else
             {
-                memmove(&parraySrc[iOut], &_parrayT[iIn1], sizeof(T));
+                memmove(parraySrc + iOut, _parrayT + iIn1, sizeof(T));
                 ++iOut;
                 if (++iIn1 == cHalf)
                 {
@@ -537,9 +651,9 @@ public:
         {
             if (tcompare.Compare(this->_parray[iFirst], this->_parray[iFirst + 1]) > 0)
             {
-                memmove(_parrayT, &this->_parray[iFirst], sizeof(T));
-                memmove(&this->_parray[iFirst], &this->_parray[iFirst + 1], sizeof(T));
-                memmove(&this->_parray[iFirst + 1], _parrayT, sizeof(T));
+                memmove(_parrayT, this->_parray + iFirst, sizeof(T));
+                memmove(this->_parray + iFirst, this->_parray + (iFirst + 1), sizeof(T));
+                memmove(this->_parray + (iFirst + 1), _parrayT, sizeof(T));
             }
         }
         else
