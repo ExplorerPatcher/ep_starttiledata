@@ -17,7 +17,7 @@ ILayoutTraversalOrder : IUnknown
     virtual HRESULT STDMETHODCALLTYPE GetFirst(POINT*, GUID*) = 0;
 };
 
-class CGenericTraversalOrder final
+class CGenericTraversalOrder
     : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::ClassicCom>
         , ILayoutTraversalOrder
     >

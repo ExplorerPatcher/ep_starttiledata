@@ -34,12 +34,12 @@ private:
     void _ChangeCellArraySize(const int, const int);
     void _GetItemsInRect(Geometry::CRect&, CSet<_GUID>*);
     void _SetRectValue(Geometry::CRect&, _GUID&);
-    const GUID _GetCellValueNoIgnore(const int, const int);
+    const GUID _GetCellValueNoIgnore(const int nXIndex, const int nYIndex);
     void _SetCellValue(const int, const int, GUID&);
     bool _IsRectEmpty(Geometry::CRect&);
     void _RemoveIgnoredItemsFromSet(CSet<GUID>*);
-    bool _IsItemInArray(GUID&);
-    HRESULT _SetArraySizeInternal(Geometry::CSize&, Geometry::CPoint&);
+    bool _IsItemInArray(REFGUID itemID);
+    HRESULT _SetArraySizeInternal(const Geometry::CSize& sizeArray, const Geometry::CPoint& ptOffset);
 
     Geometry::CRect _rcArrayBounds;
     GUID* _rgCellData;

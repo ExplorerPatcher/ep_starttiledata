@@ -805,3 +805,40 @@ class CCompoundDisplacementHandler
 
     ICellArrayManager* m_cellArrayManager;
 };
+
+enum LayoutNavigationDirection
+{
+    LayoutNavigationDirection_Up = 0x0,
+    LayoutNavigationDirection_Down = 0x1,
+    LayoutNavigationDirection_Left = 0x2,
+    LayoutNavigationDirection_Right = 0x3,
+};
+
+struct ILayoutTraversalOrder : IUnknown
+{
+};
+
+struct ILayoutTraversalOrder_vtbl : IUnknown_vtbl
+{
+    HRESULT (__stdcall*GetAdjacent)(
+        ILayoutTraversalOrder* This, const LayoutNavigationDirection, const POINT, POINT*, GUID*);
+    HRESULT (__stdcall*GetFirst)(ILayoutTraversalOrder* This, POINT*, GUID*);
+};
+
+class CGenericTraversalOrder
+    : ILayoutTraversalOrder
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    Microsoft::WRL::ComPtr<IItemLayoutResolver> m_layoutResolver;
+    int m_maxGroupWidth;
+};
+
+class CGridTraversalOrder : CGenericTraversalOrder
+{
+};
+
+class CLinearTraversalOrder : CGenericTraversalOrder
+{
+};
