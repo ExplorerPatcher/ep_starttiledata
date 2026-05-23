@@ -852,3 +852,8 @@ class CGroupsLayoutCollapseHandler
     Microsoft::WRL::ComPtr<ICellArrayManager> m_cellArrayManager;
     EXPAND_COLLAPSE_DIRECTION m_expandCollapseDirection;
 };
+
+class CGroupsCellAssignor
+    : CPortraitTileCellAssignor
+{
+};

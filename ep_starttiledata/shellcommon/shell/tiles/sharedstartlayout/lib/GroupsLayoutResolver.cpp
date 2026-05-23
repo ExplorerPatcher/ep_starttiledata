@@ -6,6 +6,7 @@
 #include "EmptyCellDisplacementHandler.h"
 #include "EmptyColumnCollapseMigrationHandler.h"
 #include "ExpandDisplacementHandler.h"
+#include "GroupsCellAssignor.h"
 #include "GroupsLayoutCollapseHandler.h"
 #include "GroupsLayoutResolverCallbackListener.h"
 #include "ItemLayoutChainDisplacement.h"
