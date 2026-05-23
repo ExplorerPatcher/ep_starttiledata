@@ -754,3 +754,54 @@ class CExpandDisplacementHandler
     ICellArrayManager* m_cellArrayManager;
     EXPAND_COLLAPSE_DIRECTION m_rowOrColumn;
 };
+
+template <typename T>
+class CRefCountedObject
+{
+    ULONG _cRef;
+};
+
+class CCompoundDisplacementHandler
+    : IItemLayoutDisplacementHandler
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    struct PendingCellCoordinates
+    {
+        GUID cell;
+        Geometry::CPoint position;
+    };
+
+    using RefCountedPendingCellCoordinates = Microsoft::WRL::ComPtr<CRefCountedObject<PendingCellCoordinates>>;
+
+    class DisplacementEvaluation
+    {
+    public:
+        DISPLACEMENT_DIRECTION direction;
+        bool possible;
+        int distance;
+        CCoSimpleArray<RefCountedPendingCellCoordinates> chain;
+        Geometry::CPoint position;
+    };
+
+    using RefCountedDisplacementEvaluation = Microsoft::WRL::ComPtr<CRefCountedObject<DisplacementEvaluation>>;
+
+    class DisplacementEvaluationSet
+    {
+    public:
+        RefCountedDisplacementEvaluation right;
+        RefCountedDisplacementEvaluation left;
+        RefCountedDisplacementEvaluation down;
+        RefCountedDisplacementEvaluation up;
+        RefCountedDisplacementEvaluation selected;
+    };
+
+    enum ShiftCriteria
+    {
+        Before = 0,
+        After = 1
+    };
+
+    ICellArrayManager* m_cellArrayManager;
+};
