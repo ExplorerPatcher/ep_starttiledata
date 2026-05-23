@@ -354,7 +354,10 @@ namespace Geometry
             bottom += dy;
         }
 
-        // void MoveTo(long x, long y);
+        void MoveTo(long x, long y)
+        {
+            Offset(x - left, y - top);
+        }
 
         static CRect MulDiv(const RECT& rect, int nNumerator, int nDenominator)
         {

@@ -504,9 +504,6 @@ void CItemLayoutResolver::GroupEmptied()
     // No-op
 }
 
-#include <wil/win32_helpers.h>
-
-// TODO Find 2x CRect::MoveTo inlined here
 HRESULT CItemLayoutResolver::GetGutterHitTarget(REFGUID tileID, const RECT targetBounds, POINT* pAdjustedTargetCell)
 {
     AutoIgnoredItem ignoredItem;
@@ -568,7 +565,7 @@ HRESULT CItemLayoutResolver::GetGutterHitTarget(REFGUID tileID, const RECT targe
         pAdjustedTargetCell->y = bottomRow + 1;
         return S_OK;
     }
-    if (wil::rect_height(targetBounds) == 1)
+    if (targetBounds.bottom - targetBounds.top == 1)
     {
         pAdjustedTargetCell->y = topRow;
         return S_OK;
@@ -577,20 +574,17 @@ HRESULT CItemLayoutResolver::GetGutterHitTarget(REFGUID tileID, const RECT targe
     pAdjustedTargetCell->y = bottomRow + 1;
     while (pAdjustedTargetCell->y != targetBounds.top)
     {
-        Geometry::CRect candidateLocation(
-            pAdjustedTargetCell->x, pAdjustedTargetCell->y - 1,
-            pAdjustedTargetCell->x + wil::rect_width(targetBounds), pAdjustedTargetCell->y);
-        candidateLocation.Offset(0, pAdjustedTargetCell->y <= targetBounds.top ? 2 : 0);
+        Geometry::CRect candidateLocation = targetRow;
+        candidateLocation.MoveTo(pAdjustedTargetCell->x, pAdjustedTargetCell->y);
+        candidateLocation.Offset(0, pAdjustedTargetCell->y <= targetBounds.top ? 1 : -1);
 
         CSet<GUID> tilesInAdjustedTarget;
         RETURN_IF_FAILED(spCommittedCellArrayManager->GetCommittedItemsInRect(candidateLocation, &tilesInAdjustedTarget)); // 494
+
         if (tilesInAdjustedTarget.GetCount())
         {
-            Geometry::CRect adjustedRect;
-            adjustedRect.left = pAdjustedTargetCell->x;
-            adjustedRect.top = pAdjustedTargetCell->y;
-            adjustedRect.right = adjustedRect.left + wil::rect_width(targetBounds);
-            adjustedRect.bottom = adjustedRect.top + wil::rect_height(targetBounds);
+            Geometry::CRect adjustedRect = targetBounds;
+            adjustedRect.MoveTo(pAdjustedTargetCell->x, pAdjustedTargetCell->y);
 
             CSet<GUID> tilesInOriginalTarget;
             RETURN_IF_FAILED(spCommittedCellArrayManager->GetCommittedItemsInRect(adjustedRect, &tilesInOriginalTarget)); // 502
