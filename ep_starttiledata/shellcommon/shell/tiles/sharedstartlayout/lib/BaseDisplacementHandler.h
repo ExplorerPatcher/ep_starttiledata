@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "ItemLayoutResolver.h"
+#include "RefCountedObject.h"
 
 enum DISPLACEMENT_DIRECTION
 {
@@ -10,6 +11,8 @@ enum DISPLACEMENT_DIRECTION
     DD_RIGHT = 3,
     DD_MAX = 4,
 };
+
+using RefCountedDirectionArray = Microsoft::WRL::ComPtr<CRefCountedObject<CCoSimpleArray<DISPLACEMENT_DIRECTION>>>;
 
 class DECLSPEC_UUID("f56d4a12-5ab3-438f-850d-e633763c12fc")
 CBaseDisplacementHandler

@@ -54,8 +54,6 @@ HRESULT CGroupsLayoutResolver::RuntimeClassInitialize()
         STAOF_PREFER_SHORTEST_DISPLACEMENT | STAOF_DISPLACE_BLOCK_IS_CONTAINED_IN_TARGET)); // 47
     RETURN_IF_FAILED(_displacementManager.AddDisplacementHandler(adjacentDisplacementHandler.Get())); // 48
 
-    using RefCountedDirectionArray = ComPtr<CRefCountedObject<CCoSimpleArray<DISPLACEMENT_DIRECTION>>>;
-
     CSimpleHashTable<UINT, RefCountedDirectionArray> chainDisplacementDirectionPriorities;
     RefCountedDirectionArray firstDirectionPriorities = CreateRefCountedObj<CCoSimpleArray<DISPLACEMENT_DIRECTION>>();
     RETURN_IF_FAILED(firstDirectionPriorities->Add(DD_UP)); // 54
