@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "ItemLayoutResolver.h"
+#include "IItemLayoutCollapseHandler.h"
 
 enum EXPAND_COLLAPSE_DIRECTION
 {

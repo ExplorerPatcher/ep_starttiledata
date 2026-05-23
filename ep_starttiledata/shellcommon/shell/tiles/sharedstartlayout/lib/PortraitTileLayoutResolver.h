@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "ItemLayoutResolver.h"
 
 class CPortraitTileLayoutResolver : public CItemLayoutResolver
