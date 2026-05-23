@@ -842,3 +842,13 @@ class CGridTraversalOrder : CGenericTraversalOrder
 class CLinearTraversalOrder : CGenericTraversalOrder
 {
 };
+
+class CGroupsLayoutCollapseHandler
+    : IItemLayoutCollapseHandler
+{
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
+    ULONG refcount_;
+
+    Microsoft::WRL::ComPtr<ICellArrayManager> m_cellArrayManager;
+    EXPAND_COLLAPSE_DIRECTION m_expandCollapseDirection;
+};
