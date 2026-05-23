@@ -1,8 +1,10 @@
 #include "pch.h"
 
 #include "GenericTraversalOrder.h"
+#include "GridTraversalOrder.h"
 #include "GroupsLayoutResolver.h"
 #include "ItemLayoutResolver.h"
+#include "LinearTraversalOrder.h"
 #include "PortraitTileLayoutResolver.h"
 #include "TileGridMetricsCalculator.h"
 
