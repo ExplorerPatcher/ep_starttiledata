@@ -87,12 +87,12 @@ HRESULT CGroupsLayoutResolver::AddNewContainer(REFGUID containerID, IItemLayoutR
 {
     Geometry::CSize groupSize;
     HRESULT hr = _GetGroupSizeWithMarginFromLayoutResolver(resolver, &groupSize);
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         groupSize.cx = max(m_containerMargins.right - m_containerMargins.left, groupSize.cx);
         groupSize.cy = max(m_containerMargins.bottom - m_containerMargins.top, groupSize.cy);
         hr = AddNewItem(containerID, groupSize);
-        if (hr >= 0)
+        if (SUCCEEDED(hr))
         {
             hr = _RegisterForCallbacksWithSubresolver(resolver, containerID);
         }
@@ -105,10 +105,10 @@ HRESULT CGroupsLayoutResolver::AddContainer(REFGUID containerID, IItemLayoutReso
 {
     Geometry::CRect groupRect;
     HRESULT hr = _PositionGroupAtPoint(resolver, destination, &groupRect);
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         hr = AddItem(containerID, groupRect);
-        if (hr >= 0)
+        if (SUCCEEDED(hr))
         {
             hr = _RegisterForCallbacksWithSubresolver(resolver, containerID);
         }
@@ -128,10 +128,10 @@ HRESULT CGroupsLayoutResolver::InsertContainerUncommitted(
 {
     Geometry::CRect groupRect;
     HRESULT hr = _PositionGroupAtPoint(resolver, destination, &groupRect);
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         hr = InsertItemUncommitted(containerID, groupRect);
-        if (hr >= 0)
+        if (SUCCEEDED(hr))
         {
             hr = _RegisterForCallbacksWithSubresolver(resolver, containerID);
         }
@@ -347,11 +347,11 @@ HRESULT CGroupsLayoutResolver::_RegisterForCallbacksWithSubresolver(IItemLayoutR
 {
     ComPtr<CGroupsLayoutResolverCallbackListener> groupLayoutResolverCallback;
     HRESULT hr = MakeAndInitialize<CGroupsLayoutResolverCallbackListener>(&groupLayoutResolverCallback, containerID, resolver);
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         hr = groupLayoutResolverCallback->RegisterCallback(m_itemLayoutResolverProxy.Get());
     }
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         GroupResolverInternal groupResolverInternal = { resolver, groupLayoutResolverCallback.Get() };
         hr = m_groupResolvers.SetItem(containerID, groupResolverInternal);
@@ -364,12 +364,12 @@ HRESULT CGroupsLayoutResolver::_UnregisterFromCallback(REFGUID groupID)
 {
     GroupResolverInternal groupResolverInternal;
     HRESULT hr = m_groupResolvers.GetItem(groupID, groupResolverInternal);
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         ComPtr<CGroupsLayoutResolverCallbackListener> resolverCallback = groupResolverInternal.resolverCallback;
         hr = resolverCallback->UnregisterCallback(m_itemLayoutResolverProxy.Get());
     }
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         hr = m_groupResolvers.DeleteItem(groupID);
     }
@@ -394,7 +394,7 @@ HRESULT CGroupsLayoutResolver::_PositionGroupAtPoint(
 {
     Geometry::CSize containerSize;
     HRESULT hr = _GetGroupSizeWithMarginFromLayoutResolver(resolver, &containerSize);
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         rect->left = destination.x;
         rect->right = rect->left + c_groupWidth;

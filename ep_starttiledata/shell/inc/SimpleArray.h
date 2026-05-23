@@ -408,11 +408,11 @@ public:
                     if (nCompare == 0)
                     {
                         hr = tmerge.Merge(elemDst, elemSrc);
-                        if (hr >= 0)
+                        if (SUCCEEDED(hr))
                         {
                             hr = SizeTSub(iSrc, 1, &iSrc);
                         }
-                        if (hr >= 0)
+                        if (SUCCEEDED(hr))
                         {
                             hr = SizeTSub(iDest, 1, &iDest);
                         }
@@ -452,7 +452,7 @@ public:
                     do
                     {
                         hr = this->InsertAt(sarraySrc.GetData()[iSrc], 0);
-                        if (hr >= 0)
+                        if (SUCCEEDED(hr))
                         {
                             hr = SizeTSub(iSrc, 1, &iSrc);
                         }

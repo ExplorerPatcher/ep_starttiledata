@@ -76,7 +76,7 @@ CAdjacentDisplacementHandler::DisplaceResult CAdjacentDisplacementHandler::_Test
         hr = boundingRect.left >= displaceTarget.left ? S_OK : E_FAIL;
     }
 
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         displaceResult.displacementDestination = _GetAdjacentRect(displaceTarget, boundingRect, direction);
 
@@ -105,11 +105,11 @@ CAdjacentDisplacementHandler::DisplaceResult CAdjacentDisplacementHandler::_Test
             }
         }
     }
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         hr = _IgnoreTiles(itemsInRect);
     }
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         displaceResult.offset = Geometry::CPoint(displaceResult.displacementDestination.left - boundingRect.left, displaceResult.displacementDestination.top - boundingRect.top);
         displaceResult.distanceMoved = abs(abs(displaceResult.offset.x) > abs(displaceResult.offset.y) ? displaceResult.offset.x : displaceResult.offset.y);
