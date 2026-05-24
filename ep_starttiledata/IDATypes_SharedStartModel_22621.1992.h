@@ -607,6 +607,46 @@ class CAdjacentDisplacementHandler
     SINGLE_TILE_ADJACENT_OPTION_FLAGS m_options;
 };
 
+template <typename T>
+class CRefCountedObject
+{
+    ULONG _cRef;
+};
+
+using RefCountedDirectionArray = Microsoft::WRL::ComPtr<CRefCountedObject<CCoSimpleArray<DISPLACEMENT_DIRECTION>>>;
+
+#define MICROSOFT_WRL_RUNTIME_CLASS \
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake; \
+    ULONG refcount_; \
+
+#define MICROSOFT_WRL_IMPLEMENTS_CLASS \
+    void* gap[3]; \
+    Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake; \
+    ULONG refcount_; \
+
+enum CHAIN_DISPLACEMENT_OPTION_FLAGS
+{
+    CDOF_NONE = 0x0,
+    CDOF_DISPLACE_ONLY_SAME_SIZED_ITEMS = 0x1,
+};
+
+class CItemLayoutChainDisplacement
+    : CBaseDisplacementHandler
+{
+    MICROSOFT_WRL_IMPLEMENTS_CLASS;
+
+    struct ChainLink
+    {
+        CSet<GUID> setTilesToMove;
+        Geometry::CPoint DisplacementVector;
+    };
+
+    using RefCountedChainLink = Microsoft::WRL::ComPtr<CRefCountedObject<ChainLink>>;
+    CSimpleHashTable<UINT, RefCountedDirectionArray> m_directionPrioritySets;
+    int m_deltaOfPriorityLengthOverShortestDistance;
+    CHAIN_DISPLACEMENT_OPTION_FLAGS m_options;
+};
+
 enum EXPAND_COLLAPSE_DIRECTION
 {
     EXPAND_COLLAPSE_DIRECTION_ROW = 0,
@@ -753,12 +793,6 @@ class CExpandDisplacementHandler
 
     ICellArrayManager* m_cellArrayManager;
     EXPAND_COLLAPSE_DIRECTION m_rowOrColumn;
-};
-
-template <typename T>
-class CRefCountedObject
-{
-    ULONG _cRef;
 };
 
 class CCompoundDisplacementHandler
