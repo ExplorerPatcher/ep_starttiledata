@@ -7,6 +7,7 @@
 
 #include "CellArrayManager.h"
 #include "ItemLayoutResolverProxy.h"
+#include "LandscapeToPortraitMigrationHandler.h"
 
 using namespace Microsoft::WRL;
 
