@@ -19,7 +19,7 @@ HRESULT CLandscapeToPortraitMigrationHandler::MigrateItems(
         hr = pSourceCellArrayManager->GetItemsInRect(pSourceCellArrayManager->GetCurrentCellArrayBounds(), &setAllItems);
         if (SUCCEEDED(hr))
         {
-            setAllItems.Enumerate([&](REFGUID key) -> const bool
+            setAllItems.Enumerate([&](REFGUID key) -> bool
             {
                 Geometry::CRect rcTileBounds;
                 hr = pSourceCellArrayManager->GetItemBounds(key, rcTileBounds);
