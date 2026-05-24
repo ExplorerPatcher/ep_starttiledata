@@ -13,6 +13,7 @@
 #include <algorithm>
 
 #include <wil/result_macros.h>
+#include <wil/wrl.h>
 #include <wrl/implements.h>
 
 #endif //PCH_H
