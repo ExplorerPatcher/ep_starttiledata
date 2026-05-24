@@ -857,3 +857,5 @@ class CGroupsCellAssignor
     : CPortraitTileCellAssignor
 {
 };
+
+CCoSimpleArray<Geometry::CPoint>;
