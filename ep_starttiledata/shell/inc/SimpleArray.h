@@ -221,6 +221,32 @@ public:
         RemoveAll();
     }
 
+    HRESULT EnsureCapacity(size_t celemCapacityDesired)
+    {
+        return _EnsureCapacity(celemCapacityDesired);
+    }
+
+    HRESULT Resize(size_t celemDesired, const T& t)
+    {
+        HRESULT hr = S_OK;
+
+        if (celemDesired > this->_celem)
+        {
+            hr = _EnsureCapacity(celemDesired);
+            if (SUCCEEDED(hr))
+            {
+                size_t celemPrev = this->_celem;
+                this->_celem = celemDesired;
+                for (size_t i = celemPrev; i < this->_celem; ++i)
+                {
+                    _InternalSetAtIndex(i, t);
+                }
+            }
+        }
+
+        return hr;
+    }
+
     HRESULT Add(const T& t, size_t* piElemInsertedAt = nullptr)
     {
         return _Add(t, piElemInsertedAt);

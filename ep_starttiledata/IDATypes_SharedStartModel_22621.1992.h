@@ -892,6 +892,7 @@ class CGroupsCellAssignor
 {
 };
 
+CCoSimpleArray<int>;
 CCoSimpleArray<Geometry::CPoint>;
 
 class CLandscapeToPortraitMigrationHandler
