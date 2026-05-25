@@ -10,6 +10,7 @@ class CPushDownDisplacementHandler
 {
 public:
     CPushDownDisplacementHandler();
+
     HRESULT RuntimeClassInitialize();
 
     //~ Begin IItemLayoutDisplacementHandler Interface

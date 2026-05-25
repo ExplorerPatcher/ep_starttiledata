@@ -10,6 +10,7 @@ class CExpandDisplacementHandler
 {
 public:
     CExpandDisplacementHandler();
+
     HRESULT RuntimeClassInitialize(EXPAND_COLLAPSE_DIRECTION);
 
     //~ Begin IItemLayoutDisplacementHandler Interface

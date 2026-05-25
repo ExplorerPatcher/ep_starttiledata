@@ -24,6 +24,7 @@ class CGenericTraversalOrder
 {
 public:
     CGenericTraversalOrder();
+
     HRESULT RuntimeClassInitialize(IItemLayoutResolver* resolver, int maxGroupWidth);
 
     //~ Begin ILayoutTraversalOrder Interface

@@ -10,6 +10,7 @@ class CGroupsLayoutCollapseHandler
 {
 public:
     CGroupsLayoutCollapseHandler();
+
     HRESULT RuntimeClassInitialize(EXPAND_COLLAPSE_DIRECTION);
 
     //~ Begin IItemLayoutCollapseHandler Interface

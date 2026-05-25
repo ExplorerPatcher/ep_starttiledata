@@ -1,11 +1,9 @@
 #pragma once
 
-#include <wrl.h>
-#include <wil/resource.h>
-
 #include "ColumnChangeMigrationHandler.h"
 #include "ICellArrayManager.h"
-#include "IItemLayoutCollapseHandler.h"
+#include "ItemLayoutCollapseManager.h"
+#include "ItemLayoutDisplacement.h"
 
 MIDL_INTERFACE("751657ce-45b3-4150-8f86-fda773983ebc")
 IItemLayoutResolverCallback : IUnknown
@@ -112,39 +110,6 @@ enum class ModificationOperation
     Move = 1,
     Remove = 2,
     Resize = 3,
-};
-
-MIDL_INTERFACE("d364071e-0afe-427c-a397-e9e1f734d4dd")
-IItemLayoutDisplacementHandler : IUnknown
-{
-    virtual HRESULT STDMETHODCALLTYPE SetCellArray(ICellArrayManager* cellArrayManager) = 0;
-    virtual HRESULT STDMETHODCALLTYPE DisplaceItemsFromRect(const Geometry::CRect& targetRect, const Geometry::CRect& previousRect) = 0;
-};
-
-class CItemLayoutDisplacement
-{
-public:
-    CItemLayoutDisplacement();
-
-    HRESULT DisplaceItemsFromRect(
-        const Geometry::CRect& targetRect, const Geometry::CRect& previousRect, ICellArrayManager* cellArrayManager);
-    HRESULT AddDisplacementHandler(IItemLayoutDisplacementHandler* displacementHandler);
-
-private:
-    CCoSimpleArray<Microsoft::WRL::ComPtr<IItemLayoutDisplacementHandler>> m_displacementHandlers;
-};
-
-class CItemLayoutCollapseManager
-{
-public :
-    CItemLayoutCollapseManager();
-
-    HRESULT Collapse(
-        const Geometry::CRect& sourceCells, const Geometry::CRect& targetCells, ICellArrayManager* cellArrayManager);
-    HRESULT AddCollapseHandler(IItemLayoutCollapseHandler* collapseHandler);
-
-private:
-    CCoSimpleArray<Microsoft::WRL::ComPtr<IItemLayoutCollapseHandler>> m_collapseHandlers;
 };
 
 enum LAYOUT_RESOLVER_OPTIONS
