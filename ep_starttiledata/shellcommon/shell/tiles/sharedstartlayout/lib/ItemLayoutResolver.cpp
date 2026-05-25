@@ -131,7 +131,7 @@ HRESULT CItemLayoutResolver::ResizeItemUncommitted(REFGUID itemID, const SIZE si
     return S_OK;
 }
 
-HRESULT CItemLayoutResolver::SwapItemsUncommitted(REFGUID itemID1, REFGUID itemID2)
+HRESULT CItemLayoutResolver::SwapItemsUncommitted(REFGUID itemID1, REFGUID itemID2) // @Note: Added in 17134
 {
     Geometry::CRect rcTileBounds;
     RETURN_IF_FAILED_EXPECTED(_spCellArrayManager->GetItemBounds(itemID1, rcTileBounds));
@@ -779,7 +779,7 @@ HRESULT CItemLayoutResolver::_StopBatchingItemBoundsChangeUpdatesAndNotify()
     _isBatchingItemBoundsChangeUpdates = false;
 
     CSimpleHashTable<GUID, Geometry::CRect> htUpdatesUnique;
-    (void)_batchedUpdates.Enum([&htUpdatesUnique](REFGUID key, const Geometry::CRect& value) -> bool // @Note: htUpdatesUnique added after 14361
+    (void)_batchedUpdates.Enum([&htUpdatesUnique](REFGUID key, const Geometry::CRect& value) -> bool // @Note: htUpdatesUnique added in 15063
     {
         htUpdatesUnique.SetItem(key, value);
         return true;

@@ -7,7 +7,7 @@ MIDL_INTERFACE("48aa14a7-b0e2-4a6e-8a9e-55e8c7a00533")
 ICommittedCellArrayManager : IUnknown
 {
     virtual const GUID STDMETHODCALLTYPE GetCommittedItemAtCell(const int, const int) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetCommittedItemBounds(REFGUID, const Geometry::CRect&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetCommittedItemBounds(REFGUID, Geometry::CRect&) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetCommittedItemsInRect(const Geometry::CRect&, CSet<GUID>*) = 0;
     virtual HRESULT STDMETHODCALLTYPE AddIgnoredCommittedItem(REFGUID) = 0;
     virtual HRESULT STDMETHODCALLTYPE RemoveIgnoredCommittedItem(REFGUID) = 0;
@@ -45,7 +45,7 @@ public:
     STDMETHODIMP RemoveItemUncommitted(REFGUID tileID) override;
     STDMETHODIMP InsertEmptyColumn(Geometry::CRect, bool) override;
     STDMETHODIMP MoveItemUncommitted(REFGUID tileID, Geometry::CRect rcTileBoundsCells) override;
-    STDMETHODIMP SwapItemsUncommitted(REFGUID tileID, REFGUID tileIDNew) override; // @Note: Added after 14361
+    STDMETHODIMP SwapItemsUncommitted(REFGUID tileID, REFGUID tileIDNew) override; // @Note: Added in 17134
     STDMETHODIMP InsertItemUncommitted(REFGUID tileID, const Geometry::CRect rcTileBoundsCells) override;
     STDMETHODIMP AddIgnoredItem(REFGUID tileID) override;
     STDMETHODIMP RemoveIgnoredItem(REFGUID tileID) override;
@@ -56,7 +56,7 @@ public:
 
     //~ Begin ICommittedCellArrayManager Interface
     STDMETHODIMP_(const GUID) GetCommittedItemAtCell(const int cellX, const int cellY) override;
-    STDMETHODIMP GetCommittedItemBounds(REFGUID tileID, const Geometry::CRect& rect) override;
+    STDMETHODIMP GetCommittedItemBounds(REFGUID tileID, Geometry::CRect& rect) override;
     STDMETHODIMP GetCommittedItemsInRect(const Geometry::CRect& rect, CSet<GUID>* prgItemsInRect) override;
     STDMETHODIMP AddIgnoredCommittedItem(REFGUID tileID) override;
     STDMETHODIMP RemoveIgnoredCommittedItem(REFGUID tileID) override;
@@ -85,13 +85,30 @@ private:
     void _NotifyCellArrayBoundsChange(const Geometry::CRect rcLayoutBoundsCells);
     void _NotifyTileRemovedPending(REFGUID tileID);
     void _NotifyTileRemoved(REFGUID tileID);
-    HRESULT _ShrinkInfiniteDimensionEdges(const Microsoft::WRL::ComPtr<ICellArray>& cellArray, bool* boundsChanged);
     HRESULT _ShrinkInfiniteDimensionEdges();
+    HRESULT _ShrinkInfiniteDimensionEdges(const Microsoft::WRL::ComPtr<ICellArray>& cellArray, bool* boundsChanged) const;
     HRESULT _EnsureWorkingWithTemporaryChanges();
     HRESULT _SaveExistingCellArray();
     void _ClearCommittedCellArray();
     HRESULT _RemoveItemInternal(REFGUID itemID, NotifyItemRemoved shouldNotifyItemRemoved);
 };
+
+template <typename TLambda>
+void CCellArrayManager::_EnumerateAllCells(TLambda lambda)
+{
+    Geometry::CRect currentArrayBounds = _pCellArray->GetArrayBounds();
+
+    for (int indexY = currentArrayBounds.top; indexY < currentArrayBounds.bottom; ++indexY)
+    {
+        for (int indexX = currentArrayBounds.left; indexX < currentArrayBounds.right; ++indexX)
+        {
+            if (!lambda(indexX, indexY, GetItemAtCell(indexX, indexY))) // Assumed return value usage
+            {
+                break;
+            }
+        }
+    }
+}
 
 enum class AutoIgnoredItemArray
 {

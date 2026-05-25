@@ -283,7 +283,7 @@ struct ICellArrayManager_vtbl : IUnknown_vtbl
     HRESULT (__stdcall *RemoveItemUncommitted)(ICellArrayManager* This, const GUID&);
     HRESULT (__stdcall *InsertEmptyColumn)(ICellArrayManager* This, Geometry::CRect, bool);
     HRESULT (__stdcall *MoveItemUncommitted)(ICellArrayManager* This, const GUID&, Geometry::CRect);
-    HRESULT (__stdcall *SwapItemsUncommitted)(ICellArrayManager* This, const GUID&, const GUID&); ///< @Note: Added after 14361
+    HRESULT (__stdcall *SwapItemsUncommitted)(ICellArrayManager* This, const GUID&, const GUID&); ///< @Note: Added in 17134
     HRESULT (__stdcall *InsertItemUncommitted)(ICellArrayManager* This, const GUID&, const Geometry::CRect);
     HRESULT (__stdcall *AddIgnoredItem)(ICellArrayManager* This, const GUID&);
     HRESULT (__stdcall *RemoveIgnoredItem)(ICellArrayManager* This, const GUID&);
@@ -366,7 +366,7 @@ struct IItemLayoutResolver_vtbl : IUnknown_vtbl
     HRESULT (__stdcall *AddItem)(IItemLayoutResolver* This, const GUID&, const RECT);
     HRESULT (__stdcall *InsertItemUncommitted)(IItemLayoutResolver* This, const GUID&, const RECT);
     HRESULT (__stdcall *ResizeItemUncommitted)(IItemLayoutResolver* This, const GUID&, const SIZE);
-    HRESULT (__stdcall *SwapItemsUncommitted)(IItemLayoutResolver* This, const GUID&, const GUID&); ///< @Note: Added after 14361
+    HRESULT (__stdcall *SwapItemsUncommitted)(IItemLayoutResolver* This, const GUID&, const GUID&); ///< @Note: Added in 17134
     HRESULT (__stdcall *AddNewContainer)(IItemLayoutResolver* This, const GUID&, IItemLayoutResolver*);
     HRESULT (__stdcall *AddContainer)(IItemLayoutResolver* This, const GUID&, IItemLayoutResolver*, const POINT);
     HRESULT (__stdcall *AddSizedContainer)(IItemLayoutResolver* This, const GUID&, IItemLayoutResolver*, const RECT);
@@ -424,7 +424,7 @@ struct IItemLayoutResolverInternal : IUnknown
 struct IItemLayoutResolverInternal_vtbl : IUnknown_vtbl
 {
     void (__stdcall *OnItemsMigrated)(IItemLayoutResolverInternal* This, IItemLayoutResolver*);
-    void (__stdcall *EnableCollapse)(IItemLayoutResolverInternal* This, BOOL); ///< @Note: Added after 14361
+    void (__stdcall *EnableCollapse)(IItemLayoutResolverInternal* This, BOOL); ///< @Note: Added in 15063
 };
 
 struct IItemLayoutDisplacementHandler : IUnknown
@@ -520,7 +520,7 @@ class CItemLayoutResolver
     char _isBatchingItemBoundsChangeUpdates;
     CSimpleHashTable<GUID, Geometry::CRect> _batchedUpdates;
     char m_isCollapsed;
-    char m_isUnk1; ///< @Note: Added after 14361
+    char m_enableCollapse; ///< @Note: Added in 15063
 };
 
 enum /*class*/ AutoIgnoredItemArray
@@ -709,7 +709,7 @@ struct ICommittedCellArrayManager : IUnknown
 struct ICommittedCellArrayManager_vtbl : IUnknown_vtbl
 {
 	GUID* (__stdcall *GetCommittedItemAtCell)(ICommittedCellArrayManager*, GUID* retstr, const int, const int);
-    HRESULT (__stdcall *GetCommittedItemBounds)(ICommittedCellArrayManager*, const GUID&, const Geometry::CRect&);
+    HRESULT (__stdcall *GetCommittedItemBounds)(ICommittedCellArrayManager*, const GUID&, Geometry::CRect&);
     HRESULT (__stdcall *GetCommittedItemsInRect)(ICommittedCellArrayManager*, const Geometry::CRect&, CSet<GUID>*);
     HRESULT (__stdcall *AddIgnoredCommittedItem)(ICommittedCellArrayManager*, const GUID&);
     HRESULT (__stdcall *RemoveIgnoredCommittedItem)(ICommittedCellArrayManager*, const GUID&);
@@ -722,11 +722,17 @@ class CCellArrayManager
 	Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
     ULONG refcount_;
 
+    enum /*class*/ NotifyItemRemoved
+    {
+        NotifyItemRemoved_DoNotSendRemoveNotification = 0,
+        NotifyItemRemoved_SendRemoveNotification = 1
+    };
+
 	CSimpleHashTable<ICellArrayManagerCallback*, Microsoft::WRL::ComPtr<ICellArrayManagerCallback>, CDefaultHashPolicy<ICellArrayManagerCallback*>, CDefaultKeyCompare<ICellArrayManagerCallback*>, CDefaultResizePolicy, CDefaultRehashPolicy> _htCallbacks;
-	Microsoft::WRL::ComPtr<ICellArray> _pCellArray; ///< Microsoft::WRL::ComPtr<ICellArray
+	Microsoft::WRL::ComPtr<ICellArray> _pCellArray;
 	Geometry::CSize _sizeMaxBounds;
 	CSimpleHashTable<GUID, Geometry::CRect, CDefaultHashPolicy<GUID>, CDefaultKeyCompare<GUID>, CDefaultResizePolicy, CDefaultRehashPolicy> _htTileBounds;
-	Microsoft::WRL::ComPtr<ICellArray> _pCommittedCellArray; ///< Microsoft::WRL::ComPtr<ICellArray
+	Microsoft::WRL::ComPtr<ICellArray> _pCommittedCellArray;
 	CSimpleHashTable<GUID, Geometry::CRect, CDefaultHashPolicy<_GUID>, CDefaultKeyCompare<GUID>, CDefaultResizePolicy, CDefaultRehashPolicy> _htCommittedTileBounds;
 	GUID m_removedItem;
 };

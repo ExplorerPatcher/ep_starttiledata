@@ -58,7 +58,7 @@ EXTERN_C STDAPI SharedStartLayout_CreateLayoutTraversalOrder(
         case LayoutOrder_Grid:
             RETURN_IF_FAILED(MakeAndInitialize<CGridTraversalOrder>(&spLayoutTraversalOrder, layoutResolver, maxGroupWidth)); // 56
             break;
-        case LayoutOrder_Two:
+        case LayoutOrder_Two: // @Note: Added in 15063
             RETURN_IF_FAILED(MakeAndInitialize<CGridTraversalOrder>(&spLayoutTraversalOrder, layoutResolver, -1)); // 59
             break;
         case LayoutOrder_Linear:

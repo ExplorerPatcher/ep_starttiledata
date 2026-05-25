@@ -41,8 +41,8 @@ typedef struct _LayoutMigrationOptions
     GUID unassignedItemId;
 } LayoutMigrationOptions;
 
-// 14361 - ?            : b86bf953-828b-4f3d-987b-04a5601b23cf
-// 19041 (at least)+    : dd5c8f3a-3ca5-4964-a162-192c9b8fd2bc
+// 14361 - 16299        : b86bf953-828b-4f3d-987b-04a5601b23cf
+// 17134+               : dd5c8f3a-3ca5-4964-a162-192c9b8fd2bc
 MIDL_INTERFACE("dd5c8f3a-3ca5-4964-a162-192c9b8fd2bc")
 IItemLayoutResolver : IUnknown
 {
@@ -54,7 +54,7 @@ IItemLayoutResolver : IUnknown
     virtual HRESULT STDMETHODCALLTYPE AddItem(REFGUID, const RECT) = 0;
     virtual HRESULT STDMETHODCALLTYPE InsertItemUncommitted(REFGUID, const RECT) = 0;
     virtual HRESULT STDMETHODCALLTYPE ResizeItemUncommitted(REFGUID, const SIZE) = 0;
-    virtual HRESULT STDMETHODCALLTYPE SwapItemsUncommitted(REFGUID, REFGUID) = 0; // @Note: Added after 14361
+    virtual HRESULT STDMETHODCALLTYPE SwapItemsUncommitted(REFGUID, REFGUID) = 0; // @Note: Added in 17134
     virtual HRESULT STDMETHODCALLTYPE AddNewContainer(REFGUID, IItemLayoutResolver*) = 0;
     virtual HRESULT STDMETHODCALLTYPE AddContainer(REFGUID, IItemLayoutResolver*, const POINT) = 0;
     virtual HRESULT STDMETHODCALLTYPE AddSizedContainer(REFGUID, IItemLayoutResolver*, const RECT) = 0;
@@ -103,7 +103,7 @@ MIDL_INTERFACE("6f13ad3b-7bf5-4ba5-b676-87f3ad61ae04")
 IItemLayoutResolverInternal : IUnknown
 {
     virtual void STDMETHODCALLTYPE OnItemsMigrated(IItemLayoutResolver*) = 0;
-    virtual void STDMETHODCALLTYPE EnableCollapse(BOOL) = 0; ///< @Note: Added after 14361
+    virtual void STDMETHODCALLTYPE EnableCollapse(BOOL) = 0; ///< @Note: Added in 15063
 };
 
 enum class ModificationOperation
@@ -179,7 +179,7 @@ public:
     STDMETHODIMP AddItem(REFGUID itemID, const RECT rcItemBoundsCells) override;
     STDMETHODIMP InsertItemUncommitted(REFGUID itemID, const RECT rcDestination) override;
     STDMETHODIMP ResizeItemUncommitted(REFGUID itemID, const SIZE sizeItemCells) override;
-    STDMETHODIMP SwapItemsUncommitted(REFGUID itemID1, REFGUID itemID2) override; // @Note: Added after 14361
+    STDMETHODIMP SwapItemsUncommitted(REFGUID itemID1, REFGUID itemID2) override; // @Note: Added in 17134
     STDMETHODIMP AddNewContainer(REFGUID containerID, IItemLayoutResolver* resolver) override;
     STDMETHODIMP AddContainer(REFGUID containerID, IItemLayoutResolver* resolver, const POINT destination) override;
     STDMETHODIMP AddSizedContainer(REFGUID containerID, IItemLayoutResolver* pResolver, const RECT destination) override;
@@ -269,7 +269,7 @@ private:
     bool _isBatchingItemBoundsChangeUpdates;
     CSimpleHashTable<GUID, Geometry::CRect> _batchedUpdates;
     bool m_isCollapsed;
-    bool m_enableCollapse; // @Note: Added after 14361
+    bool m_enableCollapse; // @Note: Added in 15063
 
     HRESULT _DisplaceItemsFromRect(const Geometry::CRect& targetRect, const Geometry::CRect& previousRect);
     HRESULT _StartBatchingItemBoundsChangeUpdates();
