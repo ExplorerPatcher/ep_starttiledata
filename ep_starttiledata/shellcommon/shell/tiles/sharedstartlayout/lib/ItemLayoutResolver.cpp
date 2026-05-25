@@ -20,12 +20,12 @@ using namespace Microsoft::WRL;
 // in modern code.
 // Example taken from CItemLayoutResolver::ResizeItemUncommitted()
 
-inline constexpr GUID c_emptyCellValue = {};
+EXTERN_C static const inline GUID c_emptyCellValue = {};
 
 CItemLayoutResolver::CItemLayoutResolver()
     : _options(LRO_DISPLACE_INTO_NEGATIVE_SPACE)
     , m_isCollapsed(false)
-    , m_canCollapse(true)
+    , m_enableCollapse(true)
 {
 }
 
@@ -476,15 +476,6 @@ void CItemLayoutResolver::NewItemAddedEnd()
     // No-op
 }
 
-void CItemLayoutResolver::OnItemsMigrated(IItemLayoutResolver* pDestinationLayout)
-{
-    (void)_htInternalCallbacks.Enum([&pDestinationLayout](IItemLayoutResolverInternalCallback*, const ComPtr<IItemLayoutResolverInternalCallback>& callback) -> bool
-    {
-        callback->OnItemsMigrated(pDestinationLayout);
-        return true;
-    });
-}
-
 void CItemLayoutResolver::OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver, REFGUID groupID)
 {
     // No-op
@@ -612,6 +603,20 @@ HRESULT CItemLayoutResolver::GetGutterHitTarget(REFGUID tileID, const RECT targe
     return S_OK;
 }
 
+void CItemLayoutResolver::OnItemsMigrated(IItemLayoutResolver* pDestinationLayout)
+{
+    (void)_htInternalCallbacks.Enum([&pDestinationLayout](IItemLayoutResolverInternalCallback*, const ComPtr<IItemLayoutResolverInternalCallback>& callback) -> bool
+    {
+        callback->OnItemsMigrated(pDestinationLayout);
+        return true;
+    });
+}
+
+void CItemLayoutResolver::EnableCollapse(BOOL enableCollapse)
+{
+    m_enableCollapse = enableCollapse != 0;
+}
+
 HRESULT CItemLayoutResolver::_ModifyItemUncommittedInternal(
     REFGUID itemID, const RECT& rcDestination, const ModificationOperation operation)
 {
@@ -671,7 +676,7 @@ HRESULT CItemLayoutResolver::_CommitChangesInternal()
 
 HRESULT CItemLayoutResolver::_Collapse(const Geometry::CRect& rcSourceCells, const Geometry::CRect& rcTargetCells)
 {
-    return m_canCollapse ? _collapseManager.Collapse(rcSourceCells, rcTargetCells, _spCellArrayManager.Get()) : S_OK;
+    return m_enableCollapse ? _collapseManager.Collapse(rcSourceCells, rcTargetCells, _spCellArrayManager.Get()) : S_OK;
 }
 
 void CItemLayoutResolver::_NotifyNewItemAddedBegin()

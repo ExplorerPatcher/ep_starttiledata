@@ -171,7 +171,7 @@ HRESULT CPathCollapseHandler::_CollapseByPath(const int shiftAmount, CCoSimpleAr
         for (int xIndex = arrayDimensions.left; xIndex < arrayDimensions.right; ++xIndex)
         {
             GUID itemID = m_cellArrayManager->GetItemAtCell(xIndex, yIndex);
-            if (itemID != c_emptyCellValue && !_visitedTiles.Contains(itemID))
+            if (itemID != c_emptyCellValue && FAILED(_visitedTiles.Contains(itemID)))
             {
                 RETURN_IF_FAILED(_visitedTiles.Add(itemID)); // 201
                 Geometry::CRect itemBounds;

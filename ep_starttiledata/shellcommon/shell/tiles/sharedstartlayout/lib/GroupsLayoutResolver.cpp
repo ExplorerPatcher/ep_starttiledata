@@ -15,7 +15,7 @@
 
 using namespace Microsoft::WRL;
 
-inline constexpr GUID c_emptyCellValue = {};
+EXTERN_C static const inline GUID c_emptyCellValue = {};
 
 CGroupsLayoutResolver::CGroupsLayoutResolver()
     : c_groupWidth(1)
@@ -266,6 +266,7 @@ void CGroupsLayoutResolver::NewItemAddedEnd()
 
 void CGroupsLayoutResolver::OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver, REFGUID groupID)
 {
+    _ASSERT(SUCCEEDED(m_groupResolvers.ContainsKey(groupID)));
     LOG_IF_FAILED(m_groupResolvers.DeleteItem(groupID)); // 297
     LOG_IF_FAILED(_RegisterForCallbacksWithSubresolver(pDestinationLayoutResolver, groupID)); // 298
 }
@@ -300,7 +301,7 @@ void CGroupsLayoutResolver::ItemRemoved(REFGUID itemID)
 
 bool CGroupsLayoutResolver::IsGroupPendingRemoval()
 {
-    // TODO: Implement this function
+    return false; // Function body unknown
 }
 
 HRESULT CGroupsLayoutResolver::_FindTargetDestinationForNewSize(
@@ -344,6 +345,8 @@ HRESULT CGroupsLayoutResolver::_RepairLayout()
 
 HRESULT CGroupsLayoutResolver::_RegisterForCallbacksWithSubresolver(IItemLayoutResolver* resolver, REFGUID containerID)
 {
+    _ASSERT(m_groupResolvers.ContainsKey(containerID) == TYPE_E_ELEMENTNOTFOUND);
+
     ComPtr<CGroupsLayoutResolverCallbackListener> groupLayoutResolverCallback;
     HRESULT hr = MakeAndInitialize<CGroupsLayoutResolverCallbackListener>(&groupLayoutResolverCallback, containerID, resolver);
     if (SUCCEEDED(hr))

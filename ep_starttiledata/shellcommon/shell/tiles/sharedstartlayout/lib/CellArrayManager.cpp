@@ -6,10 +6,10 @@
 
 using namespace Microsoft::WRL;
 
-inline const GUID c_emptyCellValue_6 = {};
+EXTERN_C static const inline GUID c_emptyCellValue = {};
 
 CCellArrayManager::CCellArrayManager()
-    : m_removedItem(c_emptyCellValue_6)
+    : m_removedItem(c_emptyCellValue)
 {
 }
 
@@ -70,7 +70,7 @@ bool CCellArrayManager::IsRectEmpty(const Geometry::CRect rcRect)
     {
         for (int xIndex = rcRect.left; xIndex < rcRect.right; ++xIndex)
         {
-            if (_pCellArray->GetCellValue(xIndex, yIndex) != c_emptyCellValue_6)
+            if (_pCellArray->GetCellValue(xIndex, yIndex) != c_emptyCellValue)
             {
                 return false;
             }

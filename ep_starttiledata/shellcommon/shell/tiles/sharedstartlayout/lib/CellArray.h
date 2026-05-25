@@ -19,7 +19,7 @@ public:
     STDMETHODIMP_(const Geometry::CRect&) GetArrayBounds() override;
     STDMETHODIMP_(void) GetItemsInRect(const Geometry::CRect& rcRect, CSet<GUID>* psetItemsInRect) override;
     STDMETHODIMP_(void) FixCoordinatesToBeNonNegative() override;
-    STDMETHODIMP SetItem(REFGUID itemID, Geometry::CRect& rcTileBoundsCells);
+    STDMETHODIMP SetItem(REFGUID itemID, const Geometry::CRect& rcTileBoundsCells) override;
     STDMETHODIMP RemoveItem(REFGUID itemID) override;
     STDMETHODIMP SetArrayBounds(const Geometry::CRect& rcNewArrayBounds) override;
     STDMETHODIMP AddIgnoredItem(REFGUID tileID) override;
@@ -30,14 +30,14 @@ private:
     template <typename TLambda>
     void _EnumerateAllCells(TLambda lambda);
 
-    void _EnsureStorage(Geometry::CRect&);
-    void _ChangeCellArraySize(const int, const int);
-    void _GetItemsInRect(Geometry::CRect&, CSet<_GUID>*);
-    void _SetRectValue(Geometry::CRect&, _GUID&);
-    const GUID _GetCellValueNoIgnore(const int nXIndex, const int nYIndex);
-    void _SetCellValue(const int, const int, GUID&);
-    bool _IsRectEmpty(Geometry::CRect&);
-    void _RemoveIgnoredItemsFromSet(CSet<GUID>*);
+    void _EnsureStorage(const Geometry::CRect& a2);
+    void _ChangeCellArraySize(const int a2, const int a3);
+    void _GetItemsInRect(const Geometry::CRect& a2, CSet<GUID>* a3) const;
+    void _SetRectValue(const Geometry::CRect& rcRect, REFGUID itemID);
+    const GUID _GetCellValueNoIgnore(const int nXIndex, const int nYIndex) const;
+    void _SetCellValue(const int nXIndex, const int nYIndex, REFGUID itemID);
+    bool _IsRectEmpty(const Geometry::CRect& rcTileBoundsCells);
+    void _RemoveIgnoredItemsFromSet(CSet<GUID>* psetItems) const;
     bool _IsItemInArray(REFGUID itemID);
     HRESULT _SetArraySizeInternal(const Geometry::CSize& sizeArray, const Geometry::CPoint& ptOffset);
 
@@ -46,3 +46,15 @@ private:
     CSet<GUID> _setIgnoredTiles;
     Geometry::CPoint _ptOrigin;
 };
+
+template <typename TLambda>
+void CCellArray::_EnumerateAllCells(TLambda lambda)
+{
+    for (int nYIndex = _rcArrayBounds.top; nYIndex < _rcArrayBounds.bottom; ++nYIndex)
+    {
+        for (int nXIndex = _rcArrayBounds.left; nXIndex < _rcArrayBounds.right; ++nXIndex)
+        {
+            lambda(nXIndex, nYIndex, _GetCellValueNoIgnore(nXIndex, nYIndex));
+        }
+    }
+}

@@ -218,7 +218,6 @@ public:
     //~ Begin IGroupBoundsChangeNotification Interface
     STDMETHODIMP_(void) NewItemAddedBegin() override;
     STDMETHODIMP_(void) NewItemAddedEnd() override;
-    STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayout) override; // IItemLayoutResolverInternal
     STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver, REFGUID groupID) override;
     STDMETHODIMP GroupBoundsChanged(REFGUID groupID) override;
     STDMETHODIMP_(void) GroupEmptiedPending(REFGUID groupID) override;
@@ -228,6 +227,11 @@ public:
     //~ Begin ILayoutHitTest Interface
     STDMETHODIMP GetGutterHitTarget(REFGUID tileID, const RECT targetBounds, POINT* pAdjustedTargetCell) override;
     //~ End ILayoutHitTest Interface
+
+    //~ Begin IItemLayoutResolverInternal Interface
+    STDMETHODIMP_(void) OnItemsMigrated(IItemLayoutResolver* pDestinationLayout) override;
+    STDMETHODIMP_(void) EnableCollapse(BOOL enableCollapse) override;
+    //~ End IItemLayoutResolverInternal Interface
 
 protected:
     virtual HRESULT _FindTargetDestinationForNewSize(
@@ -265,7 +269,7 @@ private:
     bool _isBatchingItemBoundsChangeUpdates;
     CSimpleHashTable<GUID, Geometry::CRect> _batchedUpdates;
     bool m_isCollapsed;
-    bool m_canCollapse; // @Note: Added after 14361
+    bool m_enableCollapse; // @Note: Added after 14361
 
     HRESULT _DisplaceItemsFromRect(const Geometry::CRect& targetRect, const Geometry::CRect& previousRect);
     HRESULT _StartBatchingItemBoundsChangeUpdates();
