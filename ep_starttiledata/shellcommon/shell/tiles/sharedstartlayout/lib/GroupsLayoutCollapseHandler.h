@@ -11,7 +11,7 @@ class CGroupsLayoutCollapseHandler
 public:
     CGroupsLayoutCollapseHandler();
 
-    HRESULT RuntimeClassInitialize(EXPAND_COLLAPSE_DIRECTION);
+    HRESULT RuntimeClassInitialize(EXPAND_COLLAPSE_DIRECTION expandCollapseDirection);
 
     //~ Begin IItemLayoutCollapseHandler Interface
     STDMETHODIMP SetCellArray(ICellArrayManager* cellArrayManager) override;

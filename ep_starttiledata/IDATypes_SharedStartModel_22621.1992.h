@@ -898,11 +898,12 @@ class CGroupsCellAssignor
 {
 };
 
-CCoSimpleArray<int>;
-CCoSimpleArray<Geometry::CPoint>;
-
 class CLandscapeToPortraitMigrationHandler
     : IItemMigrationHandler
 {
     MICROSOFT_WRL_RUNTIME_CLASS;
 };
+
+CCoSimpleArray<Geometry::CPoint>;
+CCoSimpleArray<GUID>;
+CCoSimpleArray<int>;

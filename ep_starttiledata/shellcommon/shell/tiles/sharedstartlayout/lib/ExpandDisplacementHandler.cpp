@@ -72,7 +72,7 @@ HRESULT CExpandDisplacementHandler::DisplaceItemsFromRect(const Geometry::CRect&
     {
         Geometry::CRect itemBounds;
         HRESULT hr = m_cellArrayManager->GetItemBounds(itemID, itemBounds);
-        if (hr >= 0)
+        if (SUCCEEDED(hr))
         {
             if (m_rowOrColumn == EXPAND_COLLAPSE_DIRECTION_ROW)
             {
