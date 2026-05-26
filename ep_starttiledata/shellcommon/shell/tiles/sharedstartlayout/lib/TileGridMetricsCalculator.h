@@ -1,7 +1,6 @@
 #pragma once
 
 #include <shtypes.h>
-#include <wrl.h>
 
 enum TileSizingMode
 {

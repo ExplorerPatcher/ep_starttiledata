@@ -4,6 +4,10 @@
 
 using namespace Microsoft::WRL;
 
+CItemLayoutChainDisplacement::CItemLayoutChainDisplacement()
+{
+}
+
 HRESULT CItemLayoutChainDisplacement::RuntimeClassInitialize(
     CSimpleHashTable<UINT, RefCountedDirectionArray>* directionPrioritySets,
     int deltaOfPriorityLengthOverShortestDistance, CHAIN_DISPLACEMENT_OPTION_FLAGS options)

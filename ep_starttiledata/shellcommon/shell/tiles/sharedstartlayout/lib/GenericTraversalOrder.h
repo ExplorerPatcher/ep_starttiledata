@@ -13,8 +13,8 @@ enum LayoutNavigationDirection
 MIDL_INTERFACE("0999ed40-ced2-4849-b435-e8cfc9b8752c")
 ILayoutTraversalOrder : IUnknown
 {
-    virtual HRESULT STDMETHODCALLTYPE GetAdjacent(const LayoutNavigationDirection, const POINT, POINT*, GUID*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetFirst(POINT*, GUID*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetAdjacent(const LayoutNavigationDirection direction, const POINT startingCell, POINT* endingCell, GUID* itemID) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetFirst(POINT* endingCell, GUID* itemID) = 0;
 };
 
 class CGenericTraversalOrder
@@ -28,8 +28,9 @@ public:
     HRESULT RuntimeClassInitialize(IItemLayoutResolver* resolver, int maxGroupWidth);
 
     //~ Begin ILayoutTraversalOrder Interface
-    HRESULT GetAdjacent(const LayoutNavigationDirection, const POINT, POINT*, GUID*) override;
-    HRESULT GetFirst(POINT*, GUID*) override;
+    STDMETHODIMP GetAdjacent(
+        const LayoutNavigationDirection direction, const POINT startingCell, POINT* endingCell, GUID* itemID) override;
+    STDMETHODIMP GetFirst(POINT* endingCell, GUID* itemID) override;
     //~ End ILayoutTraversalOrder Interface
 
 protected:

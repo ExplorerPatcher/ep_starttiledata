@@ -8,8 +8,8 @@ public:
     CLinearTraversalOrder() = default;
 
     //~ Begin ILayoutTraversalOrder Interface
-    HRESULT GetAdjacent(
+    STDMETHODIMP GetAdjacent(
         const LayoutNavigationDirection direction, const POINT startingCell, POINT* endingCell, GUID* itemID) override;
-    HRESULT GetFirst(POINT* endingCell, GUID* itemID) override;
+    STDMETHODIMP GetFirst(POINT* endingCell, GUID* itemID) override;
     //~ Begin ILayoutTraversalOrder Interface
 };

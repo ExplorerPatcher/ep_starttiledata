@@ -2,9 +2,6 @@
 
 #include "GenericTraversalOrder.h"
 
-#include <wrl.h>
-#include "../../../shell/inc/Geometry.h"
-
 using namespace Microsoft::WRL;
 
 CGenericTraversalOrder::CGenericTraversalOrder()
@@ -19,12 +16,13 @@ HRESULT CGenericTraversalOrder::RuntimeClassInitialize(IItemLayoutResolver* reso
     return S_OK;
 }
 
-HRESULT CGenericTraversalOrder::GetAdjacent(const LayoutNavigationDirection, const POINT, POINT*, GUID*)
+HRESULT CGenericTraversalOrder::GetAdjacent(
+    const LayoutNavigationDirection direction, const POINT startingCell, POINT* endingCell, GUID* itemID)
 {
     return E_NOTIMPL;
 }
 
-HRESULT CGenericTraversalOrder::GetFirst(POINT*, GUID*)
+HRESULT CGenericTraversalOrder::GetFirst(POINT* endingCell, GUID* itemID)
 {
     return E_NOTIMPL;
 }
