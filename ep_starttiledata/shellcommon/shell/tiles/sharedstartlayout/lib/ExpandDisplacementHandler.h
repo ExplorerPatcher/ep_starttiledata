@@ -11,7 +11,7 @@ class CExpandDisplacementHandler
 public:
     CExpandDisplacementHandler();
 
-    HRESULT RuntimeClassInitialize(EXPAND_COLLAPSE_DIRECTION);
+    HRESULT RuntimeClassInitialize(EXPAND_COLLAPSE_DIRECTION rowOrColumn);
 
     //~ Begin IItemLayoutDisplacementHandler Interface
     STDMETHODIMP SetCellArray(ICellArrayManager* cellArrayManager) override;
