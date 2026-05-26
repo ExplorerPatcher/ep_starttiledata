@@ -608,7 +608,7 @@ class CAdjacentDisplacementHandler
 };
 
 template <typename T>
-class CRefCountedObject
+class CRefCountedObject : public IUnknown, public T
 {
     ULONG _cRef;
 };
@@ -633,6 +633,7 @@ enum CHAIN_DISPLACEMENT_OPTION_FLAGS
 class CItemLayoutChainDisplacement
     : CBaseDisplacementHandler
 {
+public:
     MICROSOFT_WRL_IMPLEMENTS_CLASS;
 
     struct ChainLink
@@ -904,6 +905,7 @@ class CLandscapeToPortraitMigrationHandler
     MICROSOFT_WRL_RUNTIME_CLASS;
 };
 
+CCoSimpleArray<CItemLayoutChainDisplacement::RefCountedChainLink>;
 CCoSimpleArray<Geometry::CPoint>;
 CCoSimpleArray<GUID>;
 CCoSimpleArray<int>;
