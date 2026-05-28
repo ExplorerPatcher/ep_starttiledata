@@ -9,7 +9,7 @@ CPushDownDisplacementHandler::CPushDownDisplacementHandler()
 
 HRESULT CPushDownDisplacementHandler::RuntimeClassInitialize()
 {
-    return S_OK; // @Note: Couldn't find a body for this??
+    return S_OK;
 }
 
 HRESULT CPushDownDisplacementHandler::SetCellArray(ICellArrayManager* cellArrayManager)
@@ -18,7 +18,8 @@ HRESULT CPushDownDisplacementHandler::SetCellArray(ICellArrayManager* cellArrayM
     return S_OK;
 }
 
-HRESULT CPushDownDisplacementHandler::DisplaceItemsFromRect(const Geometry::CRect& targetRect, const Geometry::CRect& previousRect)
+HRESULT CPushDownDisplacementHandler::DisplaceItemsFromRect(
+    const Geometry::CRect& targetRect, const Geometry::CRect& previousRect)
 {
     Geometry::CRect arrayDimensions = m_cellArrayManager->GetCurrentCellArrayBounds();
 
@@ -29,19 +30,15 @@ HRESULT CPushDownDisplacementHandler::DisplaceItemsFromRect(const Geometry::CRec
 
     RETURN_IF_FAILED(m_cellArrayManager->GetItemsInRect(targetRect, &itemsCollidingWithTargetRect)); // 37
 
-    RETURN_IF_FAILED(itemsCollidingWithTargetRect.Enumerate([this, &pushDownAmount, targetRect](GUID itemID) -> bool // 47
+    bool enumSuccess = itemsCollidingWithTargetRect.Enumerate([&](GUID itemID) -> bool
     {
         Geometry::CRect itemBounds;
         HRESULT hr = m_cellArrayManager->GetItemBounds(itemID, itemBounds);
         if (SUCCEEDED(hr))
-        {
-            if (pushDownAmount <= targetRect.bottom - itemBounds.top )
-            {
-                pushDownAmount = targetRect.bottom - itemBounds.top;
-            }
-        }
+            pushDownAmount = max(pushDownAmount, targetRect.bottom - itemBounds.top);
         return SUCCEEDED(hr);
-    }));
+    });
+    RETURN_HR_IF(E_FAIL, !enumSuccess); // 47
 
     if (pushDownAmount != 0)
     {
@@ -49,29 +46,30 @@ HRESULT CPushDownDisplacementHandler::DisplaceItemsFromRect(const Geometry::CRec
             Geometry::CRect(arrayDimensions.left, targetRect.top, arrayDimensions.right, arrayDimensions.bottom),
             &itemsToMove)); // 52
 
-        RETURN_IF_FAILED(itemsToMove.Enumerate([this](GUID itemID) -> bool // 58
+        enumSuccess = itemsToMove.Enumerate([&](GUID itemID) -> bool
         {
             return SUCCEEDED(m_cellArrayManager->AddIgnoredItem(itemID));
-        }));
+        });
+        RETURN_HR_IF(E_FAIL, !enumSuccess); // 58
 
-        RETURN_IF_FAILED(itemsToMove.Enumerate([this, &pushDownAmount](GUID itemID) -> bool // 71
+        enumSuccess = itemsToMove.Enumerate([&](GUID itemID) -> bool
         {
             Geometry::CRect itemBounds;
             HRESULT hr = m_cellArrayManager->GetItemBounds(itemID, itemBounds);
             if (SUCCEEDED(hr))
             {
-                // inlined Geometry::CRect::MoveTo()
-                itemBounds.bottom += pushDownAmount;
-                itemBounds.top += pushDownAmount;
+                itemBounds.MoveTo(itemBounds.left, itemBounds.top + pushDownAmount);
                 hr = m_cellArrayManager->MoveItemUncommitted(itemID, itemBounds);
             }
             return SUCCEEDED(hr);
-        }));
+        });
+        RETURN_HR_IF(E_FAIL, !enumSuccess); // 71
 
-        RETURN_IF_FAILED(itemsToMove.Enumerate([this](GUID itemID) -> bool // 77
+        enumSuccess = itemsToMove.Enumerate([&](GUID itemID) -> bool
         {
             return SUCCEEDED(m_cellArrayManager->RemoveIgnoredItem(itemID));
-        }));
+        });
+        RETURN_HR_IF(E_FAIL, !enumSuccess); // 77
     }
 
     return S_OK;

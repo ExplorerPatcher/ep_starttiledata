@@ -13,7 +13,7 @@ public:
     CCompoundDisplacementHandler();
 
     //~ Begin IItemLayoutDisplacementHandler Interface
-    STDMETHODIMP SetCellArray(ICellArrayManager*) override;
+    STDMETHODIMP SetCellArray(ICellArrayManager* cellArrayManager) override;
     STDMETHODIMP DisplaceItemsFromRect(const Geometry::CRect& targetRect, const Geometry::CRect& previousRect) override;
     //~ End IItemLayoutDisplacementHandler Interface
 

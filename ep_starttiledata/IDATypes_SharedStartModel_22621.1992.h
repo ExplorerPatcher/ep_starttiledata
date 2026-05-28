@@ -805,6 +805,7 @@ class CExpandDisplacementHandler
 class CCompoundDisplacementHandler
     : IItemLayoutDisplacementHandler
 {
+public:
     Microsoft::WRL::Details::DontUseNewUseMake DontUseNewUseMake;
     ULONG refcount_;
 
@@ -905,6 +906,7 @@ class CLandscapeToPortraitMigrationHandler
     MICROSOFT_WRL_RUNTIME_CLASS;
 };
 
+CCoSimpleArray<CCompoundDisplacementHandler::RefCountedPendingCellCoordinates>;
 CCoSimpleArray<CItemLayoutChainDisplacement::RefCountedChainLink>;
 CCoSimpleArray<Geometry::CPoint>;
 CCoSimpleArray<GUID>;
