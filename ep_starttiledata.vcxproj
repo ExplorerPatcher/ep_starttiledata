@@ -94,6 +94,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>RuntimeObject.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>ep_starttiledata.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
@@ -118,20 +119,23 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="shellcommon\shell\tiles\sharedmodel\lib\**\*.h" />
-    <ClInclude Include="shellcommon\shell\tiles\sharedstartlayout\lib\**\*.h" />
+    <ClInclude Include="shell\tiles\sharedmodel\lib\**\*.h" />
+    <ClInclude Include="shell\tiles\sharedstartlayout\lib\**\*.h" />
     <ClInclude Include="shell\inc\**\*.h" />
     <ClInclude Include="IDATypes_SharedStartModel_22621.1992.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="shellcommon\shell\tiles\sharedstartlayout\lib\**\*.cpp" />
+    <ClCompile Include="shell\tiles\dll\*.cpp" />
+    <ClCompile Include="shell\tiles\sharedstartlayout\lib\**\*.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ep_starttiledata.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
