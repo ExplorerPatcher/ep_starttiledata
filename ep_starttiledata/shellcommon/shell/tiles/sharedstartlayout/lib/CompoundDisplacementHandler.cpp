@@ -501,8 +501,6 @@ HRESULT CCompoundDisplacementHandler::_ShiftRows(const ShiftCriteria criteria, c
 HRESULT CCompoundDisplacementHandler::_TestPosibleMove(
     REFGUID collision, const Geometry::CRect& position, DisplacementEvaluationSet& move)
 {
-    RefCountedDisplacementEvaluation* p_right;
-
     Geometry::CRect collisionPosition;
     RETURN_IF_FAILED(m_cellArrayManager->GetItemBounds(collision, collisionPosition)); // 483
 
