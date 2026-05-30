@@ -121,7 +121,7 @@ HRESULT CCellArray::RemoveItem(REFGUID itemID)
     {
         if (enumeratedItemID == itemID)
         {
-            _SetCellValue(indexX, indexY, enumeratedItemID);
+            _SetCellValue(indexX, indexY, c_emptyCellValue);
         }
     });
     return S_OK;

@@ -4,7 +4,7 @@ using namespace Microsoft::WRL;
 
 extern "C" HRESULT WINAPI DllCanUnloadNow()
 {
-    return Module<InProc>::GetModule().Terminate();
+    return Module<InProc>::GetModule().Terminate() ? S_OK : S_FALSE;
 }
 
 extern "C" HRESULT WINAPI DllGetClassObject(REFCLSID objectClsid, REFIID requestedInterface, LPVOID* returnedInterface)

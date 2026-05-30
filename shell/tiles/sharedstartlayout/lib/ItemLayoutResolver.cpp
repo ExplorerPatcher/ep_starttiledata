@@ -258,9 +258,6 @@ HRESULT CItemLayoutResolver::RemoveItemUncommitted(REFGUID itemID)
 
 HRESULT CItemLayoutResolver::MoveItemUncommitted(REFGUID itemID, const POINT destination)
 {
-    LONG x = destination.x;
-    LONG y = destination.y;
-
     auto cleanupOnFailure = wil::scope_exit([this]
     {
         LOG_IF_FAILED(_StopBatchingItemBoundsChangeUpdatesAndNotify()); // 211
@@ -272,9 +269,9 @@ HRESULT CItemLayoutResolver::MoveItemUncommitted(REFGUID itemID, const POINT des
     Geometry::CRect itemBounds;
     RETURN_IF_FAILED(_spCellArrayManager->GetItemBounds(itemID, itemBounds)); // 218
 
-    itemBounds.Offset(x - itemBounds.left, y - itemBounds.top);
+    itemBounds.MoveTo(destination.x, destination.y);
     RETURN_IF_FAILED(_ModifyItemUncommittedInternal(itemID, itemBounds, ModificationOperation::Move)); // 221
-    RETURN_IF_FAILED(CItemLayoutResolver::_StopBatchingItemBoundsChangeUpdatesAndNotify()); // 222
+    RETURN_IF_FAILED(_StopBatchingItemBoundsChangeUpdatesAndNotify()); // 222
 
     cleanupOnFailure.release();
     return S_OK;
@@ -420,6 +417,7 @@ HRESULT CItemLayoutResolver::AbandonChanges()
     });
 
     RETURN_IF_FAILED(_spCellArrayManager->AbandonChanges()); // 344
+    _StopBatchingItemBoundsChangeUpdatesAndNotify();
 
     cleanupOnFailure.release();
     return S_OK;
