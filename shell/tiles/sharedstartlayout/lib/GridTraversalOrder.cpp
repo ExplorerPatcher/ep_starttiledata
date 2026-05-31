@@ -406,7 +406,7 @@ HRESULT CGridTraversalOrder::GetClosestInGroupInVerticalBounds(
     *endingCell = { groupStartCell.x + closestCell.x + margins.left, groupStartCell.y + closestCell.y + margins.top };
     *itemID = closestItemID;
 
-    return 0;
+    return S_OK;
 }
 
 HRESULT CGridTraversalOrder::GetClosestInVerticalBounds(

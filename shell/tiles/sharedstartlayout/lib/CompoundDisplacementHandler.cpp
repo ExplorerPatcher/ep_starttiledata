@@ -115,7 +115,7 @@ HRESULT CCompoundDisplacementHandler::DisplaceItemsFromRect(
         RETURN_HR(E_FAIL); // 160
     }
 
-    return 0;
+    return S_OK;
 }
 
 CCompoundDisplacementHandler::DisplacementEvaluationSet::DisplacementEvaluationSet()
@@ -454,16 +454,16 @@ HRESULT CCompoundDisplacementHandler::_ShiftRows(const ShiftCriteria criteria, c
 {
     Geometry::CRect arrayDimensions = m_cellArrayManager->GetCurrentCellArrayBounds();
 
-    CSet<GUID> Block;
-    RETURN_IF_FAILED(m_cellArrayManager->GetItemsInRect(arrayDimensions, &Block)); // 434
+    CSet<GUID> items;
+    RETURN_IF_FAILED(m_cellArrayManager->GetItemsInRect(arrayDimensions, &items)); // 434
 
-    bool enumSuccess = Block.Enumerate([&](GUID itemID) -> bool
+    bool enumSuccess = items.Enumerate([&](GUID itemID) -> bool
     {
         return SUCCEEDED(m_cellArrayManager->AddIgnoredItem(itemID));
     });
     RETURN_HR_IF(E_FAIL, !enumSuccess); // 440
 
-    enumSuccess = Block.Enumerate([&](GUID itemID) -> bool
+    enumSuccess = items.Enumerate([&](GUID itemID) -> bool
     {
         Geometry::CRect position;
         HRESULT hr = m_cellArrayManager->GetItemBounds(itemID, position);
@@ -489,7 +489,7 @@ HRESULT CCompoundDisplacementHandler::_ShiftRows(const ShiftCriteria criteria, c
     });
     RETURN_HR_IF(E_FAIL, !enumSuccess); // 466
 
-    enumSuccess = Block.Enumerate([&](GUID itemID) -> bool
+    enumSuccess = items.Enumerate([&](GUID itemID) -> bool
     {
         return SUCCEEDED(m_cellArrayManager->RemoveIgnoredItem(itemID));
     });
