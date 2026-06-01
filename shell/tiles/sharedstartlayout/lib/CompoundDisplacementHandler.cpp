@@ -220,9 +220,9 @@ HRESULT CCompoundDisplacementHandler::_AttemptAdjacentBlockMove(
             else
                 offsetX = emptyAdjacent.left - collisionTopLeft.x;
 
-            bool enumSuccess = cellsAtDestination->Enumerate([&](GUID collision) -> bool
+            bool enumSuccess = cellsAtDestination->Enumerate([&](GUID itemID) -> bool
             {
-                return SUCCEEDED(m_cellArrayManager->AddIgnoredItem(collision));
+                return SUCCEEDED(m_cellArrayManager->AddIgnoredItem(itemID));
             });
             RETURN_HR_IF(E_FAIL, !enumSuccess); // 276
 
@@ -238,9 +238,9 @@ HRESULT CCompoundDisplacementHandler::_AttemptAdjacentBlockMove(
                 return hr == S_OK;
             });
 
-            enumSuccess = cellsAtDestination->Enumerate([&](GUID collision) -> bool
+            enumSuccess = cellsAtDestination->Enumerate([&](GUID itemID) -> bool
             {
-                return SUCCEEDED(m_cellArrayManager->RemoveIgnoredItem(collision));
+                return SUCCEEDED(m_cellArrayManager->RemoveIgnoredItem(itemID));
             });
             RETURN_HR_IF(E_FAIL, !enumSuccess); // 294
 
@@ -404,6 +404,8 @@ Geometry::CRect CCompoundDisplacementHandler::_GetEmptyAdjacentSpace(
     return m_cellArrayManager->IsValidRect(adjacent) && m_cellArrayManager->IsRectEmpty(adjacent) ? adjacent : position;
 }
 
+inline constexpr int c_nMaxVerticalChainLength = 2;
+
 HRESULT CCompoundDisplacementHandler::_PrepareChain(
     REFGUID cell, const Geometry::CSize& acceptedSize, const DISPLACEMENT_DIRECTION direction,
     const int moveAmount, const int linkCount, CCoSimpleArray<RefCountedPendingCellCoordinates>* pItemsInChain)
@@ -411,11 +413,10 @@ HRESULT CCompoundDisplacementHandler::_PrepareChain(
     Geometry::CRect cellPosition;
     RETURN_IF_FAILED(m_cellArrayManager->GetItemBounds(cell, cellPosition)); // 708
 
-    if (cellPosition.GetWidth() > acceptedSize.cx
-        || cellPosition.GetHeight() > acceptedSize.cy
-        || (direction == DD_UP || direction == DD_DOWN) && abs(linkCount * moveAmount) > 2)
+    RETURN_HR_IF_EXPECTED(E_FAIL, (cellPosition.GetWidth() > acceptedSize.cx) || (cellPosition.GetHeight() > acceptedSize.cy));
+    if ((direction == DD_UP || direction == DD_DOWN))
     {
-        return E_FAIL;
+        RETURN_HR_IF_EXPECTED(E_FAIL, abs(linkCount * moveAmount) > c_nMaxVerticalChainLength);
     }
 
     Geometry::CPoint movePosition = _MovePoint(cellPosition.GetTopLeft(), direction, moveAmount);
