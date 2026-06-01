@@ -53,7 +53,7 @@ HRESULT CPathCollapseHandler::Collapse(const Geometry::CRect& sourceCells, const
             {
                 startsEmpty = true;
             }
-            else if (!empty)
+            if (!empty)
             {
                 if (startsEmpty && m_smartCollapseEnabled)
                 {
@@ -63,12 +63,9 @@ HRESULT CPathCollapseHandler::Collapse(const Geometry::CRect& sourceCells, const
                     {
                         CCoSimpleArray<Geometry::CPoint> path;
 
-                        int minFirstLoop = firstLoopMin;
-                        int maxFirstLoop = firstLoopMax;
-
                         int spread = 2;
-                        minFirstLoop = max(firstLoop - spread, minFirstLoop);
-                        maxFirstLoop = min(firstLoop + spread, maxFirstLoop);
+                        int minFirstLoop = max(firstLoop - spread, firstLoopMin);
+                        int maxFirstLoop = min(firstLoop + spread, firstLoopMax);
 
                         for (; spread > 0; --spread)
                         {
@@ -77,7 +74,7 @@ HRESULT CPathCollapseHandler::Collapse(const Geometry::CRect& sourceCells, const
                                 pathCannotInclude, false, path))
                             {
                                 RETURN_IF_FAILED(_CollapseByPath(spread, path)); // 112
-                                firstLoop = min(firstLoopMin, firstLoop - spread);
+                                firstLoop = max(firstLoopMin, firstLoop - spread) - 1;
                                 firstLoopMax = max(firstLoopMin, firstLoopMax - spread);
                                 break;
                             }
@@ -96,7 +93,7 @@ HRESULT CPathCollapseHandler::Collapse(const Geometry::CRect& sourceCells, const
                 : Geometry::CRect(firstLoop, sizeArrayDimensions.top, sizeArrayDimensions.right, sizeArrayDimensions.bottom);
             if (!boundsToCollapse.Intersects(sourceCells))
             {
-                RETURN_IF_FAILED(_CollapseByOffset(boundsToCollapse, 1)); // 79
+                RETURN_IF_FAILED(_CollapseByOffset(boundsToCollapse, -1)); // 79
                 firstLoop = max(firstLoopMin, firstLoop - 1) - 1;
                 firstLoopMax = max(firstLoopMin, firstLoopMax - 1);
             }
@@ -141,7 +138,7 @@ HRESULT CPathCollapseHandler::_CollapseByOffset(const Geometry::CRect& bounds, c
                         continue;
                     }
 
-                    itemBounds.MoveTo(itemBounds.left, itemBounds.top - offset);
+                    itemBounds.MoveTo(itemBounds.left, itemBounds.top + offset);
                 }
                 else
                 {
@@ -150,7 +147,7 @@ HRESULT CPathCollapseHandler::_CollapseByOffset(const Geometry::CRect& bounds, c
                         continue;
                     }
 
-                    itemBounds.MoveTo(itemBounds.left - offset, itemBounds.top);
+                    itemBounds.MoveTo(itemBounds.left + offset, itemBounds.top);
                 }
 
                 RETURN_IF_FAILED(m_cellArrayManager->MoveItemUncommitted(itemID, itemBounds)); // 177
