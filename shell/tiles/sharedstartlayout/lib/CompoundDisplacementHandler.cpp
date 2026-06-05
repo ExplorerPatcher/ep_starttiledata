@@ -414,7 +414,7 @@ HRESULT CCompoundDisplacementHandler::_PrepareChain(
     RETURN_IF_FAILED(m_cellArrayManager->GetItemBounds(cell, cellPosition)); // 708
 
     RETURN_HR_IF_EXPECTED(E_FAIL, (cellPosition.GetWidth() > acceptedSize.cx) || (cellPosition.GetHeight() > acceptedSize.cy));
-    if ((direction == DD_UP || direction == DD_DOWN))
+    if (direction == DD_UP || direction == DD_DOWN)
     {
         RETURN_HR_IF_EXPECTED(E_FAIL, abs(linkCount * moveAmount) > c_nMaxVerticalChainLength);
     }
