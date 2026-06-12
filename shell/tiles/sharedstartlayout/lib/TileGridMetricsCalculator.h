@@ -2,11 +2,7 @@
 
 #include <shtypes.h>
 
-enum TileSizingMode
-{
-    TileSizingMode_FixedSize = 0x0,
-    TileSizingMode_EdgeToEdge = 0x1,
-};
+#include "../../sharedmodel/lib/SharedModelCommon.h"
 
 MIDL_INTERFACE("4839e2d8-ff75-4643-9bc6-435ae7c12501")
 ITileGridMetricsCalculator : IUnknown
