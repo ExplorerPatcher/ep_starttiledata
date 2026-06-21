@@ -11,6 +11,8 @@
 
 #include "DataStoreCache_MoveMe.h"
 
+#define NUKE_SHAREDSTARTLAYOUT 0
+
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
 struct CollectionConstants

@@ -3,8 +3,11 @@
 #include "CDSStartCollectionWriter.h"
 
 #include "TransformerHelpers.h"
+
+#if !NUKE_SHAREDSTARTLAYOUT
 #include "../../../sharedmodel/lib/SharedModelCommon.h"
 #include "../../../sharedstartlayout/lib/ItemLayoutResolver.h"
+#endif
 
 CommonStartTelemetry::LogAllTilesActivity_Dtor_t CommonStartTelemetry::g_pfnLogAllTilesActivity_Dtor;
 
@@ -189,11 +192,13 @@ HRESULT CDSStartCollectionWriter::WriteCollection(
             transformerRoot->SetCustomProperty(pair.first, pair.second);
         }
 
+#if !NUKE_SHAREDSTARTLAYOUT
         THROW_IF_FAILED(SharedStartLayout_CreateGroupsLayoutResolver(&_groupsLayoutResolver)); // 84
         THROW_IF_FAILED(_groupsLayoutResolver->SetMaxCellBounds(root->GetPreferredGroupColumnCount(), -1)); // 85
 
         auto groupsLayoutResolverInternal = _groupsLayoutResolver.query<IItemLayoutResolverInternal>();
         groupsLayoutResolverInternal->EnableCollapse(FALSE);
+#endif
 
         // *(LayoutCustomizationRestrictionType *)((char*)this + 648) = root->GetCustomizationRestriction(); // Was here in 16299
 
@@ -239,6 +244,9 @@ void CDSStartCollectionWriter::WriteStartGroup(
         transformerGroup->SetDisplayName(group->GetDisplayName()->c_str());
     }
 
+#if NUKE_SHAREDSTARTLAYOUT
+    transformerGroup->SetLocation(group->GetLocation());
+#else
     wil::com_ptr<IItemLayoutResolver> portraitLayoutResolver;
     THROW_IF_FAILED(SharedStartLayout_CreatePortraitLayoutResolver(&portraitLayoutResolver)); // 230
     THROW_IF_FAILED(portraitLayoutResolver->SetMaxCellBounds(8, -1)); // 231
@@ -258,6 +266,7 @@ void CDSStartCollectionWriter::WriteStartGroup(
         THROW_IF_FAILED(_groupsLayoutResolver->GetItemBounds(transformerGroup->GetLayoutId(), &groupBounds)); // 247
         transformerGroup->SetLocation({ groupBounds.left, groupBounds.top });
     }
+#endif
 
     transformerGroup->SetIsLockedForCustomization(group->GetIsCustomizationLocked());
     for (const std::pair<const std::wstring, std::wstring>& pair : group->GetCustomProperties())
@@ -269,7 +278,12 @@ void CDSStartCollectionWriter::WriteStartGroup(
     {
         try
         {
-            WriteStartFolder(pair.second, transformerGroup, portraitLayoutResolver.get());
+            WriteStartFolder(
+                pair.second, transformerGroup
+#if !NUKE_SHAREDSTARTLAYOUT
+                , portraitLayoutResolver.get()
+#endif
+            );
 
             /*_writingStartLayoutToStorageTelemetry.FolderWriteSuccess(pair.second);
             (Microsoft_Windows_ShellCommon_StartLayoutPopulationEnableBits & 0x1) != 0
@@ -300,7 +314,12 @@ void CDSStartCollectionWriter::WriteStartGroup(
         }*/
         try
         {
-            WriteStartTile(pair.second, transformerGroup, portraitLayoutResolver.get());
+            WriteStartTile(
+                pair.second, transformerGroup
+#if !NUKE_SHAREDSTARTLAYOUT
+                , portraitLayoutResolver.get()
+#endif
+            );
 
             /*_writingStartLayoutToStorageTelemetry.TileWriteSuccess(pair.second);
             (Microsoft_Windows_ShellCommon_StartLayoutPopulationEnableBits & 0x1) != 0
@@ -335,8 +354,11 @@ void CDSStartCollectionWriter::WriteStartGroup(
 
 void CDSStartCollectionWriter::WriteStartFolder(
     const std::shared_ptr<Internal::LayoutFolder>& folder,
-    const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>& transformerGroup,
-    IItemLayoutResolver* portraitLayoutResolver)
+    const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>& transformerGroup
+#if !NUKE_SHAREDSTARTLAYOUT
+    , IItemLayoutResolver* portraitLayoutResolver
+#endif
+)
 {
     using namespace DataStoreCache::CuratedTileCollectionTransformer;
 
@@ -347,20 +369,24 @@ void CDSStartCollectionWriter::WriteStartFolder(
         transformerFolder->SetDisplayName(folder->GetDisplayName()->c_str());
     }
 
+#if !NUKE_SHAREDSTARTLAYOUT
     THROW_IF_FAILED(portraitLayoutResolver->AddItem(
         transformerFolder->GetLayoutId(), {
             folder->GetLocation().x, folder->GetLocation().y,
             folder->GetLocation().x + folder->GetSize().cx, folder->GetLocation().y + folder->GetSize().cy
         }
     )); // 322
+#endif
 
     transformerFolder->SetLocation(folder->GetLocation());
     transformerFolder->SetSize(folder->GetSize());
     transformerFolder->SetIsLockedForCustomization(transformerGroup->GetIsLockedForCustomization());
 
+#if !NUKE_SHAREDSTARTLAYOUT
     wil::com_ptr<IItemLayoutResolver> folderLayoutResolver;
     THROW_IF_FAILED(SharedStartLayout_CreatePortraitLayoutResolver(&folderLayoutResolver)); // 331
     THROW_IF_FAILED(folderLayoutResolver->SetMaxCellBounds(8, -1)); // 332
+#endif
 
     for (const std::pair<const GUID, std::shared_ptr<Internal::LayoutTile>>& pair : *folder->GetTiles())
     {
@@ -368,7 +394,12 @@ void CDSStartCollectionWriter::WriteStartFolder(
         THROW_IF_FAILED(pair.second->GetTileIdentifier()->get_SerializedIdentifier(&string)); // 337
         try
         {
-            WriteStartTile(pair.second, transformerFolder, folderLayoutResolver.get());
+            WriteStartTile(
+                pair.second, transformerFolder
+#if !NUKE_SHAREDSTARTLAYOUT
+                , folderLayoutResolver.get()
+#endif
+            );
 
             /*_writingStartLayoutToStorageTelemetry.TileWriteSuccess(pair.second);
             (Microsoft_Windows_ShellCommon_StartLayoutPopulationEnableBits & 0x1) != 0
@@ -404,8 +435,11 @@ void CDSStartCollectionWriter::WriteStartFolder(
 
 void CDSStartCollectionWriter::WriteStartTile(
     const std::shared_ptr<Internal::LayoutTile>& tile,
-    const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>& transformerGroup,
-    IItemLayoutResolver* portraitLayoutResolver)
+    const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>& transformerGroup
+#if !NUKE_SHAREDSTARTLAYOUT
+    , IItemLayoutResolver* portraitLayoutResolver
+#endif
+)
 {
     using namespace DataStoreCache::CuratedTileCollectionTransformer;
 
@@ -416,6 +450,7 @@ void CDSStartCollectionWriter::WriteStartTile(
 
     std::shared_ptr<CuratedTile> transformerTile = transformerGroup->CreateTile(tile->GetTileIdentifier().get());
 
+#if !NUKE_SHAREDSTARTLAYOUT
     THROW_IF_FAILED(portraitLayoutResolver->AddItem(
         tile->GetUniqueId(),
         {
@@ -423,6 +458,7 @@ void CDSStartCollectionWriter::WriteStartTile(
             tile->GetLocation().x + tile->GetSize().cx, tile->GetLocation().y + tile->GetSize().cy
         }
     )); // 380
+#endif
 
     transformerTile->SetLocation(tile->GetLocation());
     transformerTile->SetSize(tile->GetSize());

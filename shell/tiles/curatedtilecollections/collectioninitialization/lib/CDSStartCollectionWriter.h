@@ -95,16 +95,24 @@ private:
         const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedRoot>& transformerRoot);
     void WriteStartFolder(
         const std::shared_ptr<Internal::LayoutFolder>& folder,
-        const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>& transformerGroup,
-        IItemLayoutResolver* portraitLayoutResolver);
+        const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>& transformerGroup
+#if !NUKE_SHAREDSTARTLAYOUT
+        , IItemLayoutResolver* portraitLayoutResolver
+#endif
+    );
     void WriteStartTile(
         const std::shared_ptr<Internal::LayoutTile>& tile,
-        const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>& transformerGroup,
-        IItemLayoutResolver* portraitLayoutResolver);
+        const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>& transformerGroup
+#if !NUKE_SHAREDSTARTLAYOUT
+        , IItemLayoutResolver* portraitLayoutResolver
+#endif
+    );
 
     // char _logAllTilesActivity[320];
     // char _writingStartLayoutToStorageTelemetry[320];
+#if !NUKE_SHAREDSTARTLAYOUT
     wil::com_ptr<IItemLayoutResolver> _groupsLayoutResolver;
+#endif
     std::shared_ptr<CollectionContext> _context;
     std::shared_ptr<TileInitializationHandlerManager> _tileInitializationHandlerManager;
     bool _b;

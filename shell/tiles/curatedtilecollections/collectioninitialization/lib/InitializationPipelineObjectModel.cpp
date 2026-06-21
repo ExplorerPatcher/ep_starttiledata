@@ -4,9 +4,11 @@
 
 #include <appmodel.h>
 
+#if !NUKE_SHAREDSTARTLAYOUT
 #include "../../../sharedstartlayout/lib/GenericTraversalOrder.h"
 #include "../../../sharedstartlayout/lib/ItemLayoutResolver.h"
 #include "../../../sharedmodel/lib/SharedModelCommon.h"
+#endif
 
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
@@ -941,17 +943,20 @@ void LayoutRootInternal::InitializeStart()
 {
     using namespace DataStoreCache::CuratedTileCollectionTransformer;
 
+#if !NUKE_SHAREDSTARTLAYOUT
     wil::com_ptr<IItemLayoutResolver> groupsLayoutResolver;
     THROW_IF_FAILED(SharedStartLayout_CreateGroupsLayoutResolver(&groupsLayoutResolver)); // 1133
 
     THROW_IF_FAILED(groupsLayoutResolver->SetMaxCellBounds(
         _transformerRoot->GetPreferredColumnCount() != 0 ? _transformerRoot->GetPreferredColumnCount() : 1, -1)); // 1137
+#endif
 
     for (std::pair<const GUID, std::shared_ptr<CuratedGroup>> groupIt : _transformerRoot->GetGroups())
     {
         std::shared_ptr<LayoutGroup> layoutGroup = std::make_shared<LayoutGroupInternal>(_context, groupIt.second);
         _groups->emplace(std::pair(layoutGroup->GetUniqueId(), layoutGroup));
 
+#if !NUKE_SHAREDSTARTLAYOUT
         wil::com_ptr<IItemLayoutResolver> portraitLayoutResolver;
         THROW_IF_FAILED(SharedStartLayout_CreatePortraitLayoutResolver(&portraitLayoutResolver)); // 1145
         THROW_IF_FAILED(portraitLayoutResolver->SetMaxCellBounds(_transformerRoot->GetGroupCellWidth(), -1)); // 1146
@@ -961,8 +966,27 @@ void LayoutRootInternal::InitializeStart()
         {
             THROW_IF_FAILED(portraitLayoutResolver->AddItem(tileIt.first, tileIt.second->GetLayoutRect())); // 1151
         }
+#endif
     }
 
+#if NUKE_SHAREDSTARTLAYOUT
+    std::vector<std::pair<GUID, POINT>> tileIdsAndLocations;
+    for (const std::pair<const GUID, std::shared_ptr<LayoutGroup>>& pair : *_groups)
+    {
+        tileIdsAndLocations.emplace_back(std::make_pair(pair.first, pair.second->GetLocation()));
+    }
+    std::sort(tileIdsAndLocations.begin(), tileIdsAndLocations.end(), [](const auto& a, const auto& b)
+    {
+        if (a.second.y != b.second.y)
+            return a.second.y < b.second.y;
+        return a.second.x < b.second.x;
+    });
+
+    for (const std::pair<GUID, POINT>& pair : tileIdsAndLocations)
+    {
+        _layoutInitializationGroupIds.emplace_back(pair.first);
+    }
+#else
     THROW_IF_FAILED(groupsLayoutResolver->CommitChanges()); // 1156
 
     wil::com_ptr<ILayoutTraversalOrder> layoutTraversalOrder;
@@ -984,6 +1008,7 @@ void LayoutRootInternal::InitializeStart()
             endingCell = nextEndingCell;
         }
     }
+#endif
 }
 
 void LayoutRootInternal::InitializeGenericCollection()
