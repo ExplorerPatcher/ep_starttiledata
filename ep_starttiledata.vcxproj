@@ -119,15 +119,18 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="shell\tiles\curatedtilecollections\collectioninitialization\lib\**\*.h" />
     <ClInclude Include="shell\tiles\sharedmodel\lib\**\*.h" />
     <ClInclude Include="shell\tiles\sharedstartlayout\lib\**\*.h" />
     <ClInclude Include="shell\inc\**\*.h" />
+    <ClInclude Include="IDATypes_CuratedTileCollections_22621.1992.h" />
     <ClInclude Include="IDATypes_SharedStartModel_22621.1992.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="shell\tiles\curatedtilecollections\collectioninitialization\lib\**\*.cpp" />
     <ClCompile Include="shell\tiles\dll\*.cpp" />
     <ClCompile Include="shell\tiles\sharedstartlayout\lib\**\*.cpp" />
   </ItemGroup>
