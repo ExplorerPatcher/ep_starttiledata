@@ -361,7 +361,7 @@ LayoutFolder::LayoutFolder(
     for (std::pair<const GUID, std::shared_ptr<CuratedTile>> tilePair : transformerGroup->GetTiles())
     {
         std::shared_ptr<LayoutTile> tile = std::make_shared<LayoutTileInternal>(tilePair.second, nullptr);
-        _tiles->emplace(std::pair(tile->GetUniqueId(), tile));
+        _tiles->emplace(std::make_pair(tile->GetUniqueId(), tile));
     }
 }
 
@@ -370,7 +370,7 @@ void LayoutFolder::AddLayoutInitializationTile(std::shared_ptr<LayoutTile> tile)
     THROW_HR_IF(E_INVALIDARG, tile != nullptr && tile->IsBackedByLayoutTransformer()); // 560
 
     tile->SetGroupId(_uniqueId);
-    _tiles->emplace(std::pair(tile->GetUniqueId(), tile));
+    _tiles->emplace(std::make_pair(tile->GetUniqueId(), tile));
 }
 
 std::shared_ptr<LayoutTile> LayoutFolder::AddTile(
@@ -386,7 +386,7 @@ std::shared_ptr<LayoutTile> LayoutFolder::AddTile(
         tile = std::make_shared<LayoutTileInternal>(tileIdentifier, type);
     }
 
-    _tiles->emplace(std::pair(tile->GetUniqueId(), tile));
+    _tiles->emplace(std::make_pair(tile->GetUniqueId(), tile));
     return tile;
 }
 
@@ -542,13 +542,13 @@ LayoutGroup::LayoutGroup(
     for (std::pair<const GUID, std::shared_ptr<CuratedTile>> tilePair : transformerGroup->GetTiles())
     {
         std::shared_ptr<LayoutTile> tile = std::make_shared<LayoutTileInternal>(tilePair.second, nullptr);
-        _tiles->emplace(std::pair(tile->GetUniqueId(), tile));
+        _tiles->emplace(std::make_pair(tile->GetUniqueId(), tile));
     }
 
     for (std::pair<const GUID, std::shared_ptr<CuratedGroup>> groupPair : transformerGroup->GetGroups())
     {
         std::shared_ptr<LayoutFolderInternal> folder = std::make_shared<LayoutFolderInternal>(_context, groupPair.second);
-        _folders->emplace(std::pair(folder->GetUniqueId(), folder));
+        _folders->emplace(std::make_pair(folder->GetUniqueId(), folder));
     }
 }
 
@@ -560,7 +560,7 @@ std::shared_ptr<LayoutFolder> LayoutGroup::AddFolder()
         folder = std::make_shared<LayoutFolderInternal>(_context);
     }
 
-    _folders->emplace(std::pair(folder->GetUniqueId(), folder));
+    _folders->emplace(std::make_pair(folder->GetUniqueId(), folder));
     return folder;
 }
 
@@ -569,7 +569,7 @@ void LayoutGroup::AddLayoutInitializationTile(std::shared_ptr<LayoutTile> tile)
     THROW_HR_IF(E_INVALIDARG, tile != nullptr && tile->IsBackedByLayoutTransformer()); // 789
 
     tile->SetGroupId(_uniqueId);
-    _tiles->emplace(std::pair(tile->GetUniqueId(), tile));
+    _tiles->emplace(std::make_pair(tile->GetUniqueId(), tile));
 }
 
 std::shared_ptr<LayoutTile> LayoutGroup::AddTile(
@@ -589,7 +589,7 @@ std::shared_ptr<LayoutTile> LayoutGroup::AddTile(
     }
 
     tile->SetGroupId(_uniqueId);
-    _tiles->emplace(std::pair(tile->GetUniqueId(), tile));
+    _tiles->emplace(std::make_pair(tile->GetUniqueId(), tile));
     return tile;
 }
 
@@ -757,7 +757,7 @@ LayoutRoot::LayoutRoot(
 
 void LayoutRoot::AddLayoutInitializationGroup(std::shared_ptr<LayoutGroup> group)
 {
-    _groups->emplace(std::pair(group->GetUniqueId(), group));
+    _groups->emplace(std::make_pair(group->GetUniqueId(), group));
     _layoutInitializationGroupIds.emplace_back(group->GetUniqueId());
 }
 
@@ -954,7 +954,7 @@ void LayoutRootInternal::InitializeStart()
     for (std::pair<const GUID, std::shared_ptr<CuratedGroup>> groupIt : _transformerRoot->GetGroups())
     {
         std::shared_ptr<LayoutGroup> layoutGroup = std::make_shared<LayoutGroupInternal>(_context, groupIt.second);
-        _groups->emplace(std::pair(layoutGroup->GetUniqueId(), layoutGroup));
+        _groups->emplace(std::make_pair(layoutGroup->GetUniqueId(), layoutGroup));
 
 #if !NUKE_SHAREDSTARTLAYOUT
         wil::com_ptr<IItemLayoutResolver> portraitLayoutResolver;
@@ -1018,7 +1018,7 @@ void LayoutRootInternal::InitializeGenericCollection()
     for (std::pair<const GUID, std::shared_ptr<CuratedGroup>> groupIt : _transformerRoot->GetGroups())
     {
         std::shared_ptr<LayoutGroupInternal> layoutGroup = std::make_shared<LayoutGroupInternal>(_context, groupIt.second);
-        _groups->emplace(std::pair(layoutGroup->GetUniqueId(), layoutGroup));
+        _groups->emplace(std::make_pair(layoutGroup->GetUniqueId(), layoutGroup));
     }
 }
 
