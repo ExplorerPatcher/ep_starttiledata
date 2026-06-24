@@ -1,0 +1,27 @@
+﻿namespace Windows.Internal.ApplicationModel
+{
+    [uuid(1223aea2-547b-4d03-9e6c-388a4307a07e)]
+    interface IPinnableSurface
+    {
+        Boolean CanPinTile(String a2, Windows.UI.StartScreen.SecondaryTile a3);
+        Boolean RequestPinTile(String a2, String a3, Windows.UI.StartScreen.SecondaryTile a4, Windows.Internal.ApplicationModel.WindowManagement.WindowId a5);
+        void PinTile(String a2, Windows.UI.StartScreen.SecondaryTile a3);
+        Boolean IsTilePinned(String a2, String a3);
+        Boolean CanUnpinTile(String a2, String a3);
+        void UnpinTile(String a2, String a3);
+    };
+
+    [uuid(f27684e4-e634-4807-be9a-4838381fcbfc)]
+    interface IPinnableSurfaceFactory
+    {
+        IPinnableSurface GetCurrent();
+    };
+}
+
+namespace Windows.Internal.ApplicationModel.WindowManagement
+{
+    struct WindowId
+    {
+        UInt32 Value;
+    };
+}

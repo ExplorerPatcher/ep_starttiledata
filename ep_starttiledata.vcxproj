@@ -83,9 +83,10 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <PreprocessorDefinitions>WIN32;EPSTARTTILEDATA_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;EPSTARTTILEDATA_EXPORTS;_WINDOWS;_USRDLL;__WRL_CONFIGURATION_LEGACY__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
         $(ProjectDir)shell\inc;
+        $(ProjectDir)idl\obj\$(Configuration)\$(Platform)\Generated Files;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -120,6 +121,8 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="shell\tiles\curatedtilecollections\collectioninitialization\lib\**\*.h" />
+    <ClInclude Include="shell\tiles\curatedtilecollections\collectionmanagement\lib\CuratedTileCollection.h" />
+    <ClInclude Include="shell\tiles\curatedtilecollections\collectionmanagement\lib\TileCollectionInitializers.h" />
     <ClInclude Include="shell\tiles\sharedmodel\lib\**\*.h" />
     <ClInclude Include="shell\tiles\sharedstartlayout\lib\**\*.h" />
     <ClInclude Include="shell\inc\**\*.h" />
@@ -131,6 +134,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="shell\tiles\curatedtilecollections\collectioninitialization\lib\**\*.cpp" />
+    <ClCompile Include="shell\tiles\curatedtilecollections\collectionmanagement\lib\**\*.cpp" />
     <ClCompile Include="shell\tiles\dll\*.cpp" />
     <ClCompile Include="shell\tiles\sharedstartlayout\lib\**\*.cpp" />
   </ItemGroup>
@@ -139,6 +143,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ep_starttiledata.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="idl\ep_starttiledata_idl.vcxproj">
+      <Project>{3c5f7e1f-06e1-4492-90a8-40c17d7f22ad}</Project>
+      <Name>ep_starttiledata_idl</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

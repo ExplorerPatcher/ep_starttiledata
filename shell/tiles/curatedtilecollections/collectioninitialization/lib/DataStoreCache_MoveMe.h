@@ -9,7 +9,7 @@
 #include <windows.system.h>
 #include <wil/com.h>
 
-#include "WindowsInternal.Shell.UnifiedTile_h.h"
+#include <WindowsInternal.Shell.UnifiedTile.h>
 
 namespace DataStoreCache::Util
 {
@@ -41,32 +41,35 @@ public:
 
 struct CuratedTileChangeInfo;
 
-class DECLSPEC_NOVTABLE ICuratedTileImpl
+namespace Internal
 {
-public:
-    virtual ~ICuratedTileImpl();
-    virtual POINT GetLocation() = 0;
-    virtual void SetLocation(POINT) = 0;
-    virtual std::shared_ptr<ICuratedCollectionBatchCookieImpl> BeginBatchUpdate() = 0;
-    virtual GUID GetLayoutId() = 0;
-    virtual void SetSize(const SIZE&) = 0;
-    virtual SIZE GetSize() = 0;
-    virtual wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier> GetTileIdentifier() = 0;
-    virtual void SetTileIdentifier(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
-    virtual std::wstring GetCustomProperty(const std::wstring&) = 0;
-    virtual bool HasCustomProperty(const std::wstring&) = 0;
-    virtual void RemoveCustomProperty(const std::wstring&) = 0;
-    virtual void SetCustomProperty(const std::wstring&, const std::wstring&) = 0;
-    virtual std::shared_ptr<CloudUtil::CloudItemObserverCallback<CuratedTileChangeInfo>> AddObserver(const std::function<void (const CuratedTileChangeInfo&)>&) = 0;
-    virtual bool IsDefaultData() = 0;
-    virtual std::wstring GetJSONBlob(UINT) = 0;
-};
+    class DECLSPEC_NOVTABLE ICuratedTileImpl
+    {
+    public:
+        virtual ~ICuratedTileImpl();
+        virtual POINT GetLocation() = 0;
+        virtual void SetLocation(POINT) = 0;
+        virtual std::shared_ptr<ICuratedCollectionBatchCookieImpl> BeginBatchUpdate() = 0;
+        virtual GUID GetLayoutId() = 0;
+        virtual void SetSize(const SIZE&) = 0;
+        virtual SIZE GetSize() = 0;
+        virtual wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier> GetTileIdentifier() = 0;
+        virtual void SetTileIdentifier(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
+        virtual std::wstring GetCustomProperty(const std::wstring&) = 0;
+        virtual bool HasCustomProperty(const std::wstring&) = 0;
+        virtual void RemoveCustomProperty(const std::wstring&) = 0;
+        virtual void SetCustomProperty(const std::wstring&, const std::wstring&) = 0;
+        virtual std::shared_ptr<CloudUtil::CloudItemObserverCallback<CuratedTileChangeInfo>> AddObserver(const std::function<void (const CuratedTileChangeInfo&)>&) = 0;
+        virtual bool IsDefaultData() = 0;
+        virtual std::wstring GetJSONBlob(UINT) = 0;
+    };
+}
 
 // shell/DataStoreCache/Transformers/CuratedTileCollectionTransformer/inc/CuratedTransformerObjects/CuratedTile.h
 class CuratedTile
 {
 public:
-    CuratedTile(std::shared_ptr<ICuratedTileImpl> impl)
+    CuratedTile(std::shared_ptr<Internal::ICuratedTileImpl> impl)
         : _impl(impl)
     {
         FAIL_FAST_IF(_impl == nullptr || _impl.use_count() == 0); // 51
@@ -103,13 +106,13 @@ public:
     }
 
 protected:
-    std::shared_ptr<ICuratedTileImpl> GetImpl()
+    std::shared_ptr<Internal::ICuratedTileImpl> GetImpl()
     {
         FAIL_FAST_IF(_impl == nullptr || _impl.use_count() == 0); // 91
         return _impl;
     }
 
-    std::shared_ptr<ICuratedTileImpl> _impl;
+    std::shared_ptr<Internal::ICuratedTileImpl> _impl;
 };
 
 struct CuratedGroupChangeInfo;

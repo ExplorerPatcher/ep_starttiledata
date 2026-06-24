@@ -1,31 +1,42 @@
-#define interface struct
-#define MIDL_INTERFACE(x) struct
-#define STDMETHODCALLTYPE __stdcall
+// Parser specific options > [x] No IDA specific extensions
+
+// Include paths: C:\Users\satri\Devel\ExplorerPatcher\ep_starttiledata\shell\inc
+// Compiler args: -std=c++17
+
+#pragma once
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+#include <inspectable.h>
+
+#define __WRL_CONFIGURATION_LEGACY__
+/* more WRL includes here */
+
 #include <ppltasks.h>
-// #include "C:\Users\satri\Devel\ExplorerPatcher\ep_taskbar\idl\obj\Debug\ARM64\Generated Files\WindowsInternal.Shell.UnifiedTile_h.h"
 
-// struct IUnknown_vtbl;
+#include <windows.foundation.collections.h>
+#include <windows.system.h>
+#include "idl/obj/Release/x64/Generated Files/WindowsInternal.Shell.UnifiedTile.h"
 
-struct IUnknown
+#define RESOURCE_SUPPRESS_STL
+#undef _MUTEX_
+#undef _SHARED_MUTEX_
+#include "packages/Microsoft.Windows.ImplementationLibrary.1.0.260126.7/include/wil/winrt.h" // includes WRL too
+
+#include "shell/inc/windowscollections.h"
+
+typedef struct _WNF_STATE_NAME
 {
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(const IID& riid, void** ppvObject) = 0;
-    virtual ULONG STDMETHODCALLTYPE AddRef() = 0;
-    virtual ULONG STDMETHODCALLTYPE Release() = 0;
-};
+    ULONG Data[2];
+} WNF_STATE_NAME, *PWNF_STATE_NAME;
 
-struct /*VFT*/ IUnknown_vtbl
+typedef struct _WNF_TYPE_ID
 {
-    HRESULT (__stdcall *QueryInterface)(IUnknown* This, const IID* const riid, void** ppvObject);
-    ULONG (__stdcall *AddRef)(IUnknown* This);
-    ULONG (__stdcall *Release)(IUnknown* This);
-};
+    GUID TypeId;
+} WNF_TYPE_ID, *PWNF_TYPE_ID;
 
-struct IInspectable : IUnknown
-{
-    virtual HRESULT STDMETHODCALLTYPE GetIids(ULONG* iidCount, IID** iids) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetRuntimeClassName(HSTRING* className) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetTrustLevel(TrustLevel* trustLevel) = 0;
-};
+typedef const WNF_TYPE_ID *PCWNF_TYPE_ID;
 
 namespace Windows { namespace Internal
 {
@@ -49,42 +60,49 @@ namespace Windows { namespace Internal
 
 typedef Windows::Internal::NativeString<Windows::Internal::CoTaskMemPolicy<WCHAR>> CoTaskMemNativeString;
 
-namespace Microsoft { namespace WRL
+namespace Windows { namespace Internal
 {
-	namespace Details
-	{
-		template <typename T>
-		class ComPtrRefBase
-		{
-			T* ptr_;
-		};
-
-		template <typename T>
-		class ComPtrRef : Details::ComPtrRefBase<T>
-		{
-		};
-	}
-
-    template <typename T>
-    class ComPtr
+    enum TaskApartment
     {
-        T* ptr_;
+        TaskApartment_MTA,
+        TaskApartment_STA,
+        TaskApartment_Calling,
+        TaskApartment_Any,
+        TaskApartment_Synchronous,
+        TaskApartment_STAIfSupported,
+        TaskApartment_SynchronousUnlessInSTA,
     };
 
-    namespace Details
+    enum TaskOptions
     {
-        class DontUseNewUseMake
-        {
-        };
-    }
+        TaskOptions_None = 0x0,
+        TaskOptions_CreateObject = 0x1,
+        TaskOptions_Ordered = 0x2,
+        TaskOptions_Marshal = 0x4,
+        TaskOptions_AffinityHint = 0x8,
+        TaskOptions_BypassLimits = 0x10,
+        TaskOptions_Wait = 0x20,
+        TaskOptions_WaitWithCalls = 0x40,
+        TaskOptions_SyncNesting = 0x80,
+        TaskOptions_CancelPending = 0x100,
+        TaskOptions_NoWait = 0x200,
+        TaskOptions_PriorityMask = 0xF000,
+        TaskOptions_BackgroundMode = 0x1000,
+        TaskOptions_IdlePriority = 0x2000,
+        TaskOptions_LowestPriority = 0x3000,
+        TaskOptions_LowerPriority = 0x4000,
+        TaskOptions_NormalPriority = 0x5000,
+        TaskOptions_HigherPriority = 0x6000,
+        TaskOptions_HighestPriority = 0x7000,
+        TaskOptions_CriticalPriority = 0x8000,
+    };
 
-    namespace Wrappers
+    class ComTaskPoolHandler
     {
-        class HString
-        {
-            HSTRING hstr_;
-        };
-    }
+        TaskApartment m_apartment;
+        TaskOptions m_options;
+        DWORD m_threadId;
+    };
 } }
 
 template<typename T>
@@ -283,21 +301,6 @@ class CRefCountedObject : public IUnknown, public T
 // std::vector<std::string>;
 // std::vector<std::wstring>;
 
-namespace Windows::Foundation
-{
-interface IAsyncAction;
-}
-
-namespace Windows::System
-{
-interface IUser;
-}
-
-namespace WindowsInternal::Shell::UnifiedTile
-{
-interface IUnifiedTileIdentifier;
-}
-
 interface IItemLayoutResolver;
 
 namespace CommonStartTelemetry
@@ -373,8 +376,8 @@ public:
     virtual GUID* GetLayoutId(GUID* retstr) = 0;
     virtual void SetSize(const SIZE&) = 0;
     virtual SIZE* GetSize(SIZE* retstr) = 0;
-    virtual WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier** GetTileIdentifier(WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier** retstr) = 0;
-    virtual void SetTileIdentifier(WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
+    virtual wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier>* GetTileIdentifier(wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier>* retstr) = 0;
+    virtual void SetTileIdentifier(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
     virtual std::wstring GetCustomProperty(const std::wstring&) = 0;
     virtual bool HasCustomProperty(const std::wstring&) = 0;
     virtual void RemoveCustomProperty(const std::wstring&) = 0;
@@ -451,8 +454,8 @@ public:
     virtual GUID* GetLayoutId(GUID* retstr) = 0;
     virtual std::shared_ptr<ICuratedCollectionBatchCookieImpl>* BeginBatchUpdate(std::shared_ptr<ICuratedCollectionBatchCookieImpl>* retstr) = 0;
     virtual void AddTile(std::shared_ptr<CuratedTile>) = 0;
-    virtual std::shared_ptr<CuratedTile>* CreateTile(std::shared_ptr<CuratedTile>* retstr, WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
-    virtual std::shared_ptr<CuratedTile>* CreateTile(std::shared_ptr<CuratedTile>* retstr, const GUID&, WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
+    virtual std::shared_ptr<CuratedTile>* CreateTile(std::shared_ptr<CuratedTile>* retstr, ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
+    virtual std::shared_ptr<CuratedTile>* CreateTile(std::shared_ptr<CuratedTile>* retstr, const GUID&, ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
     virtual std::unordered_map<GUID, std::shared_ptr<CuratedTile>, Util::hashGUID>* GetTiles(std::unordered_map<GUID, std::shared_ptr<CuratedTile>, Util::hashGUID>* retstr) = 0;
     virtual void DeleteTile(const GUID&) = 0;
     virtual void RemoveTile(const GUID&) = 0;
@@ -566,8 +569,8 @@ public:
     virtual FILETIME* GetGroupPolicyLayoutFileTimestamp(FILETIME* retstr, bool*) = 0;
     virtual void SetGroupPolicyLayoutFileTimestamp(const FILETIME&) = 0;
     virtual void AddTile(std::shared_ptr<CuratedTile>) = 0;
-    virtual std::shared_ptr<CuratedTile>* CreateTile(std::shared_ptr<CuratedTile>* retstr, WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
-    virtual std::shared_ptr<CuratedTile>* CreateTile(std::shared_ptr<CuratedTile>* retstr, const GUID&, WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
+    virtual std::shared_ptr<CuratedTile>* CreateTile(std::shared_ptr<CuratedTile>* retstr, ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
+    virtual std::shared_ptr<CuratedTile>* CreateTile(std::shared_ptr<CuratedTile>* retstr, const GUID&, ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
     virtual std::unordered_map<GUID, std::shared_ptr<CuratedTile>, Util::hashGUID>* GetTiles(std::unordered_map<GUID, std::shared_ptr<CuratedTile>, Util::hashGUID>* retstr) = 0;
     virtual void DeleteTile(const GUID&) = 0;
     virtual void RemoveTile(const GUID&) = 0;
@@ -599,7 +602,7 @@ enum CuratedTileCollectionTransformerOptions
     CuratedTileCollectionTransformerOptions_0,
 };
 
-/*MIDL_INTERFACE("")
+/*MIDL_INTERFACE("f54aa3a6-565a-487a-ae5b-0e5c3a1388bf")
 ICuratedTileCollectionTransformer : IInspectable
 {
     virtual std::shared_ptr<CuratedRoot> STDMETHODCALLTYPE CreateNewLayoutRoot(const GUID&, CuratedTileCollectionTransformerOptions) = 0;
@@ -617,7 +620,7 @@ ICuratedTileCollectionTransformer : IInspectable
     virtual void STDMETHODCALLTYPE SetUseCommitTimer(const WCHAR*, bool) = 0;
 };*/
 
-MIDL_INTERFACE("")
+MIDL_INTERFACE("f54aa3a6-565a-487a-ae5b-0e5c3a1388bf")
 ICuratedTileCollectionTransformer : IInspectable
 {
     virtual std::shared_ptr<CuratedRoot>* STDMETHODCALLTYPE CreateNewLayoutRoot(std::shared_ptr<CuratedRoot>* retstr, const GUID&, CuratedTileCollectionTransformerOptions) = 0;
@@ -651,21 +654,21 @@ public:
 std::shared_ptr<PlaceholderTile>; std::_Ref_count_obj2<PlaceholderTile>;
 }
 
-namespace WindowsInternal::Shell::UnifiedTile
-{
-interface IUnifiedTileManager;
-}
-
 struct CuratedTileCollectionTransformerCreationArgs
 {
-    WindowsInternal::Shell::UnifiedTile::IUnifiedTileManager* pUnifiedTileManager;
-    Windows::System::IUser* pUser;
+    ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileManager* pUnifiedTileManager;
+    ABI::Windows::System::IUser* pUser;
 };
 
 MIDL_INTERFACE("ca7bdd1c-19cc-4128-849e-1186ca3381f3")
 ITransformerFactory : IUnknown
 {
     virtual HRESULT STDMETHODCALLTYPE GetCuratedTileCollectionTransformer(CuratedTileCollectionTransformerCreationArgs, const IID&, void**) = 0;
+};
+
+struct hashGUIDCuratedTileCollections
+{
+    std::size_t operator()(const GUID& guid) const noexcept;
 };
 
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
@@ -729,7 +732,7 @@ private:
     std::map<std::wstring, std::wstring> _customProperties;
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> _transformerTile;
     std::shared_ptr<DataStoreCache::PlaceholderTileTransformer::PlaceholderTile> _placeholderTile;
-    IUnifiedTileIdentifier* _tileIdentifier; ///< wil::com_ptr<IUnifiedTileIdentifier>
+    wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier> _tileIdentifier;
     std::shared_ptr<std::wstring> _packageFamilyName;
     std::shared_ptr<std::wstring> _backgroundColor;
     std::shared_ptr<std::wstring> _displayName;
@@ -741,16 +744,16 @@ private:
     std::shared_ptr<std::wstring> _wide310x150LogoUri;
     std::shared_ptr<std::wstring> field_C8;
     std::shared_ptr<std::wstring> field_D8;
-    POINT _location;
+    POINT _location = { -1, -1 };
     SIZE _size;
-    GUID _uniqueId;
-    GUID _groupId;
-    GUID field_118;
-    _DWORD field_128;
-    _WORD field_12C;
-    _BYTE field_12E;
-    int field_130;
-    LayoutTileType _type;
+    GUID _uniqueId = GUID_NULL;
+    GUID _groupId = GUID_NULL;
+    GUID field_118 = GUID_NULL;
+    uint32_t field_128 = 0;
+    uint16_t field_12C = 0;
+    uint8_t field_12E = 0;
+    int field_130 = 6;
+    LayoutTileType _type = LayoutTileType_0;
 };
 
 class LayoutTileInternal : public LayoutTile
@@ -837,7 +840,7 @@ namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
 struct CollectionContext
 {
-    Windows::System::IUser* _user; ///< wil::com_ptr<Windows::System::IUser>
+    wil::com_ptr<ABI::Windows::System::IUser> _user;
     void* field_8; ///< wil::com_ptr<???>
     uint32_t field_10;
     void* field_18; ///< wil::com_ptr<???>
@@ -862,9 +865,9 @@ ICollectionWriter : IUnknown
 MIDL_INTERFACE("8fea4543-90d5-4ebd-9831-64b31f83e85d")
 ICollectionWriter : IUnknown
 {
-    virtual HRESULT STDMETHODCALLTYPE WriteCollection(std::shared_ptr<Internal::LayoutRoot>, std::shared_ptr<TileInitializationHandlerManager>, CommonStartTelemetry::LogAllTilesActivity, Windows::Foundation::IAsyncAction**) = 0;
+    virtual HRESULT STDMETHODCALLTYPE WriteCollection(std::shared_ptr<Internal::LayoutRoot>, std::shared_ptr<TileInitializationHandlerManager>, CommonStartTelemetry::LogAllTilesActivity, ABI::Windows::Foundation::IAsyncAction**) = 0;
     virtual bool STDMETHODCALLTYPE CanInitializeTiles() = 0;
-    virtual void STDMETHODCALLTYPE ClearCollection(std::vector<std::shared_ptr<Internal::LayoutTile>>&, Windows::Foundation::IAsyncAction**) = 0;
+    virtual void STDMETHODCALLTYPE ClearCollection(std::vector<std::shared_ptr<Internal::LayoutTile>>&, ABI::Windows::Foundation::IAsyncAction**) = 0;
     virtual bool STDMETHODCALLTYPE IsCollectionEmpty() = 0;
     virtual bool STDMETHODCALLTYPE DoesCollectionExist() = 0;
     virtual std::wstring* STDMETHODCALLTYPE GetCollectionName(std::wstring* retstr) = 0;
@@ -892,7 +895,7 @@ struct CDSStartCollectionWriter : ICollectionWriter, IStartCollectionWriter
     MICROSOFT_WRL_RUNTIME_CLASS;
     char _logAllTilesActivity[320]; ///< GE: 344 (+24) bytes
     char _writingStartLayoutToStorageTelemetry[320]; ///< GE: 344 (+24) bytes
-    IItemLayoutResolver* _groupsLayoutResolver; ///< wil::com_ptr<IItemLayoutResolver>; GE 8474: Removed
+    wil::com_ptr<IItemLayoutResolver> _groupsLayoutResolver; ///< GE 8474: Removed
     std::shared_ptr<CollectionContext> _context;
     std::shared_ptr<TileInitializationHandlerManager> _tileInitializationHandlerManager;
     bool _b;
@@ -920,5 +923,122 @@ struct CDSLayoutProvider : IInitialCollectionProvider
     std::shared_ptr<Internal::LayoutRoot> _layoutRoot;
 };
 
-}
+class CuratedTileCollectionBase
+    : public ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileCollection
+{
+public:
+    virtual HRESULT EnsureTileRegistration();
+    virtual HRESULT ResurrectTile(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile>, const GUID&);
+    virtual HRESULT OnTileAddedWithinCollection(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*);
+    virtual HRESULT OnTileRemovedWithinCollection(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*);
 
+    virtual ~CuratedTileCollectionBase();
+
+private:
+    uint32_t _1;
+    uint32_t _2;
+    uint32_t _3;
+    uint32_t _4;
+    std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedRoot> _transformerRoot;
+    wil::com_ptr<ABI::Windows::System::IUser /*???*/> _9;
+    std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::ICuratedCollectionBatchCookieImpl> _batchCookie;
+    std::unordered_map<GUID, wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup>, hashGUIDCuratedTileCollections> _15;
+    std::unordered_map<GUID, wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile>, hashGUIDCuratedTileCollections> _35;
+    wil::com_ptr<ABI::Windows::System::IUser> _user;
+    ULONGLONG _userContextToken;
+    bool _bInstallPlaceholderTilesOnNextCommit;
+    bool _commitOnDestroy;
+};
+
+std::function<void ()>;
+
+wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile>;
+wil::com_ptr<ABI::Windows::Foundation::Collections::IMapView<GUID, ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile*>>;
+wil::com_ptr<ABI::Windows::Foundation::Collections::IIterable<ABI::Windows::Foundation::Collections::IKeyValuePair<GUID, ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile*>*>>;
+wil::iterable_range<ABI::Windows::Foundation::Collections::IKeyValuePair<GUID, ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile*>*, wil::err_exception_policy>;
+
+wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup>;
+wil::com_ptr<ABI::Windows::Foundation::Collections::IMapView<GUID, ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup*>>;
+wil::com_ptr<ABI::Windows::Foundation::Collections::IIterable<ABI::Windows::Foundation::Collections::IKeyValuePair<GUID, ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup*>*>>;
+wil::iterable_range<ABI::Windows::Foundation::Collections::IKeyValuePair<GUID, ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup*>*, wil::err_exception_policy>;
+
+wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IPackagedUnifiedTileIdentifier>;
+wil::com_ptr<IInspectable>;
+wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileCollection>;
+
+Windows::Foundation::Collections::Internal::HashMap<
+    GUID,
+    ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile*,
+    Windows::Foundation::Collections::Internal::DefaultHash<GUID>,
+    Windows::Foundation::Collections::Internal::DefaultEqualityPredicate<GUID>,
+    Windows::Foundation::Collections::Internal::DefaultLifetimeTraits<GUID>,
+    Windows::Foundation::Collections::Internal::DefaultLifetimeTraits<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile*>,
+    Windows::Foundation::Collections::Internal::DefaultHashMapOptions<
+        GUID,
+        ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile*,
+        Windows::Foundation::Collections::Internal::DefaultLifetimeTraits<GUID>
+    >
+>;
+
+Windows::Foundation::Collections::Internal::HashMap<
+    GUID,
+    ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup*,
+    Windows::Foundation::Collections::Internal::DefaultHash<GUID>,
+    Windows::Foundation::Collections::Internal::DefaultEqualityPredicate<GUID>,
+    Windows::Foundation::Collections::Internal::DefaultLifetimeTraits<GUID>,
+    Windows::Foundation::Collections::Internal::DefaultLifetimeTraits<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup*>,
+    Windows::Foundation::Collections::Internal::DefaultHashMapOptions<
+        GUID,
+        ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup*,
+        Windows::Foundation::Collections::Internal::DefaultLifetimeTraits<GUID>
+    >
+>;
+
+/*MIDL_INTERFACE("ebb3adda-cd0c-4d14-a198-6fb7dcd692e2")
+ICuratedTilePrivate : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile
+{
+    virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> STDMETHODCALLTYPE GetTransformerData() = 0;
+};*/
+
+MIDL_INTERFACE("ebb3adda-cd0c-4d14-a198-6fb7dcd692e2")
+ICuratedTilePrivate : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile
+{
+    virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile>* STDMETHODCALLTYPE GetTransformerData(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile>* retstr) = 0;
+};
+
+/*MIDL_INTERFACE("6f3e1834-00c0-4e8b-8834-89da30e185e9")
+ICuratedTileGroupPrivate : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup
+{
+    virtual HRESULT STDMETHODCALLTYPE AddTile(ICuratedTilePrivate*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE AddGroup(ICuratedTileGroupPrivate*) = 0;
+    virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup> STDMETHODCALLTYPE GetTransformerData() = 0;
+};*/
+
+MIDL_INTERFACE("6f3e1834-00c0-4e8b-8834-89da30e185e9")
+ICuratedTileGroupPrivate : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup
+{
+    virtual HRESULT STDMETHODCALLTYPE AddTile(ICuratedTilePrivate*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE AddGroup(ICuratedTileGroupPrivate*) = 0;
+    virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>* STDMETHODCALLTYPE GetTransformerData(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>* retstr) = 0;
+};
+
+wil::com_ptr<ICuratedTilePrivate>;
+wil::com_ptr<ICuratedTileGroupPrivate>;
+
+class BaseTileCollectionInitializer
+{
+public:
+    BaseTileCollectionInitializer(ABI::Windows::System::IUser* user);
+
+    virtual void InitializeCollection(const std::wstring&, bool*);
+    virtual void CheckForUpdate(const std::wstring&, bool*);
+    virtual void ReinitializeCollection(const std::wstring&, ABI::Windows::Foundation::IAsyncAction**);
+
+private:
+    wil::com_ptr<ABI::Windows::System::IUser> _user;
+    wil::com_ptr<ABI::Windows::System::IUser /*???*/> _unk1;
+    std::shared_ptr<CollectionContext /*???*/> _unk2;
+};
+
+std::_Ref_count_obj2<BaseTileCollectionInitializer>;
+}

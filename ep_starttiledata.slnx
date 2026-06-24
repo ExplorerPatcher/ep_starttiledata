@@ -5,4 +5,5 @@
     <Platform Name="ARM64" />
   </Configurations>
   <Project Path="ep_starttiledata.vcxproj" Id="f65b83ff-7dac-4c47-b07a-5e6e28fcbe4a" />
+  <Project Path="idl/ep_starttiledata_idl.vcxproj" />
 </Solution>
