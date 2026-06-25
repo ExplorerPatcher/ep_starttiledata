@@ -1,6 +1,6 @@
 // Parser specific options > [x] No IDA specific extensions
 
-// Include paths: C:\Users\satri\Devel\ExplorerPatcher\ep_starttiledata\shell\inc
+// Include paths: C:\Users\Allison\Dev\Projects\ep_starttiledata\shell\inc
 // Compiler args: -std=c++17
 
 // Import "IDATypes_WrlWorkaround.h" after importing this!
@@ -1091,6 +1091,37 @@ ICuratedTileGroupPrivate : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTile
 wil::com_ptr<ICuratedTilePrivate>;
 wil::com_ptr<ICuratedTileGroupPrivate>;
 
+class CollectionInitializationPolicy;
+
+std::vector<std::shared_ptr<CollectionInitializationPolicy>>;
+
+struct ILayoutModificationXMLParser;
+
+MIDL_INTERFACE("88734a32-4faf-4a40-a9d2-21c2341f2b36")
+ICollectionInitializationPipeline : IUnknown
+{
+    virtual HRESULT STDMETHODCALLTYPE EnsureCollectionInitialized(bool*, ABI::Windows::Foundation::IAsyncAction**) = 0;
+    virtual HRESULT STDMETHODCALLTYPE CheckForUpdate(bool*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE ResetCollection(ABI::Windows::Foundation::IAsyncAction**) = 0;
+    virtual HRESULT STDMETHODCALLTYPE SetAllowLayoutOptions(int) = 0;
+    virtual HRESULT STDMETHODCALLTYPE GetModificationParser(ILayoutModificationXMLParser**) = 0;
+};
+
+wil::com_ptr<ICollectionInitializationPipeline>;
+
+MIDL_INTERFACE("7a554b29-b633-4ebf-ad2a-919da582c85e")
+IInitialCollectionPostProcessor : IUnknown
+{
+    virtual HRESULT STDMETHODCALLTYPE PostProcessLayout(
+        const SelectionData&, std::shared_ptr<Internal::LayoutRoot>&) = 0;
+    virtual const WCHAR* STDMETHODCALLTYPE GetPostProcessorLoggingName() = 0;
+};
+
+std::vector<wil::com_ptr<IInitialCollectionPostProcessor>>;
+
+std::initializer_list<std::shared_ptr<CollectionInitializationPolicy>>;
+std::allocator<std::shared_ptr<CollectionInitializationPolicy>>;
+
 class BaseTileCollectionInitializer
 {
 public:
@@ -1102,8 +1133,8 @@ public:
 
 private:
     wil::com_ptr<ABI::Windows::System::IUser> _user;
-    wil::com_ptr<ABI::Windows::System::IUser /*???*/> _unk1;
-    std::shared_ptr<CollectionContext /*???*/> _unk2;
+    wil::com_ptr<ICollectionWriter> _writer;
+    std::shared_ptr<CollectionContext> _context;
 };
 
 std::_Ref_count_obj2<BaseTileCollectionInitializer>;
