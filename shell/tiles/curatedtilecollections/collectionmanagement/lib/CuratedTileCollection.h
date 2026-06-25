@@ -21,16 +21,44 @@ struct hashGUIDCuratedTileCollections
     }
 };
 
+template <typename TFunctor>
+bool EnumerateAllTilesInGroupRecursive(utctc::ICuratedTileGroup* group, const TFunctor& functor);
+
+template <typename T>
+void FindCollectionParentOfTile(GUID tileId, T instance, IInspectable** outCollectionParent);
+
+template <typename T>
+void FindCollectionParentOfGroup(GUID groupId, T instance, IInspectable** outCollectionParent);
+
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
+MIDL_INTERFACE("20477929-b8fb-43e2-9c9e-a346c98180e1")
+ICuratedTileCollectionInternal : utctc::ICuratedTileCollection
+{
+    virtual HRESULT STDMETHODCALLTYPE EnsureTileRegistration() = 0;
+    virtual HRESULT STDMETHODCALLTYPE ResurrectTile(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> transformerTile, const GUID& tileId) = 0;
+    virtual HRESULT STDMETHODCALLTYPE OnTileAddedWithinCollection(ut::IUnifiedTileIdentifier* identifier) = 0;
+    virtual HRESULT STDMETHODCALLTYPE OnTileRemovedWithinCollection(ut::IUnifiedTileIdentifier* identifier) = 0;
+};
+
 enum UnparentItemOptions
 {
     UnparentItemOptions_0,
     UnparentItemOptions_1,
 };
 
+enum CuratedTileCollectionOptionsInternal
+{
+    CuratedTileCollectionOptionsInternal_None = 0,
+    CuratedTileCollectionOptionsInternal_1 = 0x1,
+};
+
+DEFINE_ENUM_FLAG_OPERATORS(CuratedTileCollectionOptionsInternal);
+
 class CuratedTileCollectionBase
-    : public Microsoft::WRL::Implements<utctc::ICuratedTileCollection>
+    : public Microsoft::WRL::Implements<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::WinRt>
+        , Microsoft::WRL::ChainInterfaces<ICuratedTileCollectionInternal, utctc::ICuratedTileCollection>
+    >
 {
 public:
     //~ Begin utctc::ICuratedTileCollection Interface
@@ -49,7 +77,7 @@ public:
         boolean* outResult) override;
     STDMETHODIMP MoveExistingGroupToNewParent(utctc::ICuratedTileGroup* existingGroup, utctc::ICuratedTileGroup* newParent) override;
     STDMETHODIMP CreateNewGroup(utctc::ICuratedTileGroup** outGroup) override;
-    STDMETHODIMP GetGroup(GUID groupId, utctc::ICuratedTileGroup** outGroup) override;
+    STDMETHODIMP GetGroup(GUID groupId, utctc::ICuratedTileGroup** outResult) override;
     STDMETHODIMP DeleteGroup(GUID groupId) override;
     STDMETHODIMP RemoveGroup(GUID groupId) override;
     STDMETHODIMP MoveExistingTileToNewParent(utctc::ICuratedTile* existingTile, utctc::ICuratedTileGroup* newParent) override;
@@ -70,10 +98,12 @@ public:
     STDMETHODIMP SetCustomProperty(const HSTRING key, HSTRING value) override;
     //~ End utctc::ICuratedTileCollection Interface
 
-    virtual HRESULT EnsureTileRegistration();
-    virtual HRESULT ResurrectTile(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> transformerTile, const GUID& tileId);
-    virtual HRESULT OnTileAddedWithinCollection(ut::IUnifiedTileIdentifier* identifier);
-    virtual HRESULT OnTileRemovedWithinCollection(ut::IUnifiedTileIdentifier* identifier);
+    //~ Begin ICuratedTileCollectionInternal Interface
+    STDMETHODIMP EnsureTileRegistration() override;
+    STDMETHODIMP ResurrectTile(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> transformerTile, const GUID& tileId) override;
+    STDMETHODIMP OnTileAddedWithinCollection(ut::IUnifiedTileIdentifier* identifier) override;
+    STDMETHODIMP OnTileRemovedWithinCollection(ut::IUnifiedTileIdentifier* identifier) override;
+    //~ End ICuratedTileCollectionInternal Interface
 
     CuratedTileCollectionBase();
 
@@ -93,22 +123,29 @@ protected:
     HRESULT UnparentGroup(const GUID& groupId, UnparentItemOptions options);
     HRESULT UnparentTile(const GUID& tileId, UnparentItemOptions options);
 
-private:
-    uint32_t _1;
-    uint32_t _2;
-    uint32_t _3;
-    uint32_t _4;
+    CuratedTileCollectionOptionsInternal _options;
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedRoot> _transformerRoot;
     wil::com_ptr<ABI::Windows::System::IUser /*???*/> _9;
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::ICuratedCollectionBatchCookieImpl> _batchCookie;
-    std::unordered_map<GUID, wil::com_ptr<utctc::ICuratedTileGroup>, hashGUIDCuratedTileCollections> _15;
-    std::unordered_map<GUID, wil::com_ptr<utctc::ICuratedTile>, hashGUIDCuratedTileCollections> _35;
+    std::unordered_map<GUID, wil::com_ptr<utctc::ICuratedTileGroup>, hashGUIDCuratedTileCollections> _groups;
+    std::unordered_map<GUID, wil::com_ptr<utctc::ICuratedTile>, hashGUIDCuratedTileCollections> _tiles;
     wil::com_ptr<ABI::Windows::System::IUser> _user;
-    ULONGLONG _userContextToken;
+    UINT64 _userContextToken;
     bool _bInstallPlaceholderTilesOnNextCommit;
-    bool _commitOnDestroy;
+    bool _bCommitOnDestroy;
+};
+
+MIDL_INTERFACE("ebb3adda-cd0c-4d14-a198-6fb7dcd692e2")
+ICuratedTilePrivate : utctc::ICuratedTile
+{
+    virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> STDMETHODCALLTYPE GetTransformerData() = 0;
+};
+
+MIDL_INTERFACE("6f3e1834-00c0-4e8b-8834-89da30e185e9")
+ICuratedTileGroupPrivate : utctc::ICuratedTileGroup
+{
+    virtual HRESULT STDMETHODCALLTYPE AddTile(ICuratedTilePrivate*) = 0;
+    virtual HRESULT STDMETHODCALLTYPE AddGroup(ICuratedTileGroupPrivate*) = 0;
+    virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup> STDMETHODCALLTYPE GetTransformerData() = 0;
 };
 }
-
-// void FindCollectionParentOfGroup<WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::CuratedTileCollectionBase*>(GUID, WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::CuratedTileCollectionBase*, IInspectable**);
-// void FindCollectionParentOfTile<WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::CuratedTileCollectionBase*>(GUID, WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::CuratedTileCollectionBase*, IInspectable**);

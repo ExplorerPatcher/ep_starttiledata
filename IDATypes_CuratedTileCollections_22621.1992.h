@@ -3,6 +3,8 @@
 // Include paths: C:\Users\satri\Devel\ExplorerPatcher\ep_starttiledata\shell\inc
 // Compiler args: -std=c++17
 
+// Import "IDATypes_WrlWorkaround.h" after importing this!
+
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN
@@ -302,6 +304,33 @@ class CRefCountedObject : public IUnknown, public T
 // std::vector<std::wstring>;
 
 interface IItemLayoutResolver;
+interface ILayoutTraversalOrder;
+interface ITileGridMetricsCalculator;
+
+enum TileSizingMode
+{
+    TileSizingMode_FixedSize = 0x0,
+    TileSizingMode_EdgeToEdge = 0x1,
+};
+
+enum LayoutOrder
+{
+    LayoutOrder_Grid = 0,
+    LayoutOrder_Linear = 1,
+    LayoutOrder_Two = 2, // @Note: Added in 15063
+};
+
+MIDL_INTERFACE("e329db7a-e2f4-4d74-f1b5-9d75b80a5e46")
+IStartLayoutFactory : IUnknown
+{
+    virtual HRESULT STDMETHODCALLTYPE CreatePortraitLayoutResolver(IItemLayoutResolver**) = 0;
+    virtual HRESULT STDMETHODCALLTYPE CreateDesktopPortraitLayoutResolver(IItemLayoutResolver**) = 0;
+    virtual HRESULT STDMETHODCALLTYPE CreateGroupsLayoutResolver(IItemLayoutResolver**) = 0;
+    virtual HRESULT STDMETHODCALLTYPE CreateLayoutTraversalOrder(
+        IItemLayoutResolver*, int, LayoutOrder, ILayoutTraversalOrder**) = 0;
+    virtual HRESULT STDMETHODCALLTYPE CreateTileGridMetricsCalculator(
+        const TileSizingMode, const float, const float, const float, ITileGridMetricsCalculator**) = 0;
+};
 
 namespace CommonStartTelemetry
 {
@@ -923,31 +952,40 @@ struct CDSLayoutProvider : IInitialCollectionProvider
     std::shared_ptr<Internal::LayoutRoot> _layoutRoot;
 };
 
+MIDL_INTERFACE("20477929-b8fb-43e2-9c9e-a346c98180e1")
+ICuratedTileCollectionInternal : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileCollection
+{
+    virtual HRESULT STDMETHODCALLTYPE EnsureTileRegistration() = 0;
+    virtual HRESULT STDMETHODCALLTYPE ResurrectTile(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> transformerTile, const GUID& tileId) = 0;
+    virtual HRESULT STDMETHODCALLTYPE OnTileAddedWithinCollection(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier* identifier) = 0;
+    virtual HRESULT STDMETHODCALLTYPE OnTileRemovedWithinCollection(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier* identifier) = 0;
+};
+
+enum CuratedTileCollectionOptionsInternal
+{
+    CuratedTileCollectionOptionsInternal_None = 0,
+    CuratedTileCollectionOptionsInternal_1 = 0x1,
+};
+
 class CuratedTileCollectionBase
-    : public ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileCollection
+    : public Microsoft::WRL::Implements<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::WinRt>
+        , Microsoft::WRL::ChainInterfaces<ICuratedTileCollectionInternal, ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileCollection>
+    >
 {
 public:
-    virtual HRESULT EnsureTileRegistration();
-    virtual HRESULT ResurrectTile(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile>, const GUID&);
-    virtual HRESULT OnTileAddedWithinCollection(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*);
-    virtual HRESULT OnTileRemovedWithinCollection(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*);
-
     virtual ~CuratedTileCollectionBase();
 
 private:
-    uint32_t _1;
-    uint32_t _2;
-    uint32_t _3;
-    uint32_t _4;
+    CuratedTileCollectionOptionsInternal _options;
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedRoot> _transformerRoot;
     wil::com_ptr<ABI::Windows::System::IUser /*???*/> _9;
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::ICuratedCollectionBatchCookieImpl> _batchCookie;
-    std::unordered_map<GUID, wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup>, hashGUIDCuratedTileCollections> _15;
-    std::unordered_map<GUID, wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile>, hashGUIDCuratedTileCollections> _35;
+    std::unordered_map<GUID, wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup>, hashGUIDCuratedTileCollections> _groups;
+    std::unordered_map<GUID, wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile>, hashGUIDCuratedTileCollections> _tiles;
     wil::com_ptr<ABI::Windows::System::IUser> _user;
-    ULONGLONG _userContextToken;
+    UINT64 _userContextToken;
     bool _bInstallPlaceholderTilesOnNextCommit;
-    bool _commitOnDestroy;
+    bool _bCommitOnDestroy;
 };
 
 std::function<void ()>;
@@ -993,6 +1031,34 @@ Windows::Foundation::Collections::Internal::HashMap<
         Windows::Foundation::Collections::Internal::DefaultLifetimeTraits<GUID>
     >
 >;
+
+enum StartCollectionUpdateOptions
+{
+};
+
+MIDL_INTERFACE("cfc51442-aa2d-418b-9a43-98bdbd743347")
+IStartTileCollectionUpdater : IUnknown
+{
+    virtual HRESULT STDMETHODCALLTYPE CheckForUpdateWithOptions(StartCollectionUpdateOptions) = 0;
+};
+
+class StartTileCollection
+    : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::WinRt>
+        , Microsoft::WRL::FtmBase
+        , CuratedTileCollectionBase
+        , ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::IStartTileCollection
+        , IStartTileCollectionUpdater
+    >
+{
+    wil::com_ptr<IStartLayoutFactory> _layoutFactory;
+    wil::com_ptr<IItemLayoutResolver> _stc2;
+    wil::com_ptr<DataStoreCache::CuratedTileCollectionTransformer::ICuratedTileCollectionTransformer> _transformer;
+    void* _stc4;
+    void* _stc5;
+    void* _stc6;
+    void* _stc7;
+    void* _stc8;
+};
 
 /*MIDL_INTERFACE("ebb3adda-cd0c-4d14-a198-6fb7dcd692e2")
 ICuratedTilePrivate : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile
