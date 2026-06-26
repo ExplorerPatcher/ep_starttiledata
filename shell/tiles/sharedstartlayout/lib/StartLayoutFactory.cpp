@@ -9,18 +9,6 @@
 
 using namespace Microsoft::WRL;
 
-MIDL_INTERFACE("e329db7a-e2f4-4d74-f1b5-9d75b80a5e46")
-IStartLayoutFactory : IUnknown
-{
-    virtual HRESULT STDMETHODCALLTYPE CreatePortraitLayoutResolver(IItemLayoutResolver**) = 0;
-    virtual HRESULT STDMETHODCALLTYPE CreateDesktopPortraitLayoutResolver(IItemLayoutResolver**) = 0;
-    virtual HRESULT STDMETHODCALLTYPE CreateGroupsLayoutResolver(IItemLayoutResolver**) = 0;
-    virtual HRESULT STDMETHODCALLTYPE CreateLayoutTraversalOrder(
-        IItemLayoutResolver*, int, LayoutOrder, ILayoutTraversalOrder**) = 0;
-    virtual HRESULT STDMETHODCALLTYPE CreateTileGridMetricsCalculator(
-        const TileSizingMode, const float, const float, const float, ITileGridMetricsCalculator**) = 0;
-};
-
 class DECLSPEC_UUID("7bd7ab1c-f2c5-60c2-8d00-c2e50336a954")
 StartLayoutFactory final
     : public RuntimeClass<RuntimeClassFlags<ClassicCom>

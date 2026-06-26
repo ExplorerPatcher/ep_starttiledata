@@ -11,8 +11,6 @@
 
 #include "DataStoreCache_MoveMe.h"
 
-#define NUKE_SHAREDSTARTLAYOUT 0
-
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
 struct CollectionConstants
@@ -295,7 +293,7 @@ protected:
     UINT _groupCellWidth = 0;
     std::shared_ptr<CollectionContext> _context;
     DataStoreCache::CuratedTileCollectionTransformer::LayoutCustomizationRestrictionType _customizationRestriction =
-        DataStoreCache::CuratedTileCollectionTransformer::LayoutCustomizationRestrictionType_0;
+        DataStoreCache::CuratedTileCollectionTransformer::LayoutCustomizationRestrictionType_None;
 };
 
 // Hook 3 creation points

@@ -11,6 +11,7 @@ namespace wf = ABI::Windows::Foundation;
 namespace wfc = ABI::Windows::Foundation::Collections;
 namespace ut = ABI::WindowsInternal::Shell::UnifiedTile;
 namespace utctc = ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections;
+namespace utp = ABI::WindowsInternal::Shell::UnifiedTile::Private;
 
 struct hashGUIDCuratedTileCollections
 {

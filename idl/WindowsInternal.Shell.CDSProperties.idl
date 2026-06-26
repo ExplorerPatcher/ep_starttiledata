@@ -1,0 +1,123 @@
+namespace WindowsInternal.Shell.CDSProperties
+{
+    [version(1)]
+    [interface_name("IStartGlobalPropertiesChangedArgs", fb32f177-5f49-428d-b792-55be64cfaab1)]
+    runtimeclass StartGlobalPropertiesChangedArgs
+    {
+    };
+
+    [version(1)]
+    [interface_name("IStartGlobalProperties", ee807266-a2db-4c9a-a1b4-970d33f99c91)]
+    [static_name("IStartGlobalPropertiesFactory", 2c670963-f8a9-4bbb-9adf-683a3a89537e)]
+    runtimeclass StartGlobalProperties
+    {
+        static StartGlobalProperties Create(Windows.System.User user);
+
+        Boolean FullScreenMode { get; set; };
+        Boolean HideAppList { get; set; };
+        Boolean HideRecentList { get; set; };
+        Boolean HideFrequentList { get; set; };
+        UInt32 StartMenuRelativeHeightPixels { get; set; };
+        Boolean PlacesInitialized { get; set; };
+        UInt32 PlacesInitializedVersion { get; set; };
+        IVectorView<Guid> GetVisiblePlaces();
+        void SetVisiblePlaces(IVectorView<Guid> value);
+        Boolean StartViewRestoring { get; set; };
+        event Windows.Foundation.TypedEventHandler<StartGlobalProperties, StartGlobalPropertiesChangedArgs> PropertiesChanged;
+    };
+
+    [version(1)]
+    [interface_name("ICDSTilePropertiesBatchToken", ce38d147-d122-4396-9284-4d784d5ee5c0)]
+    runtimeclass CDSTilePropertiesBatchToken
+    {
+    };
+
+    [flags]
+    enum CDSTilePropertiesKinds
+    {
+        None = 0,
+        Local = 0x1,
+        LocalVolatile = 0x2,
+        Roamed = 0x4,
+    };
+
+    [uuid(0b95d7ec-539e-4ad0-bab3-fc5acd05f716)]
+    interface ICDSTilePropertiesItem
+    {
+        String Id { get; };
+        CDSTilePropertiesKinds Kinds { get; };
+    };
+
+    enum ExtendedReconciliationRequirements
+    {
+        _0,
+    };
+
+    [version(1)]
+    [interface_name("ICDSLocalTileProperties", f2456d27-5e13-42b8-bc25-00b4cc364e44)]
+    runtimeclass CDSLocalTileProperties : ICDSTilePropertiesItem
+    {
+        Windows.Foundation.DateTime InstallTime { get; set; };
+        void GetSeenNotifications(out UInt32 a2, out UInt32 a3, out UInt32 a4, out UInt32 a5, out UInt32 a6);
+        void SetSeenNotifications(UInt32 a2, UInt32 a3, UInt32 a4, UInt32 a5, UInt32 a6);
+        Boolean WasUnpinnedFromTaskbar { get; set; };
+        Windows.Foundation.DateTime GraveyardTime { get; set; };
+        ExtendedReconciliationRequirements ExtendedReconciliationRequirements { get; set; };
+    };
+
+    [version(1)]
+    [interface_name("ICDSLocalVolatileTileProperties", 42bcc1f9-cee8-4141-8e63-b417cf554888)]
+    runtimeclass CDSLocalVolatileTileProperties : ICDSTilePropertiesItem
+    {
+        Single Relevance { get; set; };
+        UInt32 LaunchCount { get; set; };
+        Windows.Foundation.DateTime LastLaunchTime { get; set; };
+        void SetUsageData(Single relevance, UInt32 launchCount, Windows.Foundation.DateTime lastLaunchTime);
+        void ClearUsageData();
+    };
+
+    [version(1)]
+    [interface_name("ICDSRoamedTileProperties", 84dabb6f-6903-4f45-b2cc-30d23eb63ca9)]
+    runtimeclass CDSRoamedTileProperties : ICDSTilePropertiesItem
+    {
+        Windows.Foundation.DateTime FirstSeenTime { get; set; };
+        Boolean WasRemovedFromRecentlyInstalledList { get; set; };
+        Boolean WasRemovedFromFrequentAppsList { get; set; };
+        Boolean IsLiveTileDisabled { get; set; };
+        Boolean IsUserPinned { get; set; };
+    };
+
+    [version(1)]
+    [interface_name("ICDSTilePropertiesBatchedChangedArgs", f8300a47-099e-4d13-9282-e4df39796d67)]
+    runtimeclass CDSTilePropertiesBatchedChangedArgs
+    {
+        IVectorView<ICDSTilePropertiesItem> ChangedTiles { get; };
+        IVectorView<String> RemovedTiles { get; };
+    };
+
+    [version(1)]
+    [interface_name("ICDSTilePropertiesBatched", 0bf1fd14-a677-4159-8385-0bce4347354a)]
+    [static_name("ICDSTilePropertiesBatchedFactory", 3055f2cd-a89f-43f3-be60-867e2644b283)]
+    runtimeclass CDSTilePropertiesBatched
+    {
+        static CDSTilePropertiesBatched Create(Windows.System.User user, CDSTilePropertiesKinds kinds);
+
+        CDSTilePropertiesKinds PropertyKinds { get; };
+        CDSTilePropertiesBatchToken CreateBatch();
+        Boolean HasLocalProperties(String a2);
+        Boolean HasLocalVolatileProperties(String a2);
+        Boolean HasRoamedProperties(String a2);
+        ICDSTilePropertiesItem GetLocalProperties(String a2);
+        ICDSTilePropertiesItem GetLocalVolatileProperties(String a2);
+        ICDSTilePropertiesItem GetRoamedProperties(String a2);
+        IVectorView<CDSLocalTileProperties> GetAllLocalProperties();
+        IVectorView<CDSLocalVolatileTileProperties> GetAllLocalVolatileProperties();
+        IVectorView<CDSRoamedTileProperties> GetAllRoamedProperties();
+        void RemoveLocalProperties(String a2);
+        void RemoveLocalVolatileProperties(String a2);
+        void RemoveRoamedProperties(String a2);
+        event Windows.Foundation.TypedEventHandler<CDSTilePropertiesBatched, CDSTilePropertiesBatchedChangedArgs> LocalPropertiesChanged;
+        event Windows.Foundation.TypedEventHandler<CDSTilePropertiesBatched, CDSTilePropertiesBatchedChangedArgs> LocalVolatilePropertiesChanged;
+        event Windows.Foundation.TypedEventHandler<CDSTilePropertiesBatched, CDSTilePropertiesBatchedChangedArgs> RoamedPropertiesChanged;
+    };
+}

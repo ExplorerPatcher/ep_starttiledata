@@ -19,6 +19,7 @@
 
 #include <windows.foundation.collections.h>
 #include <windows.system.h>
+#include "idl/obj/Release/x64/Generated Files/WindowsInternal.Shell.CDSProperties.h"
 #include "idl/obj/Release/x64/Generated Files/WindowsInternal.Shell.UnifiedTile.h"
 
 #define RESOURCE_SUPPRESS_STL
@@ -516,6 +517,9 @@ enum LayoutOverrideType
 
 enum LayoutCustomizationRestrictionType
 {
+    LayoutCustomizationRestrictionType_None,
+    LayoutCustomizationRestrictionType_OnlySpecifiedGroups,
+    LayoutCustomizationRestrictionType_FullLayout,
 };
 
 struct CuratedRootChangeInfo;
@@ -580,7 +584,7 @@ public:
     virtual void SetGroupColumnCount(UINT) = 0;
     virtual UINT GetPreferredColumnCount() = 0;
     virtual void SetPreferredColumnCount(UINT) = 0;
-    virtual GUID GetLastGroupId() = 0;
+    virtual GUID* GetLastGroupId(GUID* retstr) = 0;
     virtual void SetLastGroupId(GUID) = 0;
     virtual LayoutOverrideType GetLayoutOverride() = 0;
     virtual void SetLayoutOverride(LayoutOverrideType) = 0;
@@ -704,10 +708,6 @@ namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
 struct CollectionContext; // fwd decl
 
-enum CollectionSKU
-{
-};
-
 enum CollectionOfficeSKU
 {
 };
@@ -724,7 +724,7 @@ struct SelectionData
     bool _bEducationModeEnabledSet;
     bool _bCommercialDeviceSet;
     std::vector<WCHAR*> _regionCodes; // CoTaskMemAlloc / CoTaskMemFree
-    std::vector<CollectionSKU> _collectionSKUs;
+    std::vector<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::CollectionSKU> _collectionSKUs;
     std::vector<CollectionOfficeSKU> _collectionOfficeSKUs;
     UINT _groupCellWidth;
     bool _bUnk1;
@@ -1034,6 +1034,8 @@ Windows::Foundation::Collections::Internal::HashMap<
 
 enum StartCollectionUpdateOptions
 {
+    StartCollectionUpdateOptions_None = 0,
+    StartCollectionUpdateOptions_1 = 0x1,
 };
 
 MIDL_INTERFACE("cfc51442-aa2d-418b-9a43-98bdbd743347")
@@ -1051,13 +1053,11 @@ class StartTileCollection
     >
 {
     wil::com_ptr<IStartLayoutFactory> _layoutFactory;
-    wil::com_ptr<IItemLayoutResolver> _stc2;
+    wil::com_ptr<IItemLayoutResolver> _lastGroupLayoutResolver;
     wil::com_ptr<DataStoreCache::CuratedTileCollectionTransformer::ICuratedTileCollectionTransformer> _transformer;
-    void* _stc4;
-    void* _stc5;
-    void* _stc6;
-    void* _stc7;
-    void* _stc8;
+    ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::TilePinSize _tilePinSize;
+    std::vector<std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile>> _tilesPendingUnpin;
+    wil::srwlock _tilesPendingUnpinLock;
 };
 
 /*MIDL_INTERFACE("ebb3adda-cd0c-4d14-a198-6fb7dcd692e2")
@@ -1137,5 +1137,5 @@ private:
     std::shared_ptr<CollectionContext> _context;
 };
 
-std::_Ref_count_obj2<BaseTileCollectionInitializer>;
+std::shared_ptr<BaseTileCollectionInitializer> a; std::_Ref_count_obj2<BaseTileCollectionInitializer>;
 }

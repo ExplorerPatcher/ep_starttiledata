@@ -208,7 +208,9 @@ enum LayoutOverrideType
 
 enum LayoutCustomizationRestrictionType
 {
-    LayoutCustomizationRestrictionType_0,
+    LayoutCustomizationRestrictionType_None,
+    LayoutCustomizationRestrictionType_OnlySpecifiedGroups,
+    LayoutCustomizationRestrictionType_FullLayout,
 };
 
 struct CuratedRootChangeInfo;

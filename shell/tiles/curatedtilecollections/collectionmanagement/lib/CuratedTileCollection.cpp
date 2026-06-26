@@ -521,14 +521,12 @@ HRESULT CuratedTileCollectionBase::MoveExistingTileToNewParent(utctc::ICuratedTi
 
 HRESULT CuratedTileCollectionBase::AddTile(ut::IUnifiedTileIdentifier* identifier, utctc::ICuratedTile** outResult)
 {
-    using namespace DataStoreCache::CuratedTileCollectionTransformer;
-
     // wil::ActivityThreadWatcher watcher = TileCollectionTelemetry::WatchCurrentThread("AddTile");
     *outResult = nullptr;
 
     try
     {
-        std::shared_ptr<CuratedTile> transformerTile = _transformerRoot->CreateTile(identifier);
+        std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> transformerTile = _transformerRoot->CreateTile(identifier);
 
         wil::com_ptr<utctc::ICuratedTile> tile;
         RETURN_IF_FAILED(Microsoft::WRL::MakeAndInitialize<CuratedTile>(&tile, transformerTile)); // 503
@@ -543,13 +541,11 @@ HRESULT CuratedTileCollectionBase::AddTile(ut::IUnifiedTileIdentifier* identifie
 
 HRESULT CuratedTileCollectionBase::AddTileWithId(ut::IUnifiedTileIdentifier* identifier, GUID tileId, utctc::ICuratedTile** outResult)
 {
-    using namespace DataStoreCache::CuratedTileCollectionTransformer;
-
     *outResult = nullptr;
 
     try
     {
-        std::shared_ptr<CuratedTile> transformerTile = _transformerRoot->CreateTile(tileId, identifier);
+        std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> transformerTile = _transformerRoot->CreateTile(tileId, identifier);
 
         wil::com_ptr<utctc::ICuratedTile> tile;
         RETURN_IF_FAILED(Microsoft::WRL::MakeAndInitialize<CuratedTile>(&tile, transformerTile)); // 518

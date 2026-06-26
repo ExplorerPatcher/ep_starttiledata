@@ -756,4 +756,35 @@ namespace WindowsInternal.Shell.UnifiedTile.CuratedTileCollections
 
         static WindowsInternal.Shell.UnifiedTile.CuratedTileCollections.CuratedTileCollectionManager CreateWithUser(Windows.System.User a2);
     };
+
+    enum CollectionSKU
+    {
+        _0,
+    };
+
+    struct CuratedCollectionSelectionData
+    {
+        CollectionSKU layoutSku;
+        Boolean unk1;
+        Boolean isPreInstalledAppsEnabled;
+        Boolean unk2;
+    };
+
+    [version(1)]
+    [static_name("ICuratedCollectionSelectionHelpers", e07ce126-3bd3-4a7d-8416-9389b13a696f)]
+    runtimeclass CuratedCollectionSelectionHelpers
+    {
+        static CuratedCollectionSelectionData GetLayoutSelectionVariables();
+        static CollectionSKU GetLayoutSku();
+        static Boolean IsDualSim { get; };
+        static Boolean IsPreInstalledAppsEnabled { get; };
+        static Boolean IsSingleGroupModeEnabled { get; };
+    };
+
+    [version(1)]
+    [static_name("IUnifiedTileUserPinBrokerStatics", 984dfe21-72c1-49fd-980a-188d66e78871)]
+    runtimeclass UnifiedTileUserPinBroker
+    {
+        static void ReleaseUserPinnedShortcutReference(WindowsInternal.Shell.UnifiedTile.UnifiedTileIdentifier identifier);
+    };
 }

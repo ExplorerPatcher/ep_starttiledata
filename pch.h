@@ -16,4 +16,6 @@
 #include <wil/wrl.h>
 #include <wrl/implements.h>
 
+#define NUKE_SHAREDSTARTLAYOUT 0
+
 #endif //PCH_H
