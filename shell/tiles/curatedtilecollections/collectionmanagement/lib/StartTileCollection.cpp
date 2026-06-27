@@ -2,10 +2,10 @@
 
 #include "StartTileCollection.h"
 
-#include <WindowsInternal.Shell.CDSProperties.h>
-#include <wil/winrt.h>
-
 #include "TileCollectionInitializers.h"
+#include "usermodelptc.h"
+#include "../../../inc/SecondaryTileHelpers.h"
+#include "../../../../common/helpers/UserHelpers.h"
 
 #if !NUKE_SHAREDSTARTLAYOUT
 #include "../../../sharedmodel/lib/SharedModelCommon.h"
@@ -419,7 +419,7 @@ HRESULT StartTileCollection::CheckForUpdateWithOptions(StartCollectionUpdateOpti
 {
     try
     {
-        if ((options & StartCollectionUpdateOptions_1) != 0)
+        if ((options & StartCollectionUpdateOptions_ResetGroupPolicyLayoutFileTimestamp) != 0)
         {
             FILETIME timestamp = {};
             _transformerRoot->SetGroupPolicyLayoutFileTimestamp(timestamp);
@@ -464,7 +464,7 @@ void StartTileCollection::EnsureLayoutFactory()
 }
 #endif
 
-wil::com_ptr<utctc::ICuratedTileGroup> StartTileCollection::FindTargetGroup(bool b)
+wil::com_ptr<utctc::ICuratedTileGroup> StartTileCollection::FindTargetGroup(bool bSingleGroupMode)
 {
     wil::com_ptr<utctc::ICuratedTileGroup> targetGroup;
 
@@ -482,7 +482,7 @@ wil::com_ptr<utctc::ICuratedTileGroup> StartTileCollection::FindTargetGroup(bool
             wf::Point location;
             THROW_IF_FAILED(pair.second->get_Location(&location)); // 594
             if ((location.Y > endmostLocation.Y || (location.Y == endmostLocation.Y && location.X > endmostLocation.X))
-                && CanPinToGroup(pair.second.get(), b))
+                && CanPinToGroup(pair.second.get(), bSingleGroupMode))
             {
                 endmostLocation = location;
                 targetGroup = pair.second.get();
@@ -494,7 +494,7 @@ wil::com_ptr<utctc::ICuratedTileGroup> StartTileCollection::FindTargetGroup(bool
         }
     }
 
-    if (targetGroup == nullptr || (!b && !CanPinToGroup(targetGroup.get(), false)))
+    if (targetGroup == nullptr || (!bSingleGroupMode && !CanPinToGroup(targetGroup.get(), false)))
     {
         CreateNewLastGroup(nullptr, &targetGroup);
         SetGroupAsLastGroup(targetGroup.get());
@@ -665,11 +665,11 @@ wil::com_ptr<IItemLayoutResolver> StartTileCollection::CreateLayoutResolverForGr
 }
 #endif
 
-bool StartTileCollection::CanPinToGroup(utctc::ICuratedTileGroup* group, bool b)
+bool StartTileCollection::CanPinToGroup(utctc::ICuratedTileGroup* group, bool bSingleGroupMode)
 {
     bool bCanPinToGroup = false;
 
-    if (b)
+    if (bSingleGroupMode)
     {
         LOG_HR_IF(E_UNEXPECTED, _groups.size() > 1); // 782
         bCanPinToGroup = true;

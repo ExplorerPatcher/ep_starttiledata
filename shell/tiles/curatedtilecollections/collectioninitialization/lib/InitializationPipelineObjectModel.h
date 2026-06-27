@@ -1,14 +1,5 @@
 ﻿#pragma once
 
-#include <functional>
-#include <map>
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include <wil/com.h>
-
 #include "DataStoreCache_MoveMe.h"
 
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections

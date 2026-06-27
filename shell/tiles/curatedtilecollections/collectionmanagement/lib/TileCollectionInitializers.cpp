@@ -1,12 +1,13 @@
 ﻿#include "pch.h"
 
+#if 0
+
 #include "TileCollectionInitializers.h"
 
 namespace wrl = Microsoft::WRL;
 
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
-
 struct CollectionInitializationPolicy;
 
 std::shared_ptr<CollectionInitializationPolicy> GetAlwaysInitPolicy(
@@ -23,7 +24,7 @@ void BaseTileCollectionInitializer::InitializeCollection(const std::wstring& a2,
     THROW_IF_FAILED(wrl::MakeAndInitialize<GenericCollectionWriter>(_writer.get(), a2.c_str(), &_context)); // 31
 
     wil::com_ptr<ICollectionInitializationPipeline> pipeline;
-    THROW_IF_FAILED(Create_AssignedAccessCollectionInitializationPipeline({}, _writer.get(),&pipeline)); // 35
+    THROW_IF_FAILED(Create_AssignedAccessCollectionInitializationPipeline({}, _writer.get(), &pipeline)); // 35
     THROW_IF_FAILED(pipeline->EnsureCollectionInitialized(a3, nullptr)); // 36
 }
 
@@ -48,3 +49,5 @@ void BaseTileCollectionInitializer::ReinitializeCollection(
     THROW_IF_FAILED(pipeline->ResetCollection(outAction)); // 57
 }
 }
+
+#endif

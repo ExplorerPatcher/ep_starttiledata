@@ -592,6 +592,13 @@ namespace WindowsInternal.Shell.UnifiedTile.Private
         Boolean IsMatchingVerbCanonicalName(String a2);
         Windows.System.User User { get; set; };
     };
+
+    [version(1)]
+    [static_name("IUnifiedTileUserPinBrokerStatics", 984dfe21-72c1-49fd-980a-188d66e78871)]
+    runtimeclass UnifiedTileUserPinBroker
+    {
+        static void ReleaseUserPinnedShortcutReference(WindowsInternal.Shell.UnifiedTile.UnifiedTileIdentifier identifier);
+    };
 }
 
 namespace WindowsInternal.Shell.UnifiedTile.CuratedTileCollections
@@ -779,12 +786,5 @@ namespace WindowsInternal.Shell.UnifiedTile.CuratedTileCollections
         static Boolean IsDualSim { get; };
         static Boolean IsPreInstalledAppsEnabled { get; };
         static Boolean IsSingleGroupModeEnabled { get; };
-    };
-
-    [version(1)]
-    [static_name("IUnifiedTileUserPinBrokerStatics", 984dfe21-72c1-49fd-980a-188d66e78871)]
-    runtimeclass UnifiedTileUserPinBroker
-    {
-        static void ReleaseUserPinnedShortcutReference(WindowsInternal.Shell.UnifiedTile.UnifiedTileIdentifier identifier);
     };
 }

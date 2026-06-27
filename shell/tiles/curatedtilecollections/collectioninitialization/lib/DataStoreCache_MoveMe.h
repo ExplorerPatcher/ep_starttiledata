@@ -1,16 +1,5 @@
 ﻿#pragma once
 
-#include <ppltasks.h>
-
-#include <functional>
-#include <memory>
-#include <string>
-
-#include <windows.system.h>
-#include <wil/com.h>
-
-#include <WindowsInternal.Shell.UnifiedTile.h>
-
 namespace DataStoreCache::Util
 {
 struct hashGUID
@@ -353,8 +342,25 @@ void CreateCuratedTileCollectionTransformer(
 
 namespace DataStoreCache
 {
+struct IDataManager
+{
+};
+
+enum DataStoreCacheInit
+{
+};
+
 struct LineData
 {
+};
+
+MIDL_INTERFACE("47ab0a63-152e-49e5-b183-06c1eae6597c")
+IDataStoreTransformer : IUnknown
+{
+    virtual const GUID& STDMETHODCALLTYPE GetId() const = 0;
+    virtual void STDMETHODCALLTYPE SetDataManager(IDataManager*) = 0;
+    virtual void STDMETHODCALLTYPE SetInitializationStage(DataStoreCacheInit) = 0;
+    virtual std::vector<LineData> STDMETHODCALLTYPE DumpData(const GUID&, HSTRING, UINT) = 0;
 };
 }
 
@@ -362,6 +368,11 @@ namespace Windows::Data
 {
 struct PlaceholderTile;
 struct PlaceholderTileLocal;
+}
+
+namespace StartPlaceHolderTelemetry
+{
+class PlaceholderTileActivated;
 }
 
 namespace DataStoreCache::PlaceholderTileTransformer::Internal
@@ -482,6 +493,39 @@ public:
 private:
     std::shared_ptr<PlaceholderTileImpl> _impl;
     std::shared_ptr<PlaceholderTileLocalImpl> _localImpl;
+};
+
+class IPlaceholderTileBatchCookie
+{
+};
+
+MIDL_INTERFACE("93400fa0-3b2d-413c-9a9c-fb7962988d15")
+IPlaceholderTileTransformer : IDataStoreTransformer
+{
+    virtual std::shared_ptr<IPlaceholderTileBatchCookie> STDMETHODCALLTYPE BeginBatchUpdate() = 0;
+    virtual Concurrency::task<void> STDMETHODCALLTYPE EndBatchUpdate(std::shared_ptr<IPlaceholderTileBatchCookie>) = 0;
+    virtual std::shared_ptr<PlaceholderTile> STDMETHODCALLTYPE AddTileToCollection(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*, HSTRING) = 0;
+    virtual void STDMETHODCALLTYPE RemoveTileFromCollection(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*, HSTRING) = 0;
+    virtual std::map<std::wstring, std::shared_ptr<PlaceholderTile>> STDMETHODCALLTYPE GetAllTilesInCollection(HSTRING) = 0;
+    virtual std::shared_ptr<PlaceholderTile> STDMETHODCALLTYPE GetTile(const WCHAR*) = 0;
+    virtual std::shared_ptr<PlaceholderTile> STDMETHODCALLTYPE GetTile(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
+    virtual std::shared_ptr<PlaceholderTile> STDMETHODCALLTYPE TryGetTile(const WCHAR*) = 0;
+    virtual bool STDMETHODCALLTYPE HasTile(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
+    virtual std::map<std::wstring, std::shared_ptr<PlaceholderTile>> STDMETHODCALLTYPE GetAllTiles() = 0;
+    virtual void STDMETHODCALLTYPE DeleteTile(const WCHAR*) = 0;
+    virtual bool STDMETHODCALLTYPE HasTile(const WCHAR*) = 0;
+    virtual bool STDMETHODCALLTYPE HasPendingCommits() = 0;
+};
+
+MIDL_INTERFACE("bb5d3c4c-40cb-41c6-8de7-d036a8f90f6c")
+Internal::IPlaceholderTileTransformerInternal : IPlaceholderTileTransformer
+{
+    virtual void STDMETHODCALLTYPE OnItemUpdated(const WCHAR*, const Windows::Data::PlaceholderTileLocal&) = 0;
+    virtual void STDMETHODCALLTYPE OnItemUpdated(const WCHAR*, const Windows::Data::PlaceholderTile&) = 0;
+    virtual wil::com_ptr_t<ABI::Windows::System::IUser> STDMETHODCALLTYPE GetUser() = 0;
+    virtual HRESULT STDMETHODCALLTYPE InstallApp(const std::shared_ptr<PlaceholderTile>&, HSTRING, UINT, ABI::Windows::Foundation::Collections::IPropertySet*, StartPlaceHolderTelemetry::PlaceholderTileActivated&) = 0;
+    virtual HRESULT STDMETHODCALLTYPE CancelAppInstall(const std::shared_ptr<PlaceholderTile>&, HSTRING) = 0;
+    virtual bool STDMETHODCALLTYPE IsAppInstalling(const std::shared_ptr<PlaceholderTile>&) = 0;
 };
 }
 

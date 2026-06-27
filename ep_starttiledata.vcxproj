@@ -120,8 +120,10 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="shell\common\helpers\UserHelpers.h" />
     <ClInclude Include="shell\tiles\curatedtilecollections\collectioninitialization\lib\**\*.h" />
     <ClInclude Include="shell\tiles\curatedtilecollections\collectionmanagement\lib\**\*.h" />
+    <ClInclude Include="shell\tiles\inc\SecondaryTileHelpers.h" />
     <ClInclude Include="shell\tiles\sharedmodel\lib\**\*.h" />
     <ClInclude Include="shell\tiles\sharedstartlayout\lib\**\*.h" />
     <ClInclude Include="shell\inc\**\*.h" />

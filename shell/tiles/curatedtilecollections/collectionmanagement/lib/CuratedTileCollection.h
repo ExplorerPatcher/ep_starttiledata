@@ -1,10 +1,5 @@
 #pragma once
 
-#include <Windows.Foundation.h>
-#include <Windows.UI.Core.h>
-
-#include <WindowsInternal.Shell.UnifiedTile.h>
-
 #include "../../collectioninitialization/lib/DataStoreCache_MoveMe.h"
 
 namespace wf = ABI::Windows::Foundation;
@@ -51,7 +46,8 @@ enum UnparentItemOptions
 enum CuratedTileCollectionOptionsInternal
 {
     CuratedTileCollectionOptionsInternal_None = 0,
-    CuratedTileCollectionOptionsInternal_1 = 0x1,
+    CuratedTileCollectionOptionsInternal_Batched = 0x1,
+    CuratedTileCollectionOptionsInternal_Placeholder = 0x2,
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(CuratedTileCollectionOptionsInternal);
@@ -126,7 +122,7 @@ protected:
 
     CuratedTileCollectionOptionsInternal _options;
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedRoot> _transformerRoot;
-    wil::com_ptr<ABI::Windows::System::IUser /*???*/> _9;
+    wil::com_ptr<DataStoreCache::PlaceholderTileTransformer::IPlaceholderTileTransformer> _placeholderTileTransformer;
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::ICuratedCollectionBatchCookieImpl> _batchCookie;
     std::unordered_map<GUID, wil::com_ptr<utctc::ICuratedTileGroup>, hashGUIDCuratedTileCollections> _groups;
     std::unordered_map<GUID, wil::com_ptr<utctc::ICuratedTile>, hashGUIDCuratedTileCollections> _tiles;

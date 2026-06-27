@@ -2,11 +2,10 @@
 
 #include "CuratedTileCollection.h"
 
-#include <wil/winrt.h>
-
 #include "InternalAsync.h"
 #include "TileCollectionInitializers.h"
 #include "windowscollections.h"
+#include "../../../../common/helpers/UserHelpers.h"
 
 typedef struct _WNF_STATE_NAME
 {
@@ -629,14 +628,15 @@ HRESULT CuratedTileCollectionBase::CommitAsyncWithTimerBypass(wf::IAsyncAction**
 
 HRESULT CuratedTileCollectionBase::ResetToDefault()
 {
-    using namespace DataStoreCache::CuratedTileCollectionTransformer;
+    FAIL_FAST_HR(E_NOTIMPL); // @MOD We're only replacing StartTileCollection, where its CheckForUpdate override does not call this super method
+    /*using namespace DataStoreCache::CuratedTileCollectionTransformer;
 
     try
     {
         /*(Microsoft_Windows_ShellCommon_StartLayoutPopulationEnableBits & 0x1) != 0
            && McTemplateU0z_EventWriteTransfer(
                &Microsoft_Windows_StartLayoutPopulation_Provider_Context, &StartLayout_LayoutResetStarted,
-               _transformerRoot->GetLayoutName()->c_str());*/
+               _transformerRoot->GetLayoutName()->c_str());#1#
 
         if (_batchCookie != nullptr)
         {
@@ -657,7 +657,7 @@ HRESULT CuratedTileCollectionBase::ResetToDefault()
         PopulateFromTransformerData();
 
         return S_OK;
-    } CATCH_RETURN() // 641
+    } CATCH_RETURN() // 641*/
 }
 
 HRESULT CuratedTileCollectionBase::ResetToDefaultAsync(wf::IAsyncAction** outResult)
@@ -667,7 +667,8 @@ HRESULT CuratedTileCollectionBase::ResetToDefaultAsync(wf::IAsyncAction** outRes
 
 HRESULT CuratedTileCollectionBase::CheckForUpdate()
 {
-    using namespace DataStoreCache::CuratedTileCollectionTransformer;
+    FAIL_FAST_HR(E_NOTIMPL); // @MOD We're only replacing StartTileCollection, where its CheckForUpdate override does not call this super method
+    /*using namespace DataStoreCache::CuratedTileCollectionTransformer;
 
     try
     {
@@ -698,7 +699,7 @@ HRESULT CuratedTileCollectionBase::CheckForUpdate()
         }
 
         return S_OK;
-    } CATCH_RETURN() // 680
+    } CATCH_RETURN() // 680*/
 }
 
 HRESULT CuratedTileCollectionBase::GetCustomProperty(const HSTRING key, HSTRING* outResult)
@@ -744,7 +745,8 @@ HRESULT CuratedTileCollectionBase::SetCustomProperty(const HSTRING key, HSTRING 
 
 HRESULT CuratedTileCollectionBase::EnsureTileRegistration()
 {
-    try
+    return S_OK; // @MOD Skipped this because IPackageManagerInternal changes often without GUID changes
+    /*try
     {
         if (!_userContextToken && _user != nullptr)
         {
@@ -756,7 +758,8 @@ HRESULT CuratedTileCollectionBase::EnsureTileRegistration()
         THROW_IF_FAILED(GetAllTilesInCollection(&tiles)); // 727
         auto tilesIterable = tiles.query<wfc::IIterable<wfc::IKeyValuePair<GUID, utctc::ICuratedTile*>*>>();
 
-        auto packageManagerInternal = wil::ActivateInstance<ABI::Windows::Management::Deployment::Internal::IPackageManagerInternal>();
+        auto packageManagerInternal = wil::ActivateInstance<ABI::Windows::Management::Deployment::Internal::IPackageManagerInternal>(
+            RuntimeClass_Windows_Management_Deployment_Internal_PackageManagerInternal);
 
         for (const auto& pair : wil::iterable_range(tilesIterable.get()))
         {
@@ -765,7 +768,7 @@ HRESULT CuratedTileCollectionBase::EnsureTileRegistration()
                 wil::com_ptr<utctc::ICuratedTile> tile;
                 THROW_IF_FAILED(pair->get_Value(&tile)); // 739
 
-                wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier> identifier;
+                wil::com_ptr<ut::IUnifiedTileIdentifier> identifier;
                 THROW_IF_FAILED(tile->get_Identifier(&identifier)); // 742
 
                 auto packagedIdentifier = identifier.try_query<ut::IPackagedUnifiedTileIdentifier>();
@@ -779,7 +782,7 @@ HRESULT CuratedTileCollectionBase::EnsureTileRegistration()
         }
 
         return S_OK;
-    } CATCH_RETURN() // 755
+    } CATCH_RETURN()*/ // 755
 }
 
 HRESULT CuratedTileCollectionBase::ResurrectTile(
@@ -820,16 +823,33 @@ HRESULT CuratedTileCollectionBase::ResurrectTile(
 
 HRESULT CuratedTileCollectionBase::OnTileAddedWithinCollection(ut::IUnifiedTileIdentifier* identifier)
 {
-    static_assert(false); // TODO Requires the type of _9 to be known
+    if ((_options & CuratedTileCollectionOptionsInternal_Placeholder) != 0)
+    {
+        if (!_bInstallPlaceholderTilesOnNextCommit && !_placeholderTileTransformer->HasTile(identifier))
+        {
+            _bInstallPlaceholderTilesOnNextCommit = true;
+        }
+
+        _placeholderTileTransformer->AddTileToCollection(
+            identifier, Microsoft::WRL::Wrappers::HStringReference(_transformerRoot->GetLayoutName()->c_str()).Get());
+    }
+
+    return S_OK;
 }
 
 HRESULT CuratedTileCollectionBase::OnTileRemovedWithinCollection(ut::IUnifiedTileIdentifier* identifier)
 {
-    static_assert(false); // TODO Requires the type of _9 to be known
+    if ((_options & CuratedTileCollectionOptionsInternal_Placeholder) != 0)
+    {
+        _placeholderTileTransformer->RemoveTileFromCollection(
+            identifier, Microsoft::WRL::Wrappers::HStringReference(_transformerRoot->GetLayoutName()->c_str()).Get());
+    }
+
+    return S_OK;
 }
 
 CuratedTileCollectionBase::CuratedTileCollectionBase()
-    : _options(0x1)
+    : _options(CuratedTileCollectionOptionsInternal_Batched)
     , _userContextToken(0)
     , _bInstallPlaceholderTilesOnNextCommit(false)
     , _bCommitOnDestroy(true)
@@ -900,7 +920,7 @@ HRESULT CuratedTileCollectionBase::CommitAsyncInternal(std::function<void()>&& c
 
 void CuratedTileCollectionBase::BeginBatchIfNecessary()
 {
-    if (_transformerRoot != nullptr && (_options & 0x1) != 0)
+    if (_transformerRoot != nullptr && (_options & CuratedTileCollectionOptionsInternal_Batched) != 0)
     {
         _batchCookie = _transformerRoot->BeginBatchUpdate();
     }

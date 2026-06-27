@@ -1,0 +1,232 @@
+namespace Windows.System.Internal
+{
+    enum SignInCaller
+    {
+        Unknown = 0,
+        Nui = 1,
+        Vui = 2,
+        Smartglass = 3,
+        AccountPicker = 4,
+        SignInApp = 5,
+        Home = 6,
+        AutoSignIn = 7,
+    };
+
+    [uuid(2a145478-913a-490b-ac8c-5efc1faff95f)]
+    interface IUserProfile
+    {
+        UInt32 Id { get; };
+        String AccountName { get; };
+        String EmailAddress { get; };
+        Boolean IsAutoSignInEnabled { get; };
+        Boolean HasCredentialsPersisted { get; };
+        Windows.Foundation.Collections.IPropertySet Properties { get; };
+        String DisplayName { get; set; };
+        String FirstName { get; };
+        String LastName { get; };
+
+        Windows.Foundation.IAsyncOperation<Windows.Storage.Streams.IRandomAccessStreamReference> GetPictureAsync(Windows.System.UserPictureSize size);
+    };
+
+    [version(1)]
+    [interface_name("IUserCreatedEventArgs", 5af5819b-31b6-412a-b6cc-b97a3c5f34f7)]
+    runtimeclass UserCreatedEventArgs
+    {
+        UInt32 Id { get; };
+        String AccountName { get; };
+    };
+
+    [version(1)]
+    [interface_name("IUserDeletedEventArgs", 2d3edf68-f0cf-41a5-afcd-2dda7688d8b0)]
+    runtimeclass UserDeletedEventArgs
+    {
+        UInt32 Id { get; };
+    };
+
+    [version(1)]
+    [interface_name("IUserProfileEventArgs", b2b104e2-8a1c-418d-bbfb-17160b994eef)]
+    runtimeclass UserProfileEventArgs
+    {
+        IUserProfile Profile { get; };
+    };
+
+    enum UserTypeInternal
+    {
+        _0,
+    };
+
+    [version(1)]
+    [interface_name("ISetPictureResult", 80c4c116-8883-49fe-ae39-05508044f0aa)]
+    runtimeclass SetPictureResult
+    {
+        HRESULT Status { get; };
+        String CorrelationId { get; };
+        Boolean UIShown { get; };
+        Boolean PictureSetLocally { get; };
+    };
+
+    [uuid(c39ab8a5-824f-4acf-92e0-bb53b8a90555)]
+    interface ICredentialSerialization
+    {
+        UInt32 AuthenticationPackage { get; };
+    };
+
+    [uuid(3503377d-2055-4d2d-9fcf-f02531eb5b9a)]
+    interface ISignInContext
+    {
+        UInt32 User { get; set; };
+        SignInCaller Agent { get; set; };
+        Boolean ShowToast { get; set; };
+        String AuthData { get; set; };
+        ICredentialSerialization Credentials { get; set; };
+        Windows.Foundation.Collections.IPropertySet Properties { get; set; };
+    };
+
+    [version(1)]
+    [interface_name("ISignInResult", c3e53f22-a1e9-4678-873b-fb8b39895af8)]
+    runtimeclass SignInResult
+    {
+        String AccountName { get; };
+        String FlowUrl { get; };
+        HRESULT Result { get; };
+        SignInCaller SignInCaller { get; };
+        UInt32 UserId { get; };
+        String UserData { get; };
+    };
+
+    [version(1)]
+    [interface_name("ISignOutResult", 6406c65d-90e2-4532-81f0-a94a8bf0cac3)]
+    runtimeclass SignOutResult
+    {
+        String AccountName { get; };
+        String FlowUrl { get; };
+        HRESULT Result { get; };
+        UInt32 UserId { get; };
+        Boolean RemoteSignOut { get; };
+    };
+
+    [version(1)]
+    [interface_name("IValidateCredentialsResult", 3db0edb5-177d-46f3-b8c2-09d6fd550d55)]
+    runtimeclass ValidateCredentialsResult
+    {
+        Windows.System.User User { get; };
+        HRESULT Status { get; };
+        HRESULT SubStatus { get; };
+        String AccountName { get; };
+    };
+
+    [version(1)]
+    [interface_name("ISignInCompleteEventArgs", 4b82c7ab-c805-4e9c-9d57-43b568dd964e)]
+    runtimeclass SignInCompleteEventArgs
+    {
+        SignInResult Result { get; };
+    };
+
+    [version(1)]
+    [interface_name("ISignOutCompleteEventArgs", 397fbe36-b236-4922-8bb1-93028cd57dbc)]
+    runtimeclass SignOutCompleteEventArgs
+    {
+        SignOutResult Result { get; };
+    };
+
+    [uuid(d3ee3737-cb59-4732-ac03-c2be6f02b7f1)]
+    interface ISignInArbiter
+    {
+        Windows.Foundation.IAsyncAction SignInUserAsync(ISignInContext ctx);
+        Boolean SignedInUser(ISignInContext ctx, SignInResult res, out Int32 extendedResult);
+    };
+
+    [version(1)]
+    [interface_name("ISetUserAutologonResult", aa955c53-26ba-49f6-b527-5750cb199949)]
+    runtimeclass SetUserAutologonResult
+    {
+        String UserKey { get; };
+    };
+
+    [version(1)]
+    runtimeclass UserManager
+    {
+        [static_name("IUserManagerStatics", 252e7f79-acfa-4ea2-9a7e-fa27a8a4d3d9)]
+        {
+            static UInt32 Create();
+            static UInt32 CreateWithName(String name);
+            static UInt32 CreateSponsoredProfile();
+            static void Delete(UInt32 userId);
+            static void Update(UInt32 userId, Windows.Foundation.Collections.IPropertySet properties);
+
+            static Windows.Foundation.Collections.IVectorView<IUserProfile> Profiles { get; };
+
+            static IUserProfile GetUser(UInt32 userId);
+            static IUserProfile GetUserByName(String name);
+
+            static event Windows.Foundation.EventHandler<UserCreatedEventArgs> Created;
+            static event Windows.Foundation.EventHandler<UserDeletedEventArgs> Deleted;
+        }
+
+        [static_name("IUserManagerStatics2", 039a83e3-d5bd-491a-9e47-3feba3427a92)]
+        {
+            static Windows.System.UserWatcher CreateInternalWatcher();
+        }
+
+        [static_name("IUserManagerStatics3", 1292a652-a1b2-483b-ae29-3d90012c77c1)]
+        {
+            static event Windows.Foundation.EventHandler<UserProfileEventArgs> UserProfileChanged;
+        }
+
+        [static_name("IUserManagerStatics4", 2e85bca9-772c-4a63-9ff6-65ab7cd7612a)]
+        {
+            static UInt32 CreateWithNameAndType(String name, UserTypeInternal type);
+            static Windows.Foundation.IAsyncOperation<Windows.System.User> GetResourceUserAsync();
+            static Windows.Foundation.IAsyncOperation<IVectorView<Windows.System.User> > GetVisitorUsersAsync();
+            static Windows.System.User EnsureRightKindOfUser(Windows.System.User a2, Boolean a3);
+        }
+
+        [static_name("IUserManagerStatics5", 52c2dfbf-05ed-466b-8e94-b72d27548635)]
+        {
+            static UInt32 CreateWithNameAndProperties(String name, Windows.Foundation.Collections.IPropertySet properties);
+            static void CleanupStaleProfiles();
+        }
+
+        [static_name("IUserManagerStatics6", e3ef19ae-1599-4fc8-beb1-6616f62ad07a)]
+        {
+            static Windows.Foundation.IAsyncOperation<SetPictureResult> SetPictureForUserAsync(Windows.System.User user, Windows.Storage.Streams.IRandomAccessStreamReference a3, UInt32 a4, String a5);
+            static Windows.Storage.Streams.IRandomAccessStreamReference TryFindPictureForUser(Windows.System.User user, Windows.System.UserPictureSize size);
+            static Windows.Foundation.IAsyncAction PictureCallback(UInt64 a2, String a3);
+        }
+
+        [static_name("IUserManagerStatics7", ffc01044-c5b8-4e69-a46f-830e337ce18a)]
+        {
+            static UInt32 CreateConnectedWithNameAndType(String name, UserTypeInternal type);
+        }
+
+        [static_name("ISignInStateManager", 100eb64b-b24c-4c38-8964-720d926d05a4)]
+        {
+            static Windows.Foundation.IAsyncOperation<SignInResult> SignInUserAsync(UInt32 userId, SignInCaller caller);
+            static Windows.Foundation.IAsyncOperation<SignInResult> SignInUserWithContextAsync(ISignInContext ctx);
+            static ISignInContext CreateSignInContext(UInt32 userId);
+            static Windows.Foundation.IAsyncAction SignOutUserAsync(Windows.System.User user);
+            static Windows.Foundation.IAsyncAction SignOutUserAsyncById(UInt32 userId);
+            static Windows.Foundation.IAsyncOperation<ValidateCredentialsResult> ValidateCredentialsAsync(ICredentialSerialization credentials);
+
+            static event Windows.Foundation.EventHandler<SignInCompleteEventArgs> SignInComplete;
+            static event Windows.Foundation.EventHandler<SignOutCompleteEventArgs> SignOutComplete;
+
+            static void SignOutAllUsers(Int32 reason);
+            static UInt64 GetHandleForUser(Windows.System.User user);
+            static UInt64 RegisterSignInArbiter(ISignInArbiter arbiter);
+            static void UnregisterSignInArbiter(UInt64 handle);
+            static Windows.System.User GetUserForContext(UInt64 contextHandle);
+            static IUserProfile GetProfileForUser(Windows.System.User user);
+            static Windows.Foundation.IAsyncOperation<SetUserAutologonResult> SetAutologonForUserAsync(Windows.System.User user);
+            static Windows.Foundation.IAsyncOperation<ValidateCredentialsResult> ValidateCredentialsForUserAsync(Windows.System.User user, ICredentialSerialization credentials);
+            static Windows.Foundation.IAsyncAction SetAutologonWithContextAsync(ISignInContext ctx);
+            static void AutologonWithContext();
+            static ISignInContext CreateSignInContextForUnknownUser();
+        }
+
+        [static_name("ISignInStateManager2", 661110c7-5083-4b93-8d41-1d37a51e4425)]
+        {
+            static Boolean IsUserPresentForSid(String sidString);
+        }
+    };
+}

@@ -14,7 +14,7 @@ namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 enum StartCollectionUpdateOptions
 {
     StartCollectionUpdateOptions_None = 0,
-    StartCollectionUpdateOptions_1 = 0x1,
+    StartCollectionUpdateOptions_ResetGroupPolicyLayoutFileTimestamp = 0x1,
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(StartCollectionUpdateOptions);
@@ -79,13 +79,13 @@ private:
 #if !NUKE_SHAREDSTARTLAYOUT
     void EnsureLayoutFactory();
 #endif
-    wil::com_ptr<utctc::ICuratedTileGroup> FindTargetGroup(bool b);
+    wil::com_ptr<utctc::ICuratedTileGroup> FindTargetGroup(bool bSingleGroupMode);
     void CreateNewLastGroup(const GUID* groupId, utctc::ICuratedTileGroup** outResult);
 #if !NUKE_SHAREDSTARTLAYOUT
     wil::com_ptr<IItemLayoutResolver> CreateLayoutResolverForCurrentCollection();
     wil::com_ptr<IItemLayoutResolver> CreateLayoutResolverForGroup(utctc::ICuratedTileGroup* group);
 #endif
-    bool CanPinToGroup(utctc::ICuratedTileGroup* group, bool b);
+    bool CanPinToGroup(utctc::ICuratedTileGroup* group, bool bSingleGroupMode);
     void SetGroupAsLastGroup(utctc::ICuratedTileGroup* group);
     void PinTileToGroup(ut::IUnifiedTileIdentifier* identifier, utctc::ICuratedTileGroup* group, const RECT* bounds);
     void UnpinFromStartInternal(utctc::ICuratedTile* const tile, utctc::ICuratedTileGroup* const group);

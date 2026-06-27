@@ -1,0 +1,12 @@
+namespace Windows.Internal.UI.StartScreen
+{
+    [uuid(5365d67e-eedb-4ecd-a099-a195558a9f80)]
+    interface ISecondaryTileStaticsPrivate
+    {
+        Windows.Foundation.IAsyncOperation<IVectorView<Windows.UI.StartScreen.SecondaryTile> > FindAllForAUMIDAsync(String aumid);
+        Windows.Foundation.IAsyncOperation<Boolean> DeleteAsync(String aumid, String tileId);
+        void Delete(String aumid, String tileId);
+        void DeleteIfNotPinned(String aumid, String tileId);
+        Windows.Foundation.IAsyncOperation<Boolean> DeleteIfNotPinnedAsync(String aumid, String tileId);
+    };
+}

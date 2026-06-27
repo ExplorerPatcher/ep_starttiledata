@@ -10,11 +10,26 @@
 // add headers that you want to pre-compile here
 #include "framework.h"
 
-#include <algorithm>
+#include <ppltasks.h>
+#include <winstring.h>
 
-#include <wil/result_macros.h>
-#include <wil/wrl.h>
-#include <wrl/implements.h>
+#include <algorithm>
+#include <functional>
+#include <map>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include <wil/winrt.h>
+
+#include <wrl.h>
+
+#include <Windows.Foundation.h>
+#include <Windows.System.h>
+#include <Windows.UI.Core.h>
+#include <WindowsInternal.Shell.CDSProperties.h>
+#include <WindowsInternal.Shell.UnifiedTile.h>
 
 #define NUKE_SHAREDSTARTLAYOUT 0
 

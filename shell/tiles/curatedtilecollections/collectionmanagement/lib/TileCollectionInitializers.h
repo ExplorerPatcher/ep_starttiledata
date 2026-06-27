@@ -1,12 +1,5 @@
 ﻿#pragma once
 
-#include <memory>
-
-#include <Windows.Foundation.h>
-#include <Windows.System.h>
-
-#include <wil/com.h>
-
 #include "../../collectioninitialization/lib/CDSStartCollectionWriter.h"
 #include "../../collectioninitialization/lib/InitializationPipelineObjectModel.h"
 

@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <windows.foundation.h>
-
 #include "DataStoreCache_MoveMe.h"
 #include "InitializationPipelineObjectModel.h"
 
