@@ -1042,3 +1042,6 @@ __declspec(dllexport) std::make_shared<
     std::shared_ptr<WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::CollectionContext>&,
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedRoot>&&
 );
+
+// Verify the mangled name
+__pragma(comment(linker, "/INCLUDE:??$make_shared@VLayoutRootInternal@Internal@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@AEAV?$shared_ptr@UCollectionContext@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@@std@@V?$shared_ptr@VCuratedRoot@CuratedTileCollectionTransformer@DataStoreCache@@@8@@std@@YA?AV?$shared_ptr@VLayoutRootInternal@Internal@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@@0@AEAV?$shared_ptr@UCollectionContext@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@@0@$$QEAV?$shared_ptr@VCuratedRoot@CuratedTileCollectionTransformer@DataStoreCache@@@0@@Z"))

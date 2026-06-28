@@ -219,12 +219,13 @@ inline HRESULT AddUserToProcessObject(PSID userSid)
     process.reset(OpenProcess(PROCESS_QUERY_INFORMATION | READ_CONTROL | WRITE_DAC, FALSE, GetCurrentProcessId()));
     RETURN_LAST_ERROR_IF_NULL(process); // 128
 
-    RETURN_IF_FAILED(AddUserToHandle(process.get(), userSid, 0x400 | 0x1000 | SYNCHRONIZE)); // 130
+    RETURN_IF_FAILED(AddUserToHandle(
+        process.get(), userSid, PROCESS_QUERY_INFORMATION | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE)); // 130
 
     wil::unique_handle token;
     RETURN_IF_WIN32_BOOL_FALSE(OpenProcessToken(process.get(), TOKEN_READ | WRITE_DAC, &token)); // 133
 
-    RETURN_IF_FAILED(AddUserToHandle(token.get(), userSid, 0x2 | 0x4 | 0x8)); // 135
+    RETURN_IF_FAILED(AddUserToHandle(token.get(), userSid, TOKEN_DUPLICATE | TOKEN_IMPERSONATE | TOKEN_QUERY)); // 135
 
     return S_OK;
 }
