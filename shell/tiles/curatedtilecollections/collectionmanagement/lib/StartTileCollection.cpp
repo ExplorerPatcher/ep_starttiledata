@@ -3,6 +3,7 @@
 #include "StartTileCollection.h"
 
 #include "CallerIdentity.h"
+#include "CuratedTile.h"
 #include "CuratedTileGroup.h"
 #include "TileCollectionInitializers.h"
 #include "usermodelptc.h"
@@ -22,7 +23,7 @@ namespace wrlw = Microsoft::WRL::Wrappers;
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
 typedef std::shared_ptr<BaseTileCollectionInitializer> (*Create_StartTileGridCollectionInitializer_t)(ABI::Windows::System::IUser*);
-EXTERN_C __declspec(dllexport) Create_StartTileGridCollectionInitializer_t g_pfnCreate_StartTileGridCollectionInitializer;
+EXTERN_C __declspec(dllexport) Create_StartTileGridCollectionInitializer_t g_pfnCreate_StartTileGridCollectionInitializer = nullptr;
 #define Create_StartTileGridCollectionInitializer g_pfnCreate_StartTileGridCollectionInitializer
 
 StartTileCollection::StartTileCollection()
@@ -273,7 +274,7 @@ HRESULT StartTileCollection::ReplaceTinyOrMediumTile(
 {
     try
     {
-        THROW_IF_FAILED(HRESULT_FROM_WIN32(ERROR_ALREADY_ASSIGNED), TryFindTileAndParentGroup(identifier2, nullptr, nullptr)); // 351
+        THROW_HR_IF(HRESULT_FROM_WIN32(ERROR_ALREADY_ASSIGNED), TryFindTileAndParentGroup(identifier2, nullptr, nullptr)); // 351
 
         wil::com_ptr<utctc::ICuratedTile> tile;
         wil::com_ptr<utctc::ICuratedTileGroup> group;

@@ -7,8 +7,6 @@ interface IItemLayoutResolver;
 interface IStartLayoutFactory;
 #endif
 
-namespace dsct = DataStoreCache::CuratedTileCollectionTransformer;
-
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
 enum StartCollectionUpdateOptions
@@ -20,7 +18,7 @@ enum StartCollectionUpdateOptions
 DEFINE_ENUM_FLAG_OPERATORS(StartCollectionUpdateOptions);
 
 MIDL_INTERFACE("cfc51442-aa2d-418b-9a43-98bdbd743347")
-IStartTileCollectionUpdater : IUnknown
+IStartTileCollectionUpdater : IInspectable
 {
     virtual HRESULT STDMETHODCALLTYPE CheckForUpdateWithOptions(StartCollectionUpdateOptions) = 0;
 };

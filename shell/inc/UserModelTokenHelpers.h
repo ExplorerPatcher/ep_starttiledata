@@ -1,7 +1,8 @@
 #pragma once
 
-#include <ntstatus.h>
 #include <winnt.h>
+
+EXTERN_C_START
 
 NTSYSAPI
 NTSTATUS
@@ -109,6 +110,8 @@ NtSetSecurityObject(
     _In_ PSECURITY_DESCRIPTOR SecurityDescriptor
     );
 
+EXTERN_C_END
+
 inline HRESULT GetTokenInformationHelper(HANDLE token, TOKEN_INFORMATION_CLASS infoClass, void** tokenInfo)
 {
     DWORD byteCount;
@@ -178,7 +181,7 @@ inline HRESULT AddUserToHandle(HANDLE handle, PSID userSid, ACCESS_MASK flags)
 {
     ULONG requiredLength;
     NTSTATUS status = NtQuerySecurityObject(handle, DACL_SECURITY_INFORMATION, nullptr, 0, &requiredLength);
-    if (status != STATUS_BUFFER_TOO_SMALL)
+    if (status != (NTSTATUS)0xC0000023L) // STATUS_BUFFER_TOO_SMALL
     {
         RETURN_IF_NTSTATUS_FAILED(status); // 98
         return S_OK;

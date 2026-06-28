@@ -240,7 +240,8 @@ HRESULT CuratedTileCollectionBase::get_CollectionName(HSTRING* outResult)
     try
     {
         RETURN_HR(WindowsCreateString(
-            _transformerRoot->GetLayoutName()->c_str(), _transformerRoot->GetLayoutName()->size(), outResult)); // 202
+            _transformerRoot->GetLayoutName()->c_str(), static_cast<UINT32>(_transformerRoot->GetLayoutName()->size()),
+            outResult)); // 202
     } CATCH_RETURN() // 203
 }
 
@@ -454,13 +455,13 @@ HRESULT CuratedTileCollectionBase::GetGroup(GUID groupId, utctc::ICuratedTileGro
 HRESULT CuratedTileCollectionBase::DeleteGroup(GUID groupId)
 {
     // wil::ActivityThreadWatcher watcher = TileCollectionTelemetry::WatchCurrentThread("DeleteGroup");
-    return UnparentGroup(groupId, UnparentItemOptions_1);
+    return UnparentGroup(groupId, UnparentItemOptions_Delete);
 }
 
 HRESULT CuratedTileCollectionBase::RemoveGroup(GUID groupId)
 {
     // wil::ActivityThreadWatcher watcher = TileCollectionTelemetry::WatchCurrentThread("RemoveGroup");
-    return UnparentGroup(groupId, UnparentItemOptions_0);
+    return UnparentGroup(groupId, UnparentItemOptions_Remove);
 }
 
 HRESULT CuratedTileCollectionBase::MoveExistingTileToNewParent(utctc::ICuratedTile* existingTile, utctc::ICuratedTileGroup* newParent)
@@ -578,13 +579,13 @@ HRESULT CuratedTileCollectionBase::GetTile(GUID tileId, utctc::ICuratedTile** ou
 HRESULT CuratedTileCollectionBase::DeleteTile(GUID tileId)
 {
     // wil::ActivityThreadWatcher watcher = TileCollectionTelemetry::WatchCurrentThread("DeleteTile");
-    return UnparentTile(tileId, UnparentItemOptions_1);
+    return UnparentTile(tileId, UnparentItemOptions_Delete);
 }
 
 HRESULT CuratedTileCollectionBase::RemoveTile(GUID tileId)
 {
     // wil::ActivityThreadWatcher watcher = TileCollectionTelemetry::WatchCurrentThread("RemoveTile");
-    return UnparentTile(tileId, UnparentItemOptions_0);
+    return UnparentTile(tileId, UnparentItemOptions_Remove);
 }
 
 HRESULT CuratedTileCollectionBase::Commit()
@@ -616,7 +617,7 @@ HRESULT CuratedTileCollectionBase::CommitAsyncWithTimerBypass(wf::IAsyncAction**
             return transformer->CommitAsyncWithTimerBypass(_transformerRoot->GetLayoutName()->c_str());
         };
 
-        RETURN_IF_FAILED(wil::run_when_complete_nothrow(*outResult, [inner = std::move(inner)]() -> void
+        RETURN_IF_FAILED(wil::run_when_complete_nothrow(*outResult, [inner = std::move(inner)](HRESULT) -> void
         {
             try
             {
@@ -882,7 +883,7 @@ HRESULT CuratedTileCollectionBase::CommitAsyncInternal(std::function<void()>&& c
 
         hr = MakeAsyncAction<Microsoft::WRL::DisableCausality>(
             ComTaskPoolHandler(TaskApartment::MTA, TaskOptions::SyncNesting), outAction, BaseTrust,
-            [user, task, bInstallPlaceholderTiles, callback = std::move(callback)]() -> HRESULT
+            [user, task, bInstallPlaceholderTiles, callback = std::move(callback)](CNoResult&) -> HRESULT
             {
                 (void)task.wait();
 
@@ -906,7 +907,7 @@ HRESULT CuratedTileCollectionBase::CommitAsyncInternal(std::function<void()>&& c
         hr = MakeAsyncAction<Microsoft::WRL::DisableCausality>(
             ComTaskPoolHandler(TaskApartment::MTA, TaskOptions::SyncNesting),
             outAction, BaseTrust,
-            [callback = std::move(callback)]() -> HRESULT
+            [callback = std::move(callback)](CNoResult&) -> HRESULT
             {
                 callback();
                 return S_OK;
@@ -1110,7 +1111,7 @@ HRESULT CuratedTileCollectionBase::UnparentGroup(const GUID& groupId, UnparentIt
         {
             _groups.erase(groupId);
 
-            if (options == UnparentItemOptions_0)
+            if (options == UnparentItemOptions_Remove)
             {
                 _transformerRoot->RemoveGroup(groupId);
             }
@@ -1137,7 +1138,7 @@ HRESULT CuratedTileCollectionBase::UnparentTile(const GUID& tileId, UnparentItem
 
             _tiles.erase(tileId);
 
-            if (options == UnparentItemOptions_0)
+            if (options == UnparentItemOptions_Remove)
             {
                 _transformerRoot->RemoveTile(tileId);
             }

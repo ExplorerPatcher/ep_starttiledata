@@ -56,7 +56,7 @@ inline void FindAndRemoveSecondaryTile(
             wil::com_ptr<wf::IAsyncOperation<bool>> deleteOperation;
             if (SUCCEEDED_LOG(secondaryTileStaticsPriv->DeleteIfNotPinnedAsync(aumid.get(), otherTileId.get(), &deleteOperation))) // 48
             {
-                bool bDeleted = false;
+                boolean bDeleted = FALSE;
                 if (SUCCEEDED_LOG(WaitForCompletionAndGetResults(deleteOperation.get(), &bDeleted, COWAIT_DISPATCH_CALLS))) // 51
                 {
                     LOG_HR_IF(E_FAIL, !bDeleted); // 53

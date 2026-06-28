@@ -1304,7 +1304,7 @@ namespace XWinRT
         {
         }
 
-        bool operator==(const SecureVersionTag& other)
+        bool operator==(const SecureVersionTag& other) const // @MOD Make this method const to fix compile
         {
             return _pVersion == other._pVersion;
         }

@@ -4,8 +4,7 @@
 
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
-HRESULT CuratedTile::RuntimeClassInitialize(
-    const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile>& transformerTile)
+HRESULT CuratedTile::RuntimeClassInitialize(const std::shared_ptr<dsct::CuratedTile>& transformerTile)
 {
     _transformerTile = transformerTile;
     return S_OK;
@@ -99,5 +98,10 @@ HRESULT CuratedTile::SetCustomProperty(HSTRING key, HSTRING value)
             WindowsGetStringRawBuffer(key, nullptr), WindowsGetStringRawBuffer(value, nullptr));
         return S_OK;
     } CATCH_RETURN() // 89
+}
+
+std::shared_ptr<dsct::CuratedTile> CuratedTile::GetTransformerData()
+{
+    return _transformerTile;
 }
 }

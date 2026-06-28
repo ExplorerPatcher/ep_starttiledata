@@ -1,21 +1,6 @@
 #pragma once
 
-#include "../../collectioninitialization/lib/DataStoreCache_MoveMe.h"
-
-namespace wf = ABI::Windows::Foundation;
-namespace wfc = ABI::Windows::Foundation::Collections;
-namespace ut = ABI::WindowsInternal::Shell::UnifiedTile;
-namespace utctc = ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections;
-namespace utp = ABI::WindowsInternal::Shell::UnifiedTile::Private;
-
-struct hashGUIDCuratedTileCollections
-{
-    size_t operator()(const GUID& guid) const noexcept
-    {
-        const uint64_t* p = reinterpret_cast<const uint64_t*>(&guid);
-        return std::hash<uint64_t>{}(p[0]) ^ std::hash<uint64_t>{}(p[1]);
-    }
-};
+#include "Common.h"
 
 template <typename TFunctor>
 bool EnumerateAllTilesInGroupRecursive(utctc::ICuratedTileGroup* group, const TFunctor& functor);
@@ -35,12 +20,6 @@ ICuratedTileCollectionInternal : utctc::ICuratedTileCollection
     virtual HRESULT STDMETHODCALLTYPE ResurrectTile(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> transformerTile, const GUID& tileId) = 0;
     virtual HRESULT STDMETHODCALLTYPE OnTileAddedWithinCollection(ut::IUnifiedTileIdentifier* identifier) = 0;
     virtual HRESULT STDMETHODCALLTYPE OnTileRemovedWithinCollection(ut::IUnifiedTileIdentifier* identifier) = 0;
-};
-
-enum UnparentItemOptions
-{
-    UnparentItemOptions_0,
-    UnparentItemOptions_1,
 };
 
 enum CuratedTileCollectionOptionsInternal
@@ -130,19 +109,5 @@ protected:
     UINT64 _userContextToken;
     bool _bInstallPlaceholderTilesOnNextCommit;
     bool _bCommitOnDestroy;
-};
-
-MIDL_INTERFACE("ebb3adda-cd0c-4d14-a198-6fb7dcd692e2")
-ICuratedTilePrivate : utctc::ICuratedTile
-{
-    virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> STDMETHODCALLTYPE GetTransformerData() = 0;
-};
-
-MIDL_INTERFACE("6f3e1834-00c0-4e8b-8834-89da30e185e9")
-ICuratedTileGroupPrivate : utctc::ICuratedTileGroup
-{
-    virtual HRESULT STDMETHODCALLTYPE AddTile(ICuratedTilePrivate*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddGroup(ICuratedTileGroupPrivate*) = 0;
-    virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup> STDMETHODCALLTYPE GetTransformerData() = 0;
 };
 }

@@ -1168,14 +1168,6 @@ class CuratedTileCollection /*final*/
 {
 };
 
-class CuratedTile /*final*/
-    : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::WinRt>
-        , ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile
-    >
-{
-    std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> _transformerTile;
-};
-
 enum StartCollectionUpdateOptions
 {
     StartCollectionUpdateOptions_None = 0,
@@ -1183,7 +1175,7 @@ enum StartCollectionUpdateOptions
 };
 
 MIDL_INTERFACE("cfc51442-aa2d-418b-9a43-98bdbd743347")
-IStartTileCollectionUpdater : IUnknown
+IStartTileCollectionUpdater : IInspectable
 {
     virtual HRESULT STDMETHODCALLTYPE CheckForUpdateWithOptions(StartCollectionUpdateOptions) = 0;
 };
@@ -1216,6 +1208,16 @@ ICuratedTilePrivate : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileColle
     virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile>* STDMETHODCALLTYPE GetTransformerData(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile>* retstr) = 0;
 };
 
+class CuratedTile /*final*/
+    : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::WinRt>
+        , Microsoft::WRL::FtmBase
+        , ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile
+        , ICuratedTilePrivate
+    >
+{
+    std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> _transformerTile;
+};
+
 /*MIDL_INTERFACE("6f3e1834-00c0-4e8b-8834-89da30e185e9")
 ICuratedTileGroupPrivate : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup
 {
@@ -1230,6 +1232,19 @@ ICuratedTileGroupPrivate : ABI::WindowsInternal::Shell::UnifiedTile::CuratedTile
     virtual HRESULT STDMETHODCALLTYPE AddTile(ICuratedTilePrivate*) = 0;
     virtual HRESULT STDMETHODCALLTYPE AddGroup(ICuratedTileGroupPrivate*) = 0;
     virtual std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>* STDMETHODCALLTYPE GetTransformerData(std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup>* retstr) = 0;
+};
+
+class CuratedTileGroup final
+    : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::WinRt>
+        , Microsoft::WRL::FtmBase
+        , ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTileGroup
+        , ICuratedTileGroupPrivate
+    >
+{
+    std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedGroup> _transformerGroup;
+    std::unordered_map<GUID, wil::com_ptr<ICuratedTileGroup>, hashGUIDCuratedTileCollections> _groups;
+    std::unordered_map<GUID, wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile>, hashGUIDCuratedTileCollections> _tiles;
+    wil::com_ptr<IWeakReference> _collectionWeak;
 };
 
 wil::com_ptr<ICuratedTilePrivate>;

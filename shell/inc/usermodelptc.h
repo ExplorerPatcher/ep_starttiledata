@@ -6,6 +6,21 @@
 #include "ConstrainedImpersonationUtil.h"
 #include "UserModelTokenHelpers.h"
 
+EXTERN_C_START
+
+ROAPI
+_Check_return_
+HRESULT
+WINAPI
+RoGetActivationFactoryAsUser(
+    _In_ HSTRING activatableClassId,
+    _In_ UINT64 userContext,
+    _In_ REFIID iid,
+    _COM_Outptr_ void** factory
+    );
+
+EXTERN_C_END
+
 namespace Windows::Foundation
 {
 template <typename T>
