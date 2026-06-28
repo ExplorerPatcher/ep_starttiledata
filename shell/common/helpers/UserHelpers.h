@@ -5,6 +5,8 @@
 
 #include <wil/token_helpers.h>
 
+#include "usermgr.h"
+
 inline BOOL IsUMgrGetImpersonationTokenForContextPresent()
 {
     return TRUE; // Don't care
@@ -28,7 +30,7 @@ inline UINT64 GetUserContextToken(ABI::Windows::System::IUser* user)
     {
         if (IsUMgrGetImpersonationTokenForContextPresent())
         {
-            THROW_HR(UMgrQueryUserContext(0, &userContextToken)); // 66
+            THROW_HR(UMgrQueryUserContext(nullptr, &userContextToken)); // 66
         }
         else
         {

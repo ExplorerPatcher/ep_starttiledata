@@ -2,6 +2,8 @@
 
 #include "CuratedTileCollection.h"
 
+#include "CuratedTile.h"
+#include "CuratedTileGroup.h"
 #include "InternalAsync.h"
 #include "TileCollectionInitializers.h"
 #include "windowscollections.h"

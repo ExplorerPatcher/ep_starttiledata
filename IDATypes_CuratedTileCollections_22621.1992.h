@@ -412,13 +412,13 @@ public:
     virtual SIZE* GetSize(SIZE* retstr) = 0;
     virtual wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier>* GetTileIdentifier(wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier>* retstr) = 0;
     virtual void SetTileIdentifier(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier*) = 0;
-    virtual std::wstring GetCustomProperty(const std::wstring&) = 0;
+    virtual std::wstring* GetCustomProperty(std::wstring* retstr, const std::wstring&) = 0;
     virtual bool HasCustomProperty(const std::wstring&) = 0;
     virtual void RemoveCustomProperty(const std::wstring&) = 0;
     virtual void SetCustomProperty(const std::wstring&, const std::wstring&) = 0;
     virtual std::shared_ptr<CloudUtil::CloudItemObserverCallback<CuratedTileChangeInfo>>* AddObserver(std::shared_ptr<CloudUtil::CloudItemObserverCallback<CuratedTileChangeInfo>>* retstr, const std::function<void (const CuratedTileChangeInfo&)>&) = 0;
     virtual bool IsDefaultData() = 0;
-    virtual std::wstring GetJSONBlob(UINT) = 0;
+    virtual std::wstring* GetJSONBlob(std::wstring* retstr, UINT) = 0;
 };
 
 class CuratedTile
@@ -1166,6 +1166,14 @@ class CuratedTileCollection /*final*/
         , CuratedTileCollectionBase
     >
 {
+};
+
+class CuratedTile /*final*/
+    : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::WinRt>
+        , ABI::WindowsInternal::Shell::UnifiedTile::CuratedTileCollections::ICuratedTile
+    >
+{
+    std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedTile> _transformerTile;
 };
 
 enum StartCollectionUpdateOptions

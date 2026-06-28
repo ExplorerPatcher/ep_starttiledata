@@ -2,9 +2,12 @@
 
 #include "StartTileCollection.h"
 
+#include "CallerIdentity.h"
+#include "CuratedTileGroup.h"
 #include "TileCollectionInitializers.h"
 #include "usermodelptc.h"
 #include "../../../inc/SecondaryTileHelpers.h"
+#include "../../../inc/TileNotificationHelpers.h"
 #include "../../../../common/helpers/UserHelpers.h"
 
 #if !NUKE_SHAREDSTARTLAYOUT
@@ -18,6 +21,10 @@ namespace wrlw = Microsoft::WRL::Wrappers;
 
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
+typedef std::shared_ptr<BaseTileCollectionInitializer> (*Create_StartTileGridCollectionInitializer_t)(ABI::Windows::System::IUser*);
+EXTERN_C __declspec(dllexport) Create_StartTileGridCollectionInitializer_t g_pfnCreate_StartTileGridCollectionInitializer;
+#define Create_StartTileGridCollectionInitializer g_pfnCreate_StartTileGridCollectionInitializer
+
 StartTileCollection::StartTileCollection()
 {
 }
@@ -864,4 +871,14 @@ void StartTileCollection::UnpinFromStartInternal(utctc::ICuratedTile* const tile
         THROW_IF_FAILED(userPinBrokerStatics->ReleaseUserPinnedShortcutReference(identifier.get())); // 1013
     }
 }
+
+wil::com_ptr<utctc::ICuratedTileCollection> __declspec(dllexport) Create_StartTileGridCollection(
+    CuratedTileCollectionOptionsInternal options, ABI::Windows::System::IUser* user)
+{
+    wil::com_ptr<utctc::ICuratedTileCollection> instance;
+    THROW_IF_FAILED(Microsoft::WRL::MakeAndInitialize<StartTileCollection>(&instance, options, user)); // 1020
+    return instance;
+}
+
+#undef Create_StartTileGridCollectionInitializer
 }
