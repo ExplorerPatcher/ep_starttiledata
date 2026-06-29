@@ -150,7 +150,7 @@ class CuratedGroup
 {
 public:
     CuratedGroup(std::shared_ptr<ICuratedGroupImpl> impl)
-        : _impl(std::move(impl)) // TODO Check disasm
+        : _impl(impl)
     {
     }
 
@@ -258,7 +258,7 @@ class CuratedRoot
 {
 public:
     CuratedRoot(std::shared_ptr<ICuratedRootImpl> impl)
-        : _impl(std::move(impl)) // TODO Check disasm
+        : _impl(impl)
     {
     }
 
@@ -421,7 +421,7 @@ public:
     bool GetShowNameOnWide310x150Logo();
     std::shared_ptr<const std::wstring> GetSkuId();
     std::shared_ptr<const std::wstring> GetStoreCampaignId();
-    wil::com_ptr_t<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier> GetTileIdentifier();
+    wil::com_ptr<ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier> GetTileIdentifier();
     UINT64 GetVisualsChangedHash();
     bool HasCollectionReference(const WCHAR*);
     bool HasPrimaryCollectionReference();
@@ -522,7 +522,7 @@ Internal::IPlaceholderTileTransformerInternal : IPlaceholderTileTransformer
 {
     virtual void STDMETHODCALLTYPE OnItemUpdated(const WCHAR*, const Windows::Data::PlaceholderTileLocal&) = 0;
     virtual void STDMETHODCALLTYPE OnItemUpdated(const WCHAR*, const Windows::Data::PlaceholderTile&) = 0;
-    virtual wil::com_ptr_t<ABI::Windows::System::IUser> STDMETHODCALLTYPE GetUser() = 0;
+    virtual wil::com_ptr<ABI::Windows::System::IUser> STDMETHODCALLTYPE GetUser() = 0;
     virtual HRESULT STDMETHODCALLTYPE InstallApp(const std::shared_ptr<PlaceholderTile>&, HSTRING, UINT, ABI::Windows::Foundation::Collections::IPropertySet*, StartPlaceHolderTelemetry::PlaceholderTileActivated&) = 0;
     virtual HRESULT STDMETHODCALLTYPE CancelAppInstall(const std::shared_ptr<PlaceholderTile>&, HSTRING) = 0;
     virtual bool STDMETHODCALLTYPE IsAppInstalling(const std::shared_ptr<PlaceholderTile>&) = 0;

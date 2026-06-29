@@ -14,7 +14,7 @@ struct CollectionContext
     wil::com_ptr<ABI::Windows::System::IUser> _user;
     wil::com_ptr<IUnknown> field_8; ///< wil::com_ptr<???>
     uint32_t field_10;
-    wil::com_ptr<IUnknown> field_18; ///< wil::com_ptr<???>
+    wil::com_ptr<interface IStartLayoutTileInitializationHandler> _userPinnedAppResolverTileInitializationHandler;
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedRoot> _transformerRoot;
     wil::com_ptr<IUnknown> field_30; ///< wil::com_ptr<???>
 };

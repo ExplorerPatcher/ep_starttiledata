@@ -297,7 +297,7 @@ HRESULT CuratedTileGroup::AddTile(ICuratedTilePrivate* tile)
     try
     {
         _transformerGroup->AddTile(tile->GetTransformerData());
-        _tiles[tile->GetTransformerData()->GetLayoutId()] = wil::com_query<utctc::ICuratedTile>(tile); // TODO Check disasm, com_query should be done first before GetLayoutId()
+        _tiles[tile->GetTransformerData()->GetLayoutId()] = wil::com_query<utctc::ICuratedTile>(tile);
         return S_OK;
     } CATCH_RETURN() // 327
 }
@@ -307,7 +307,7 @@ HRESULT CuratedTileGroup::AddGroup(ICuratedTileGroupPrivate* group)
     try
     {
         _transformerGroup->AddGroup(group->GetTransformerData());
-        _groups[group->GetTransformerData()->GetLayoutId()] = wil::com_query<utctc::ICuratedTileGroup>(group); // TODO Check disasm, com_query should be done first before GetLayoutId()
+        _groups[group->GetTransformerData()->GetLayoutId()] = wil::com_query<utctc::ICuratedTileGroup>(group);
         return S_OK;
     } CATCH_RETURN() // 327
 }

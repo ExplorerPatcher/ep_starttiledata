@@ -1,0 +1,5 @@
+LIBRARY SHCORE.dll
+EXPORTS
+    SHTaskPoolAllowThreadReuse ;argsize=0
+    SHTaskPoolGetUniqueContext ;argsize=0
+    SHTaskPoolQueueTask        ;argsize=24

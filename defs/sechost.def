@@ -1,0 +1,3 @@
+LIBRARY sechost.dll
+EXPORTS
+    CapabilityCheck ;argsize=12

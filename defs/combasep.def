@@ -1,0 +1,4 @@
+LIBRARY combase.dll
+EXPORTS
+    RoGetActivationFactoryAsUser @148 NONAME ;argsize=20
+    CoCreateInstanceAsUser       @154 NONAME ;argsize=28

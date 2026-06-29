@@ -794,7 +794,7 @@ Internal::IPlaceholderTileTransformerInternal : IPlaceholderTileTransformer
 {
     virtual void STDMETHODCALLTYPE OnItemUpdated(const WCHAR*, const Windows::Data::PlaceholderTileLocal&) = 0;
     virtual void STDMETHODCALLTYPE OnItemUpdated(const WCHAR*, const Windows::Data::PlaceholderTile&) = 0;
-    // virtual wil::com_ptr_t<ABI::Windows::System::IUser> STDMETHODCALLTYPE GetUser() = 0;
+    // virtual wil::com_ptr<ABI::Windows::System::IUser> STDMETHODCALLTYPE GetUser() = 0;
     virtual HRESULT STDMETHODCALLTYPE InstallApp(const std::shared_ptr<PlaceholderTile>&, HSTRING, UINT, ABI::Windows::Foundation::Collections::IPropertySet*, StartPlaceHolderTelemetry::PlaceholderTileActivated&) = 0;
     virtual HRESULT STDMETHODCALLTYPE CancelAppInstall(const std::shared_ptr<PlaceholderTile>&, HSTRING) = 0;
     virtual bool STDMETHODCALLTYPE IsAppInstalling(const std::shared_ptr<PlaceholderTile>&) = 0;
@@ -805,7 +805,7 @@ Internal::IPlaceholderTileTransformerInternal : IPlaceholderTileTransformer
 {
     virtual void STDMETHODCALLTYPE OnItemUpdated(const WCHAR*, const Windows::Data::PlaceholderTileLocal&) = 0;
     virtual void STDMETHODCALLTYPE OnItemUpdated(const WCHAR*, const Windows::Data::PlaceholderTile&) = 0;
-    virtual wil::com_ptr_t<ABI::Windows::System::IUser>* STDMETHODCALLTYPE GetUser(wil::com_ptr_t<ABI::Windows::System::IUser>* retstr) = 0;
+    virtual wil::com_ptr<ABI::Windows::System::IUser>* STDMETHODCALLTYPE GetUser(wil::com_ptr<ABI::Windows::System::IUser>* retstr) = 0;
     virtual HRESULT STDMETHODCALLTYPE InstallApp(const std::shared_ptr<PlaceholderTile>&, HSTRING, UINT, ABI::Windows::Foundation::Collections::IPropertySet*, StartPlaceHolderTelemetry::PlaceholderTileActivated&) = 0;
     virtual HRESULT STDMETHODCALLTYPE CancelAppInstall(const std::shared_ptr<PlaceholderTile>&, HSTRING) = 0;
     virtual bool STDMETHODCALLTYPE IsAppInstalling(const std::shared_ptr<PlaceholderTile>&) = 0;
@@ -994,17 +994,31 @@ std::function<bool (const std::shared_ptr<LayoutTile>&)>;
 
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
+MIDL_INTERFACE("dfdbd59d-7e05-41e6-8820-6777608d561f")
+IStartLayoutTileInitializationHandler : IUnknown
+{
+    virtual bool STDMETHODCALLTYPE CanInitializeTile(std::shared_ptr<Internal::LayoutTile> tile) = 0;
+    virtual void STDMETHODCALLTYPE InitializeTile(std::shared_ptr<Internal::LayoutTile> tile) = 0;
+    virtual void STDMETHODCALLTYPE UninitializeTile(std::shared_ptr<Internal::LayoutTile> tile) = 0;
+};
+
 struct CollectionContext
 {
     wil::com_ptr<ABI::Windows::System::IUser> _user;
     void* field_8; ///< wil::com_ptr<???>
     uint32_t field_10;
-    void* field_18; ///< wil::com_ptr<???>
+    wil::com_ptr<IStartLayoutTileInitializationHandler> _userPinnedAppResolverTileInitializationHandler;
     std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedRoot> _transformerRoot;
     void* field_30; ///< wil::com_ptr<???>
 };
 
-class TileInitializationHandlerManager;
+class TileInitializationHandlerManager
+{
+    std::vector<wil::com_ptr<IStartLayoutTileInitializationHandler>> _knownHandlers;
+    std::shared_ptr<CollectionContext> _context;
+};
+
+std::shared_ptr<TileInitializationHandlerManager>; std::_Ref_count_obj2<TileInitializationHandlerManager>;
 
 /*MIDL_INTERFACE("8fea4543-90d5-4ebd-9831-64b31f83e85d")
 ICollectionWriter : IUnknown

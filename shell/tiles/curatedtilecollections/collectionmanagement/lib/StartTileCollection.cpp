@@ -485,7 +485,7 @@ wil::com_ptr<utctc::ICuratedTileGroup> StartTileCollection::FindTargetGroup(bool
     if (targetGroup == nullptr)
     {
         wf::Point endmostLocation = { -1.0f, -1.0f };
-        for (const std::pair<const GUID, wil::com_ptr_t<utctc::ICuratedTileGroup>>& pair : _groups)
+        for (const std::pair<const GUID, wil::com_ptr<utctc::ICuratedTileGroup>>& pair : _groups)
         {
             wf::Point location;
             THROW_IF_FAILED(pair.second->get_Location(&location)); // 594
@@ -571,7 +571,7 @@ wil::com_ptr<IItemLayoutResolver> StartTileCollection::CreateLayoutResolverForCu
     THROW_IF_FAILED(collectionLayoutResolver->SetMaxCellBounds(_transformerRoot->GetGroupColumnCount(), -1)); // 682
     THROW_IF_FAILED(collectionLayoutResolver->SetContainerMargins({ 0, 1, 0, 0 })); // 683
 
-    for (const std::pair<const GUID, wil::com_ptr_t<utctc::ICuratedTileGroup>>& pair : _groups)
+    for (const std::pair<const GUID, wil::com_ptr<utctc::ICuratedTileGroup>>& pair : _groups)
     {
         wil::com_ptr_nothrow<IItemLayoutResolver> groupLayoutResolver = CreateLayoutResolverForGroup(pair.second.get()); // @Note: There's a temporary here
 

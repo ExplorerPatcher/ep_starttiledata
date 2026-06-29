@@ -2,6 +2,7 @@
 
 #include "CDSStartCollectionWriter.h"
 
+#include "TileInitializationHandlerManager.h"
 #include "TransformerHelpers.h"
 
 #if !NUKE_SHAREDSTARTLAYOUT
@@ -445,7 +446,7 @@ void CDSStartCollectionWriter::WriteStartTile(
 
     if (_tileInitializationHandlerManager != nullptr)
     {
-        // _tileInitializationHandlerManager->InitializeTile(tile); // TODO Implement
+        _tileInitializationHandlerManager->InitializeTile(tile);
     }
 
     std::shared_ptr<CuratedTile> transformerTile = transformerGroup->CreateTile(tile->GetTileIdentifier().get());

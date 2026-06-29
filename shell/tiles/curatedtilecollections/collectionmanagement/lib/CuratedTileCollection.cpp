@@ -900,7 +900,7 @@ HRESULT CuratedTileCollectionBase::CommitAsyncInternal(std::function<void()>&& c
             }
         );
 
-        _batchCookie = nullptr; // TODO Check disasm, could it be = nullptr or .reset() ?
+        _batchCookie = nullptr;
     }
     else
     {

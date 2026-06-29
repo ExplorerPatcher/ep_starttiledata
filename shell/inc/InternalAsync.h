@@ -129,7 +129,7 @@ namespace Windows::Internal
 	interface IComPoolTask;
 }
 
-extern "C" inline HRESULT (WINAPI *SHTaskPoolQueueTask)(
+/*extern "C" inline HRESULT (WINAPI *SHTaskPoolQueueTask)(
 	Windows::Internal::TaskApartment apartment,
 	Windows::Internal::TaskOptions options,
 	DWORD context,
@@ -140,7 +140,24 @@ extern "C" inline HRESULT (WINAPI *SHTaskPoolQueueTask)(
 
 extern "C" inline DWORD (WINAPI *SHTaskPoolGetUniqueContext)() = nullptr;
 
-extern "C" inline void (WINAPI *SHTaskPoolAllowThreadReuse)() = nullptr;
+extern "C" inline void (WINAPI *SHTaskPoolAllowThreadReuse)() = nullptr;*/
+
+EXTERN_C_START
+
+STDAPI SHTaskPoolQueueTask(
+	Windows::Internal::TaskApartment apartment,
+	Windows::Internal::TaskOptions options,
+	DWORD context,
+	DWORD startDelayInMs,
+	Windows::Internal::IComPoolTask* task,
+	IUnknown** delayedTask
+);
+
+STDAPI_(DWORD) SHTaskPoolGetUniqueContext();
+
+STDAPI_(void) SHTaskPoolAllowThreadReuse();
+
+EXTERN_C_END
 
 namespace Windows::Internal
 {
