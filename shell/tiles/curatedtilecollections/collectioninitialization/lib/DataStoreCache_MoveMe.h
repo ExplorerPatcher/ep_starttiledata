@@ -338,6 +338,15 @@ ICuratedTileCollectionTransformer : IInspectable
 void CreateCuratedTileCollectionTransformer(
     ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileManager* pUnifiedTileManager,
     ABI::Windows::System::IUser* pUser, ICuratedTileCollectionTransformer** ppTransformer);
+
+class CollectionDoesNotExistException : public wil::ResultException
+{
+public:
+    CollectionDoesNotExistException()
+        : ResultException(E_NOT_SET)
+    {
+    }
+};
 }
 
 namespace DataStoreCache

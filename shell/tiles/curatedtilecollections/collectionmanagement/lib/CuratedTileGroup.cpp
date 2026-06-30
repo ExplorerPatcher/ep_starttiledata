@@ -11,12 +11,15 @@ namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 HRESULT CuratedTileGroup::RuntimeClassInitialize(
     std::shared_ptr<dsct::CuratedGroup> transformerGroup, utctc::ICuratedTileCollection* collection)
 {
-    _collectionWeak = wil::com_weak_query(collection);
-    _transformerGroup = transformerGroup;
+    try
+    {
+        _collectionWeak = wil::com_weak_query(collection);
+        _transformerGroup = transformerGroup;
 
-    PopulateFromTransformerData();
+        PopulateFromTransformerData();
 
-    return S_OK;
+        return S_OK;
+    } CATCH_RETURN() // 27
 }
 
 HRESULT CuratedTileGroup::get_UniqueId(GUID* value)
@@ -117,16 +120,19 @@ HRESULT CuratedTileGroup::GetGroups(wfc::IMapView<GUID, ICuratedTileGroup*>** re
 {
     *result = nullptr;
 
-    wil::com_ptr<Windows::Foundation::Collections::Internal::HashMap<GUID, ICuratedTileGroup*>> groups;
-    Windows::Foundation::Collections::Internal::HashMap<GUID, ICuratedTileGroup*>::Make(&groups);
-
-    for (const std::pair<const GUID, wil::com_ptr<ICuratedTileGroup>>& pair : _groups)
+    try
     {
-        boolean bReplaced;
-        RETURN_IF_FAILED(groups->Insert(pair.first, pair.second.get(), &bReplaced)); // 126
-    }
+        wil::com_ptr<Windows::Foundation::Collections::Internal::HashMap<GUID, ICuratedTileGroup*>> groups;
+        Windows::Foundation::Collections::Internal::HashMap<GUID, ICuratedTileGroup*>::Make(&groups);
 
-    RETURN_HR(groups->GetView(result)); // 128
+        for (const std::pair<const GUID, wil::com_ptr<ICuratedTileGroup>>& pair : _groups)
+        {
+            boolean bReplaced;
+            RETURN_IF_FAILED(groups->Insert(pair.first, pair.second.get(), &bReplaced)); // 126
+        }
+
+        RETURN_HR(groups->GetView(result)); // 128
+    } CATCH_RETURN() // 129
 }
 
 HRESULT CuratedTileGroup::GetTiles(wfc::IMapView<GUID, utctc::ICuratedTile*>** result)
@@ -309,7 +315,7 @@ HRESULT CuratedTileGroup::AddGroup(ICuratedTileGroupPrivate* group)
         _transformerGroup->AddGroup(group->GetTransformerData());
         _groups[group->GetTransformerData()->GetLayoutId()] = wil::com_query<utctc::ICuratedTileGroup>(group);
         return S_OK;
-    } CATCH_RETURN() // 327
+    } CATCH_RETURN() // 335
 }
 
 std::shared_ptr<dsct::CuratedGroup> CuratedTileGroup::GetTransformerData()

@@ -38,7 +38,7 @@ HRESULT GetActivationFactoryAsUser(HSTRING activatableClassId, ABI::Windows::Sys
         wil::unique_hlocal tokenUser;
         RETURN_IF_FAILED(GetTokenInformationHelper(impersonationHandle.get(), TokenUser, &tokenUser)); // 84
 
-        RETURN_IF_FAILED(AddUserToProcessObject(tokenUser.get())); // 87
+        RETURN_IF_FAILED(AddUserToProcessObject(static_cast<TOKEN_USER*>(tokenUser.get())->User.Sid)); // 87
 
         Microsoft::WRL::ComPtr<ABI::Windows::System::Internal::ISignInStateManager> signinMgr;
         RETURN_IF_FAILED(GetActivationFactory(

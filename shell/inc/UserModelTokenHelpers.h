@@ -115,7 +115,7 @@ EXTERN_C_END
 inline HRESULT GetTokenInformationHelper(HANDLE token, TOKEN_INFORMATION_CLASS infoClass, void** tokenInfo)
 {
     DWORD byteCount;
-    RETURN_HR_IF(E_UNEXPECTED, GetTokenInformation(token, TokenUser, nullptr, 0, &byteCount)); // 30
+    RETURN_HR_IF(E_UNEXPECTED, GetTokenInformation(token, infoClass, nullptr, 0, &byteCount)); // 30
 
     DWORD lastError = GetLastError();
     if (lastError == ERROR_INSUFFICIENT_BUFFER)

@@ -51,10 +51,22 @@ HRESULT StartTileCollection::RuntimeClassInitialize(CuratedTileCollectionOptions
     }*/ // @MOD Disable this
 
     CreateCuratedTileCollectionTransformer(nullptr, _user.get(), &_transformer);
-    _transformerRoot = _transformer->GetCuratedTileCollectionRoot(
-        L"Start.TileGrid", dsct::CuratedTileCollectionTransformerOptions_0);
 
-    PopulateFromTransformerData();
+    try
+    {
+        _transformerRoot = _transformer->GetCuratedTileCollectionRoot(
+           L"Start.TileGrid", dsct::CuratedTileCollectionTransformerOptions_0);
+    }
+    catch (dsct::CollectionDoesNotExistException)
+    {
+        return E_INVALIDARG;
+    } CATCH_RETURN() // 139
+
+    try
+    {
+        PopulateFromTransformerData();
+    } CATCH_RETURN() // 145
+
     BeginBatchIfNecessary();
 
     return S_OK;

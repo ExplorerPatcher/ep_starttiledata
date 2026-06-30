@@ -885,18 +885,22 @@ HRESULT CuratedTileCollectionBase::CommitAsyncInternal(std::function<void()>&& c
             ComTaskPoolHandler(TaskApartment::MTA, TaskOptions::SyncNesting), outAction, BaseTrust,
             [user, task, bInstallPlaceholderTiles, callback = std::move(callback)](CNoResult&) -> HRESULT
             {
-                (void)task.wait();
-
-                if (bInstallPlaceholderTiles)
+                try
                 {
-                    PlaceholderTileWnf data;
-                    data.operation = 1;
-                    data.userContextToken = UserHelpers::GetUserContextToken(user.get());
-                    RtlPublishWnfStateData(WNF_SHEL_INSTALL_PLACEHOLDER_TILES, nullptr, &data, sizeof(data), nullptr);
-                }
+                    (void)task.wait();
 
-                callback();
-                return S_OK;
+                    if (bInstallPlaceholderTiles)
+                    {
+                        PlaceholderTileWnf data;
+                        data.operation = 1;
+                        data.userContextToken = UserHelpers::GetUserContextToken(user.get());
+                        RtlPublishWnfStateData(WNF_SHEL_INSTALL_PLACEHOLDER_TILES, nullptr, &data, sizeof(data), nullptr);
+                    }
+
+                    if (callback != nullptr)
+                        callback();
+                    return S_OK;
+                } CATCH_RETURN() // 848
             }
         );
 
@@ -909,7 +913,8 @@ HRESULT CuratedTileCollectionBase::CommitAsyncInternal(std::function<void()>&& c
             outAction, BaseTrust,
             [callback = std::move(callback)](CNoResult&) -> HRESULT
             {
-                callback();
+                if (callback != nullptr)
+                    callback();
                 return S_OK;
             }
         );

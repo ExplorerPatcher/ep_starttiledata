@@ -77,7 +77,7 @@ namespace WindowsInternal.Shell.CDSProperties
     };
 
     [version(1)]
-    [interface_name("ICDSRoamedTileProperties", 84dabb6f-6903-4f45-b2cc-30d23eb63ca9)]
+    [interface_name("ICDSRoamedTileProperties", 08f05079-9cdc-4a9f-a4ae-8a8661ecc402)]
     runtimeclass CDSRoamedTileProperties : ICDSTilePropertiesItem
     {
         Windows.Foundation.DateTime FirstSeenTime { get; set; };
