@@ -10,8 +10,6 @@
 #include "../../../sharedstartlayout/lib/ItemLayoutResolver.h"
 #endif
 
-CommonStartTelemetry::LogAllTilesActivity_Dtor_t CommonStartTelemetry::g_pfnLogAllTilesActivity_Dtor;
-
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
 CDSStartCollectionWriter::CDSStartCollectionWriter()

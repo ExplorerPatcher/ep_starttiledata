@@ -7,6 +7,7 @@
 #include "InternalAsync.h"
 #include "TileCollectionInitializers.h"
 #include "windowscollections.h"
+#include "../../../inc/ExternalFunctions.h"
 #include "../../../../common/helpers/UserHelpers.h"
 
 typedef struct _WNF_STATE_NAME
@@ -157,7 +158,7 @@ void FindCollectionParentOfTile(GUID tileId, T instance, IInspectable** outColle
 
             wil::com_ptr<utctc::ICuratedTileGroup> groupOther;
             THROW_IF_FAILED(groupCurrent2->get_Value(&groupOther)); // 129
-            FindCollectionParentOfGroup(tileId, groupOther.get(), outCollectionParent);
+            FindCollectionParentOfTile(tileId, groupOther.get(), outCollectionParent);
             if (*outCollectionParent != nullptr)
             {
                 break;
@@ -621,7 +622,7 @@ HRESULT CuratedTileCollectionBase::CommitAsyncWithTimerBypass(wf::IAsyncAction**
         {
             try
             {
-                (void)inner().wait();
+                (void)WaitTask(inner());
             } CATCH_LOG() // 613
         })); // 613
 
@@ -887,7 +888,7 @@ HRESULT CuratedTileCollectionBase::CommitAsyncInternal(std::function<void()>&& c
             {
                 try
                 {
-                    (void)task.wait();
+                    (void)WaitTask(task);
 
                     if (bInstallPlaceholderTiles)
                     {
@@ -1016,7 +1017,7 @@ bool CuratedTileCollectionBase::TryFindTileAndParentGroupInGroup(
                 foundGroup = group;
             }
 
-            return bEqual != 0;
+            return !bEqual;
         }
     );
 

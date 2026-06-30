@@ -2,14 +2,12 @@
 
 #include "DataStoreCache_MoveMe.h"
 #include "InitializationPipelineObjectModel.h"
+#include "../../../inc/ExternalFunctions.h"
 
 interface IItemLayoutResolver;
 
 namespace CommonStartTelemetry
 {
-typedef void (__thiscall *LogAllTilesActivity_Dtor_t)(class LogAllTilesActivity* _this);
-EXTERN_C __declspec(dllexport) LogAllTilesActivity_Dtor_t g_pfnLogAllTilesActivity_Dtor;
-
 class LogAllTilesActivity
 {
 public:

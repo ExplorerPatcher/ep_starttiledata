@@ -83,7 +83,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <PreprocessorDefinitions>WIN32;EPSTARTTILEDATA_EXPORTS;_WINDOWS;_USRDLL;__WRL_CONFIGURATION_LEGACY__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;EPSTARTTILEDATA_EXPORTS;_WINDOWS;_USRDLL;__WRL_CONFIGURATION_LEGACY__;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
         $(ProjectDir)shell\inc;
         $(ProjectDir)idl\obj\$(Configuration)\$(Platform)\Generated Files;
@@ -123,6 +123,7 @@
     <ClInclude Include="shell\common\helpers\UserHelpers.h" />
     <ClInclude Include="shell\tiles\curatedtilecollections\collectioninitialization\lib\**\*.h" />
     <ClInclude Include="shell\tiles\curatedtilecollections\collectionmanagement\lib\**\*.h" />
+    <ClInclude Include="shell\tiles\inc\ExternalFunctions.h" />
     <ClInclude Include="shell\tiles\inc\SecondaryTileHelpers.h" />
     <ClInclude Include="shell\tiles\inc\TileNotificationHelpers.h" />
     <ClInclude Include="shell\tiles\sharedmodel\lib\**\*.h" />

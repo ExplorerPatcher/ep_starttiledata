@@ -7,6 +7,7 @@
 #include "CuratedTileGroup.h"
 #include "TileCollectionInitializers.h"
 #include "usermodelptc.h"
+#include "../../../inc/ExternalFunctions.h"
 #include "../../../inc/SecondaryTileHelpers.h"
 #include "../../../inc/TileNotificationHelpers.h"
 #include "../../../../common/helpers/UserHelpers.h"
@@ -22,8 +23,6 @@ namespace wrlw = Microsoft::WRL::Wrappers;
 
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
-typedef std::shared_ptr<BaseTileCollectionInitializer> (*Create_StartTileGridCollectionInitializer_t)(ABI::Windows::System::IUser*);
-EXTERN_C __declspec(dllexport) Create_StartTileGridCollectionInitializer_t g_pfnCreate_StartTileGridCollectionInitializer = nullptr;
 #define Create_StartTileGridCollectionInitializer g_pfnCreate_StartTileGridCollectionInitializer
 
 StartTileCollection::StartTileCollection()
@@ -127,7 +126,7 @@ HRESULT StartTileCollection::ResetToDefaultAsync(wf::IAsyncAction** outResult)
 
     if (_batchCookie != nullptr)
     {
-        (void)_transformerRoot->EndBatchUpdate(_batchCookie).wait();
+        (void)WaitTask(_transformerRoot->EndBatchUpdate(_batchCookie));
         _batchCookie = nullptr;
     }
 

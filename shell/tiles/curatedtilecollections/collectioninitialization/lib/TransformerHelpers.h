@@ -3,6 +3,7 @@
 #include "DataStoreCache_MoveMe.h"
 #include "InitializationPipelineObjectModel.h"
 #include "InternalAsync.h"
+#include "../../../inc/ExternalFunctions.h"
 
 namespace WindowsInternal::Shell::UnifiedTile::CuratedTileCollections
 {
@@ -66,7 +67,7 @@ public:
             ComTaskPoolHandler(TaskApartment::Calling, TaskOptions::None), result, BaseTrust,
             [task](CNoResult&) -> HRESULT
             {
-                (void)task.wait();
+                (void)WaitTask(task);
                 return S_OK;
             })
         ); // 62
