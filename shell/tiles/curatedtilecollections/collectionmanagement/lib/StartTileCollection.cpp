@@ -477,8 +477,12 @@ void StartTileCollection::EnsureLayoutFactory()
 {
     if (_layoutFactory == nullptr)
     {
-        THROW_IF_FAILED(CoCreateInstance(
-            __uuidof(StartLayoutFactory), nullptr, CLSCTX_INPROC, IID_PPV_ARGS(&_layoutFactory))); // 569
+        /*THROW_IF_FAILED(CoCreateInstance(
+            __uuidof(StartLayoutFactory), nullptr, CLSCTX_INPROC, IID_PPV_ARGS(&_layoutFactory)));*/ // 569
+
+        wil::com_ptr<IClassFactory> classFactory; // @MOD Initialize our implementation in the same DLL
+        THROW_IF_FAILED(DllGetClassObject(__uuidof(StartLayoutFactory), IID_PPV_ARGS(&classFactory)));
+        THROW_IF_FAILED(classFactory->CreateInstance(nullptr, IID_PPV_ARGS(&_layoutFactory)));
     }
 }
 #endif

@@ -1,10 +1,5 @@
 #include "pch.h"
 
-#include <WRL/Module.h>
-
-#include "GenericTraversalOrder.h"
-#include "ItemLayoutResolver.h"
-#include "TileGridMetricsCalculator.h"
 #include "../../sharedmodel/lib/SharedModelCommon.h"
 
 using namespace Microsoft::WRL;
