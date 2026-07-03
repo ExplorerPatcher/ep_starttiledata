@@ -1045,3 +1045,7 @@ __declspec(dllexport) std::make_shared<
 
 // Verify the mangled name
 __pragma(comment(linker, "/INCLUDE:??$make_shared@VLayoutRootInternal@Internal@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@AEAV?$shared_ptr@UCollectionContext@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@@std@@V?$shared_ptr@VCuratedRoot@CuratedTileCollectionTransformer@DataStoreCache@@@8@@std@@YA?AV?$shared_ptr@VLayoutRootInternal@Internal@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@@0@AEAV?$shared_ptr@UCollectionContext@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@@0@$$QEAV?$shared_ptr@VCuratedRoot@CuratedTileCollectionTransformer@DataStoreCache@@@0@@Z"))
+
+// For hooking inlined std::make_shared<LayoutRootInternal>(context, transformerRoot)
+__pragma(comment(linker, "/EXPORT:??_7?$_Ref_count_obj2@VLayoutRootInternal@Internal@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@@std@@6B@"))
+__pragma(comment(linker, "/EXPORT:??0LayoutRootInternal@Internal@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@QEAA@AEBV?$shared_ptr@UCollectionContext@CuratedTileCollections@UnifiedTile@Shell@WindowsInternal@@@std@@V?$shared_ptr@VCuratedRoot@CuratedTileCollectionTransformer@DataStoreCache@@@7@@Z"))
