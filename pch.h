@@ -31,6 +31,9 @@
 #include <WindowsInternal.Shell.CDSProperties.h>
 #include <WindowsInternal.Shell.UnifiedTile.h>
 
+EXTERN_C IMAGE_DOS_HEADER __ImageBase;
+#define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
+
 #define NUKE_SHAREDSTARTLAYOUT 0
 
 #endif //PCH_H

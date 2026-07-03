@@ -95,7 +95,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>RuntimeObject.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>runtimeobject.lib;ntdll.lib;ShLwApi.Lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>ep_starttiledata.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -140,6 +140,7 @@
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="shell\appresolver\lib\PinToStartContextMenu.cpp" />
     <ClCompile Include="shell\tiles\curatedtilecollections\collectioninitialization\lib\**\*.cpp" />
     <ClCompile Include="shell\tiles\curatedtilecollections\collectionmanagement\lib\**\*.cpp" />
     <ClCompile Include="shell\tiles\dll\*.cpp" />

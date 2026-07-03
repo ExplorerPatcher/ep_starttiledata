@@ -333,8 +333,8 @@ namespace ProcessToken
                                 if (RtlCompareUnicodeString(&attributeNameSYSAPPID, &attribute->Name, TRUE) == 0)
                                 {
                                     *sysAppId = attribute;
-                                    sai = nullptr;
                                     *attributes = sai; // sai.Detach()
+                                    sai = nullptr;
                                     rv = ERROR_SUCCESS;
                                     Free(sai); // Duplicated to remove gotos (while not using AutoPtr)
                                     return rv;
@@ -700,7 +700,7 @@ namespace CallerIdentity
     {
         *phToken = nullptr;
 
-        wil::unique_handle shPrimaryToken;
+        wil::unique_handle shPrimaryToken; // OG uses CAutoHandle<HANDLE>
         HRESULT hr = ResultFromWin32Bool(OpenProcessToken(hProcess, dwExtraTokenAccess, &shPrimaryToken));
         if (SUCCEEDED(hr))
         {
@@ -784,6 +784,27 @@ namespace CallerIdentity
         if (SUCCEEDED(hr))
         {
             hr = IsShellExperienceAppId(spszCallerAppID.get()) ? S_OK : E_ACCESSDENIED;
+        }
+
+        return hr;
+    }
+
+    inline HRESULT IsProcessAppContainer(HANDLE hProcess, bool* pfAppContainer)
+    {
+        *pfAppContainer = false;
+
+        wil::unique_handle shToken; // OG uses CAutoHandle<HANDLE>
+        HRESULT hr = HRESULT_FROM_WIN32(ARI::ProcessToken::SysAppId::OpenTokenForProcess(hProcess, &shToken));
+        if (SUCCEEDED(hr))
+        {
+            BOOL IsAppContainer = FALSE;
+            DWORD cbToken;
+            hr = ResultFromWin32Bool(GetTokenInformation(
+                shToken.get(), TokenIsAppContainer, &IsAppContainer, sizeof(IsAppContainer), &cbToken));
+            if (SUCCEEDED(hr))
+            {
+                *pfAppContainer = IsAppContainer != 0;
+            }
         }
 
         return hr;

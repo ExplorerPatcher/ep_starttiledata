@@ -1,0 +1,3 @@
+LIBRARY SHLWAPI.dll
+EXPORTS
+    SHExpandEnvironmentStringsW @460 NONAME ;argsize=12
