@@ -36,4 +36,3 @@ FORCEINLINE Concurrency::task_status WaitTask(const Concurrency::task<TReturnTyp
 
     return g_pfnConcurrency__details___Task_impl_base___Wait(impl);
 }
-

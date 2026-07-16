@@ -170,7 +170,7 @@ public:
     std::shared_ptr<ICuratedCollectionBatchCookieImpl> BeginBatchUpdate() { return _impl->BeginBatchUpdate(); }
     void AddTile(std::shared_ptr<CuratedTile> a2) { _impl->AddTile(a2); }
     std::shared_ptr<CuratedTile> CreateTile(ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier* a2) { return _impl->CreateTile(a2); }
-    std::shared_ptr<CuratedTile> CreateTile(const GUID&, ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier* a2) { return _impl->CreateTile(a2); }
+    std::shared_ptr<CuratedTile> CreateTile(const GUID& a2, ABI::WindowsInternal::Shell::UnifiedTile::IUnifiedTileIdentifier* a3) { return _impl->CreateTile(a2, a3); }
     std::unordered_map<GUID, std::shared_ptr<CuratedTile>, Util::hashGUID> GetTiles() { return _impl->GetTiles(); }
     void DeleteTile(const GUID& a2) { _impl->DeleteTile(a2); }
     void RemoveTile(const GUID& a2) { _impl->RemoveTile(a2); }
