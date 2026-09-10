@@ -4,81 +4,7 @@
 #include "ICellArrayManager.h"
 #include "ItemLayoutCollapseManager.h"
 #include "ItemLayoutDisplacement.h"
-
-MIDL_INTERFACE("751657ce-45b3-4150-8f86-fda773983ebc")
-IItemLayoutResolverCallback : IUnknown
-{
-    virtual void STDMETHODCALLTYPE ItemBoundsUpdated(const GUID*, const RECT*, const UINT) = 0;
-    virtual void STDMETHODCALLTYPE LayoutBoundsUpdated(const RECT) = 0;
-    virtual void STDMETHODCALLTYPE ItemRemovedPending(REFGUID itemID) = 0;
-    virtual void STDMETHODCALLTYPE ItemRemoved(REFGUID itemID) = 0;
-    virtual void STDMETHODCALLTYPE LastItemRemovedPending() = 0;
-    virtual void STDMETHODCALLTYPE LastItemRemoved() = 0;
-};
-
-interface IItemLayoutResolver;
-
-MIDL_INTERFACE("c20f0b4b-91e4-47a6-a785-c0d735c7b6c6")
-IItemLayoutResolverInternalCallback : IUnknown
-{
-    virtual void STDMETHODCALLTYPE NewItemAddedBegin() = 0;
-    virtual void STDMETHODCALLTYPE NewItemAddedEnd() = 0;
-    virtual void STDMETHODCALLTYPE OnItemsMigrated(IItemLayoutResolver* pDestinationLayoutResolver) = 0;
-};
-
-enum LayoutMigrationType
-{
-    LayoutMigrationType_LandscapeToPortrait = 0x0,
-    LayoutMigrationType_PortraitToLandscape = 0x1,
-    LayoutMigrationType_ColumnChange = 0x2,
-};
-
-typedef struct _LayoutMigrationOptions
-{
-    LayoutMigrationType migrationType;
-    GUID unassignedItemId;
-} LayoutMigrationOptions;
-
-// 14361 - 16299        : b86bf953-828b-4f3d-987b-04a5601b23cf
-// 17134+               : dd5c8f3a-3ca5-4964-a162-192c9b8fd2bc
-MIDL_INTERFACE("dd5c8f3a-3ca5-4964-a162-192c9b8fd2bc")
-IItemLayoutResolver : IUnknown
-{
-    virtual HRESULT STDMETHODCALLTYPE RegisterCallback(IItemLayoutResolverCallback*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE UnregisterCallback(IItemLayoutResolverCallback*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE RegisterInternalCallback(IItemLayoutResolverInternalCallback*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE UnregisterInternalCallback(IItemLayoutResolverInternalCallback*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddNewItem(REFGUID, const SIZE) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddItem(REFGUID, const RECT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE InsertItemUncommitted(REFGUID, const RECT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE ResizeItemUncommitted(REFGUID, const SIZE) = 0;
-    virtual HRESULT STDMETHODCALLTYPE SwapItemsUncommitted(REFGUID, REFGUID) = 0; // @Note: Added in 17134
-    virtual HRESULT STDMETHODCALLTYPE AddNewContainer(REFGUID, IItemLayoutResolver*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddContainer(REFGUID, IItemLayoutResolver*, const POINT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE AddSizedContainer(REFGUID, IItemLayoutResolver*, const RECT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE InsertContainerUncommitted(REFGUID, IItemLayoutResolver*, const POINT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetLayoutResolverForContainer(REFGUID, IItemLayoutResolver**) = 0;
-    virtual BOOL STDMETHODCALLTYPE IsCollapsed() = 0;
-    virtual HRESULT STDMETHODCALLTYPE Collapse() = 0;
-    virtual HRESULT STDMETHODCALLTYPE Expand() = 0;
-    virtual HRESULT STDMETHODCALLTYPE RemoveItemUncommitted(REFGUID) = 0;
-    virtual HRESULT STDMETHODCALLTYPE MoveItemUncommitted(REFGUID, const POINT) = 0;
-    virtual BOOL STDMETHODCALLTYPE IsEmpty() = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetItemByCell(const POINT, GUID*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetLayoutBounds(RECT*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetLayoutBoundsWithoutItem(REFGUID, RECT*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetItemBounds(REFGUID, RECT*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetContainerSizeWithMargins(REFGUID, SIZE*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetLastOccupiedCellInColumn(const long, REFGUID, POINT*, int*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE SetContainerMargins(const RECT) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetContainerMargins(RECT*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE SetMaxCellBounds(const int, const int) = 0;
-    virtual SIZE STDMETHODCALLTYPE GetMaxCellBounds() = 0;
-    virtual HRESULT STDMETHODCALLTYPE MigrateItems(IItemLayoutResolver*, const LayoutMigrationOptions) = 0;
-    virtual HRESULT STDMETHODCALLTYPE CommitChanges() = 0;
-    virtual HRESULT STDMETHODCALLTYPE AbandonChanges() = 0;
-    virtual HRESULT STDMETHODCALLTYPE RepairLayoutUncommitted() = 0;
-};
+#include "SharedStartModel.h"
 
 MIDL_INTERFACE("7749f118-6f2a-4fb7-b84d-eef688cbd0e6")
 IGroupBoundsChangeNotification : IUnknown
@@ -89,12 +15,6 @@ IGroupBoundsChangeNotification : IUnknown
     virtual HRESULT STDMETHODCALLTYPE GroupBoundsChanged(REFGUID) = 0;
     virtual void STDMETHODCALLTYPE GroupEmptiedPending(REFGUID) = 0;
     virtual void STDMETHODCALLTYPE GroupEmptied() = 0;
-};
-
-MIDL_INTERFACE("aa22a8ff-a704-4ea8-82b5-3c51d9dd3b3c")
-ILayoutHitTest : IUnknown
-{
-    virtual HRESULT STDMETHODCALLTYPE GetGutterHitTarget(REFGUID, const RECT, POINT*) = 0;
 };
 
 MIDL_INTERFACE("6f13ad3b-7bf5-4ba5-b676-87f3ad61ae04")
@@ -162,7 +82,7 @@ public:
     STDMETHODIMP GetItemBounds(REFGUID itemID, RECT* itemBounds) override;
     STDMETHODIMP GetContainerSizeWithMargins(REFGUID containerID, SIZE* size) override;
     STDMETHODIMP GetLastOccupiedCellInColumn(
-        const long column, REFGUID excludedItemID, POINT* occupiedCell, int* columnUnoccupied) override;
+        const long column, REFGUID excludedItemID, POINT* occupiedCell, BOOL* columnUnoccupied) override;
     STDMETHODIMP SetContainerMargins(const RECT containerMargins) override;
     STDMETHODIMP GetContainerMargins(RECT* containerMargins) override;
     STDMETHODIMP SetMaxCellBounds(const int nMaxXBounds, const int nMaxYBounds) override;

@@ -2,21 +2,6 @@
 
 #include "ItemLayoutResolver.h"
 
-enum LayoutNavigationDirection
-{
-    LayoutNavigationDirection_Up = 0x0,
-    LayoutNavigationDirection_Down = 0x1,
-    LayoutNavigationDirection_Left = 0x2,
-    LayoutNavigationDirection_Right = 0x3,
-};
-
-MIDL_INTERFACE("0999ed40-ced2-4849-b435-e8cfc9b8752c")
-ILayoutTraversalOrder : IUnknown
-{
-    virtual HRESULT STDMETHODCALLTYPE GetAdjacent(const LayoutNavigationDirection direction, const POINT startingCell, POINT* endingCell, GUID* itemID) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetFirst(POINT* endingCell, GUID* itemID) = 0;
-};
-
 class CGenericTraversalOrder
     : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::ClassicCom>
         , ILayoutTraversalOrder

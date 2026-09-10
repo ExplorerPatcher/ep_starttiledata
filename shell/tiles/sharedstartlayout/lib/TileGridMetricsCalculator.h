@@ -4,13 +4,6 @@
 
 #include "../../sharedmodel/lib/SharedModelCommon.h"
 
-MIDL_INTERFACE("4839e2d8-ff75-4643-9bc6-435ae7c12501")
-ITileGridMetricsCalculator : IUnknown
-{
-    virtual HRESULT STDMETHODCALLTYPE GetGroupWidthOptions(ULONG*, ULONG, ULONG*, ULONG*, ULONG*, ULONG*) = 0;
-    virtual HRESULT STDMETHODCALLTYPE GetTileSize(const DEVICE_SCALE_FACTOR, const ULONG, float*) = 0;
-};
-
 class TileGridMetricsCalculator final
     : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::ClassicCom>
         , ITileGridMetricsCalculator

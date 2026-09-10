@@ -330,7 +330,7 @@ HRESULT CItemLayoutResolver::GetContainerSizeWithMargins(REFGUID containerID, SI
 }
 
 HRESULT CItemLayoutResolver::GetLastOccupiedCellInColumn(
-    const long column, REFGUID excludedItemID, POINT* occupiedCell, int* columnUnoccupied)
+    const long column, REFGUID excludedItemID, POINT* occupiedCell, BOOL* columnUnoccupied)
 {
     GUID itemID = c_emptyCellValue;
 
