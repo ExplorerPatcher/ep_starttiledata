@@ -173,6 +173,7 @@ inline HRESULT BuildUserSD(PSECURITY_DESCRIPTOR oldSD, PSID userSid, ACCESS_MASK
     RETURN_IF_NTSTATUS_FAILED(RtlAddAce(newDacl.get(), aclRevisionInfo.AclRevision, 0, ace, aclSizeInfo.AclBytesInUse - (4 /*Header*/ + 4 /*Mask*/))); // 78
     RETURN_IF_NTSTATUS_FAILED(RtlAddAccessAllowedAce(newDacl.get(), aclRevisionInfo.AclRevision, flags, userSid)); // 81
     RETURN_IF_NTSTATUS_FAILED(RtlSetDaclSecurityDescriptor(newSD, TRUE, newDacl.get(), 0)); // 83
+    newDacl.release();
 
     return S_OK;
 }
