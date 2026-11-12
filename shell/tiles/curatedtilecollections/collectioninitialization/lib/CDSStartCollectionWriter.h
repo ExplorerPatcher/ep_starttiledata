@@ -11,6 +11,10 @@ namespace CommonStartTelemetry
 class LogAllTilesActivity
 {
 public:
+    // Native copies retain a shared telemetry context; copying these bytes does not.
+    LogAllTilesActivity(const LogAllTilesActivity&) = delete;
+    LogAllTilesActivity& operator=(const LogAllTilesActivity&) = delete;
+
     ~LogAllTilesActivity()
     {
         if (g_pfnLogAllTilesActivity_Dtor)
@@ -84,8 +88,8 @@ private:
     void ClearCollection(std::vector<std::shared_ptr<Internal::LayoutTile>>& removedTiles);
     HRESULT WriteCollection(
         std::shared_ptr<Internal::LayoutRoot> root,
-        std::shared_ptr<TileInitializationHandlerManager> tileInitializationHandlerManager,
-        CommonStartTelemetry::LogAllTilesActivity logAllTilesActivity);
+        std::shared_ptr<TileInitializationHandlerManager> tileInitializationHandlerManager/*,
+        CommonStartTelemetry::LogAllTilesActivity logAllTilesActivity*/);
     void WriteStartGroup(
         const std::shared_ptr<Internal::LayoutGroup>& group,
         const std::shared_ptr<DataStoreCache::CuratedTileCollectionTransformer::CuratedRoot>& transformerRoot);

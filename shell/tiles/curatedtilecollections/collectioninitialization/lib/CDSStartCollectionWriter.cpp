@@ -34,8 +34,10 @@ HRESULT CDSStartCollectionWriter::WriteCollection(
 {
     auto functor = [&]() -> HRESULT
     {
-        CommonStartTelemetry::LogAllTilesActivity activityLocal = activity;
-        return WriteCollection(root, tileInitializationHandlerManager, activityLocal);
+        // @MOD Do not perform copy operations with our opaque LogAllTilesActivity otherwise we'd have a heap
+        //      corruption (#5182). We do not call the original copy constructor.
+        // CommonStartTelemetry::LogAllTilesActivity activityLocal = activity;
+        return WriteCollection(root, tileInitializationHandlerManager/*, activityLocal*/);
     };
 
     HRESULT hr = S_OK;
@@ -145,8 +147,8 @@ void CDSStartCollectionWriter::ClearCollection(std::vector<std::shared_ptr<Inter
 
 HRESULT CDSStartCollectionWriter::WriteCollection(
     std::shared_ptr<Internal::LayoutRoot> root,
-    std::shared_ptr<TileInitializationHandlerManager> tileInitializationHandlerManager,
-    CommonStartTelemetry::LogAllTilesActivity logAllTilesActivity)
+    std::shared_ptr<TileInitializationHandlerManager> tileInitializationHandlerManager/*,
+    CommonStartTelemetry::LogAllTilesActivity logAllTilesActivity*/)
 {
     using namespace DataStoreCache::CuratedTileCollectionTransformer;
     using namespace Internal;
